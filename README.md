@@ -1,13 +1,13 @@
 # GrowAgentAI 🌱
 
-[![GitHub License](https://img.shields.io/github/license/[usuario]/growagentai?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/[usuario]/growagentai?style=social)](https://github.com/[usuario]/growagentai)
-[![GitHub Forks](https://img.shields.io/github/forks/[usuario]/growagentai?style=social)](https://github.com/[usuario]/growagentai)
+[![GitHub License](https://img.shields.io/github/license/hvilleg-dev/GrowAgentAI?style=flat-square)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/hvilleg-dev/GrowAgentAI?style=social)](https://github.com/hvilleg-dev/GrowAgentAI)
+[![GitHub Forks](https://img.shields.io/github/forks/hvilleg-dev/GrowAgentAI?style=social)](https://github.com/hvilleg-dev/GrowAgentAI)
 [![Discord Community](https://img.shields.io/badge/chat-discord-7289da?style=flat-square)](https://discord.gg/growagentai)
 
 **A conversational AI coaching platform with 7-stage GROW methodology goal tracking.**
 
-[**Versión en Español**](docs/README_ES.md)
+**English** | [Español](./docs/README_es.md)
 
 - 🎯 ICF (International Coach Federation) methodology
 - 🌍 Bilingual: Spanish + English
