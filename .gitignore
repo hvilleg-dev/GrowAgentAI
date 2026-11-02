@@ -101,3 +101,11 @@ prisma/migrations/
 generated/
 dist/
 types/
+
+# Internal documentation (private)
+.internal/
+BITACORA_PROYECTO.md
+PLAYBOOK_REPLICABLE.md
+
+# Claude Code local settings
+.claude/
