@@ -1,0 +1,68 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+.npm
+
+# Dependencies
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Tests
+coverage
+.nyc_output
+jest.config.js
+
+# IDE
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+
+# Build
+dist
+build
+out
+.next
+.nuxt
+.cache
+
+# Documentation
+docs
+README.md
+CONTRIBUTING.md
+
+# Docker
+docker-compose*
+Dockerfile.dev
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.circleci
+
+# Temporary
+tmp
+temp
+*.tmp
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Development files
+.editorconfig
+.prettierrc
+.eslintrc*
+tsconfig.json
+jest.config.js
