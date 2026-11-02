@@ -30,11 +30,12 @@
 - [x] `docs/12_TROUBLESHOOTING.md` - Common issues and solutions
 - [x] `docs/13_ROADMAP.md` - Q1-Q4 2026 roadmap, community priorities
 
-### ✅ Community & Governance (5/5)
+### ✅ Community & Governance (6/6)
 - [x] `CONTRIBUTING.md` - Contributing guide, development workflow
 - [x] `CODE_OF_CONDUCT.md` - Community standards and expectations
 - [x] `SECURITY.md` - Security vulnerability reporting, response timeline
-- [x] `LICENSE` - MIT License (permissive, commercial-friendly)
+- [x] `CLA.md` - Contributor License Agreement (IP protection)
+- [x] `LICENSE` - GNU AGPLv3 License (SaaS protection)
 - [x] `legal/` - Legal templates (Privacy, Terms, Cookies, Compliance)
 
 ### ✅ GitHub Configuration (7/7)
@@ -117,12 +118,14 @@
 - [x] Deployment options are explained
 - [x] FAQs answer common questions
 - [x] Troubleshooting guide is thorough
-- [x] License is clear (MIT)
+- [x] License is clear (GNU AGPLv3)
+- [x] CLA is clear (IP protection)
 - [x] GitHub Actions workflows are setup
 - [x] Issue templates guide bug reporting
 
 ### ✅ Open Source Standards
-- [x] MIT License (standard, permissive)
+- [x] GNU AGPLv3 License (protects SaaS business model)
+- [x] CLA (IP protection)
 - [x] Comprehensive documentation
 - [x] Clear contribution guidelines
 - [x] Security vulnerability reporting process
@@ -215,7 +218,8 @@ GrowAgentAI/                          # ← Ready to push
 ├── QUICKSTART.md                    # ✅ 60 seconds
 ├── ARCHITECTURE.md                  # ✅ Quick ref
 ├── CHANGELOG.md                     # ✅ Version history
-├── LICENSE                          # ✅ MIT
+├── CLA.md                           # ✅ Contributor License Agreement
+├── LICENSE                          # ✅ GNU AGPLv3
 ├── CONTRIBUTING.md                  # ✅ Guidelines
 ├── CODE_OF_CONDUCT.md              # ✅ Community rules
 ├── SECURITY.md                      # ✅ Vulnerability reporting

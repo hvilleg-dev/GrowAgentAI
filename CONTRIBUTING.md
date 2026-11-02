@@ -6,6 +6,13 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 We are committed to providing a welcoming and inspiring community for all. Please read and follow our [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
+## Contributor License Agreement
+
+By submitting a PR, you agree to our [CLA.md](CLA.md) terms:
+- You assign IP rights to GrowAgentAI maintainers
+- Your contribution will be under GNU AGPLv3 license
+- You confirm the code is your own and doesn't infringe third-party rights
+
 ## How to Contribute
 
 ### Reporting Bugs
