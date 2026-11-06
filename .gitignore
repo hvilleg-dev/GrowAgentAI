@@ -102,10 +102,53 @@ generated/
 dist/
 types/
 
-# Internal documentation (private)
+# Internal documentation (private - keep local only)
 .internal/
+INTERNAL/
+PRIVATE/
 BITACORA_PROYECTO.md
 PLAYBOOK_REPLICABLE.md
+
+# Session & Development notes (internal use only)
+SESION_*.md
+RESUMEN_*.md
+CHECKPOINT*.md
+UPDATE_*.md
+
+# Planning & roadmap (internal)
+ROADMAP*.md
+IMPLEMENTACION_*.md
+PASO_*.md
+
+# Architecture internals (sensitive)
+ARQUITECTURA_*.md
+RESUMEN_ARQUITECTURA*.md
+ARQUITECTURA_PROVIDER_*.md
+CODE_REVIEW_*.md
+DIAGRAMA_*.md
+
+# Pricing & business (confidential)
+Tabla_Precios*.md
+PRICING*.md
+BUSINESS*.md
+
+# Phase planning (internal)
+FASE_*.md
+
+# Development guides (internal)
+QUICK_START*.md
+README_BUILD*.md
+RELEASE_WORKFLOW.md
+VERCEL_DEPLOYMENT_GUIDE.md
+
+# Setup & configuration guides (internal)
+setup-signing.*
+
+# User-specific development notes
+*.local.md
+notes.md
+TODO.md
+NOTES.md
 
 # Claude Code local settings
 .claude/
