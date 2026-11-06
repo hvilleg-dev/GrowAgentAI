@@ -1,8 +1,10 @@
 import { app, BrowserWindow, Menu, ipcMain } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import path from 'path'
 import isDev from 'electron-is-dev'
 
 let mainWindow: BrowserWindow | null = null
+autoUpdater.checkForUpdatesAndNotify()
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -79,6 +81,20 @@ const createMenu = () => {
 app.on('ready', () => {
   createWindow()
   createMenu()
+
+  // Setup auto-updater
+  autoUpdater.on('update-available', () => {
+    mainWindow?.webContents.send('update-available')
+  })
+
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow?.webContents.send('update-downloaded')
+  })
+
+  // Check for updates every 10 minutes
+  setInterval(() => {
+    autoUpdater.checkForUpdates()
+  }, 10 * 60 * 1000)
 })
 
 app.on('window-all-closed', () => {
@@ -100,4 +116,12 @@ ipcMain.handle('app:version', () => {
 
 ipcMain.handle('app:name', () => {
   return 'GrowAgentAI'
+})
+
+ipcMain.handle('app:restart-install-update', async () => {
+  autoUpdater.quitAndInstall()
+})
+
+ipcMain.handle('app:check-updates', async () => {
+  return await autoUpdater.checkForUpdates()
 })

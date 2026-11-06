@@ -1,0 +1,68 @@
+appId: com.growagentai.app
+productName: GrowAgentAI
+directories:
+  buildResources: resources
+  output: dist
+
+publish:
+  provider: github
+  owner: hvilleg-dev
+  repo: GrowAgentAI
+
+win:
+  target:
+    - nsis
+    - portable
+  certificateFile: ${CSC_LINK}
+  certificatePassword: ${CSC_KEY_PASSWORD}
+  signingHashAlgorithms:
+    - sha256
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: GrowAgentAI
+
+portable:
+  artifactName: ${productName}-${version}.${ext}
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.productivity
+  identity: ${CSC_NAME}
+  certificateFile: ${CSC_LINK}
+  certificatePassword: ${CSC_KEY_PASSWORD}
+  notarize:
+    teamId: ${APPLE_TEAM_ID}
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+      type: file
+      path: /Applications
+    - x: 410
+      y: 220
+      type: link
+
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Office
+  synopsis: AI Coaching Platform
+
+appImage:
+  artifactName: ${productName}-${version}.${ext}
+
+deb:
+  depends:
+    - gconf2
+    - gconf-service
+    - libnotify4
+    - libappindicator1
+  category: Office

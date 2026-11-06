@@ -6,6 +6,10 @@ interface ElectronAPI {
   send: (channel: string, ...args: any[]) => void
   getVersion: () => Promise<string>
   getAppName: () => Promise<string>
+  onUpdateAvailable: (callback: () => void) => void
+  onUpdateDownloaded: (callback: () => void) => void
+  restartAndInstall: () => Promise<void>
+  checkUpdates: () => Promise<any>
 }
 
 const electronAPI: ElectronAPI = {
@@ -15,6 +19,12 @@ const electronAPI: ElectronAPI = {
   send: (channel: string, ...args: any[]) => ipcRenderer.send(channel, ...args),
   getVersion: () => ipcRenderer.invoke('app:version'),
   getAppName: () => ipcRenderer.invoke('app:name'),
+  onUpdateAvailable: (callback: () => void) =>
+    ipcRenderer.on('update-available', callback),
+  onUpdateDownloaded: (callback: () => void) =>
+    ipcRenderer.on('update-downloaded', callback),
+  restartAndInstall: () => ipcRenderer.invoke('app:restart-install-update'),
+  checkUpdates: () => ipcRenderer.invoke('app:check-updates'),
 }
 
 contextBridge.exposeInMainWorld('electron', electronAPI)

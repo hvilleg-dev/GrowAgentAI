@@ -13,6 +13,7 @@ import NotFoundPage from './pages/NotFoundPage'
 // Layout & Components
 import MainLayout from './components/layout/MainLayout'
 import ErrorBoundary from './components/ErrorBoundary'
+import { UpdateNotification } from './components/UpdateNotification'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -28,6 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <ErrorBoundary>
+      <UpdateNotification />
       <Router>
         <Routes>
           {/* Public Routes */}

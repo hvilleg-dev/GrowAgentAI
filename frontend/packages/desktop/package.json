@@ -20,7 +20,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.8.11"
   },
   "devDependencies": {
     "@types/electron": "^1.6.10",
@@ -41,6 +42,11 @@
     ],
     "directories": {
       "buildResources": "resources"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "hvilleg-dev",
+      "repo": "GrowAgentAI"
     },
     "win": {
       "target": [
