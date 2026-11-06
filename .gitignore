@@ -109,6 +109,17 @@ PRIVATE/
 BITACORA_PROYECTO.md
 PLAYBOOK_REPLICABLE.md
 
+# Additional sensitive files
+GITIGNORE_Y_SECRETOS.md
+LIMPIEZA_HISTORIAL_COMPLETADA.md
+RESUMEN_EJECUTIVO_COMPLETO.md
+UX_BEST_PRACTICES_GROWAGENTAI.md
+SECURITY_FINAL_CHECK.md
+"Protocolos para Agente Coach de IA.pdf"
+base_conocimiento_coach.zip
+documentos_legales/
+financiero/
+
 # Session & Development notes (internal use only)
 SESION_*.md
 RESUMEN_*.md
