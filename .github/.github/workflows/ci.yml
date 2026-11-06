@@ -1,0 +1,145 @@
+name: CI - Tests & Lint
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: growagentai_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup database
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/growagentai_test
+        run: |
+          npm run migrate
+          npm run seed
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Run unit tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/growagentai_test
+          NODE_ENV: test
+        run: npm run test:unit -- --coverage
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/growagentai_test
+          NODE_ENV: test
+        run: npm run test:integration
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          fail_ci_if_error: true
+          verbose: true
+
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(cat coverage/coverage-summary.json | grep -o '"lines"[^}]*' | grep -o '[0-9.]*' | head -1)
+          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+            echo "Coverage is below 70%: $COVERAGE%"
+            exit 1
+          fi
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build backend
+        run: npm run build:backend
+
+      - name: Build frontend
+        run: npm run build:frontend
+
+  docker:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend/web
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check types
+        run: npm run type:check
