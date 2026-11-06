@@ -8,6 +8,12 @@ export const schemas = {
     idioma: Joi.string().length(2).default('es')
   }),
 
+  chat: Joi.object({
+    sessionId: Joi.string().uuid().required(),
+    userId: Joi.string().uuid().required(),
+    message: Joi.string().min(1).max(5000).required()
+  }),
+
   sendMessage: Joi.object({
     sesionId: Joi.string().uuid().required(),
     contenido: Joi.string().min(1).max(5000).required(),

@@ -7,12 +7,8 @@ export function createChatRoutes(router: ProviderRouter, crisisDetector: CrisisD
   const chatRouter = Router();
   const chatController = new ChatController(router, crisisDetector);
 
-  chatRouter.post('/:sesionId/message', (req, res, next) =>
-    chatController.sendMessage(req, res, next)
-  );
-
-  chatRouter.get('/:sesionId/messages', (req, res, next) =>
-    chatController.getMessages(req, res, next)
+  chatRouter.post('/', (req, res, next) =>
+    chatController.chat(req, res, next)
   );
 
   return chatRouter;

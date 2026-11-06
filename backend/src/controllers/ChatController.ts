@@ -3,9 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ProviderRouter } from '@/services/ProviderRouter';
 import { CrisisDetector } from '@/services/CrisisDetector';
 import { AppDataSource } from '@/database/db';
-import { Sesion, Mensaje } from '@/database/entities';
+import { Sesion, Mensaje, Usuario } from '@/database/entities';
 import { NotFoundError } from '@/errors/AppError';
-import { validateData, schemas } from '@/utils/validators';
 
 export class ChatController {
   constructor(
@@ -13,40 +12,54 @@ export class ChatController {
     private crisisDetector: CrisisDetector
   ) {}
 
-  async sendMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async chat(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const body: any = await validateData(
-        req.body,
-        schemas.sendMessage
-      );
-      const sesionId = body.sesionId as string;
-      const contenido = body.contenido as string;
+      const { sessionId, userId, message } = req.body;
 
+      if (!sessionId || !userId || !message) {
+        res.status(400).json({
+          error: 'Missing required fields: sessionId, userId, message'
+        });
+        return;
+      }
+
+      const startTime = Date.now();
       const sesionRepo = AppDataSource.getRepository(Sesion);
       const mensajeRepo = AppDataSource.getRepository(Mensaje);
+      const usuarioRepo = AppDataSource.getRepository(Usuario);
 
-      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+      // Verify session exists
+      const sesion = await sesionRepo.findOne({ where: { id: sessionId } });
       if (!sesion) {
         throw new NotFoundError('Sesión');
       }
 
-      const crisisResult = await this.crisisDetector.detectCrisis(contenido);
+      // Verify user exists
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        throw new NotFoundError('Usuario');
+      }
+
+      // Crisis detection
+      const crisisResult = await this.crisisDetector.detectCrisis(message);
       this.crisisDetector.throwIfCrisis(crisisResult);
 
+      // Save user message
       const userMessage = new Mensaje();
       userMessage.id = uuidv4();
-      userMessage.sesionId = sesionId;
+      userMessage.sesionId = sessionId;
       userMessage.rol = 'usuario';
-      userMessage.contenido = contenido;
+      userMessage.contenido = message;
       userMessage.criadoEn = new Date();
-
       await mensajeRepo.save(userMessage);
 
-      const response = await this.router.route(contenido);
+      // Get AI response
+      const response = await this.router.route(message);
 
+      // Save coach message
       const coachMessage = new Mensaje();
       coachMessage.id = uuidv4();
-      coachMessage.sesionId = sesionId;
+      coachMessage.sesionId = sessionId;
       coachMessage.rol = 'coach';
       coachMessage.contenido = response.content;
       coachMessage.proveedor = response.provider;
@@ -54,30 +67,18 @@ export class ChatController {
       coachMessage.tokensSalida = response.tokens.output;
       coachMessage.costo = response.cost;
       coachMessage.criadoEn = new Date();
-
       await mensajeRepo.save(coachMessage);
 
+      const latency = Date.now() - startTime;
+
       res.json({
-        mensaje: response.content,
-        proveedor: response.provider,
-        costo: response.cost
+        response: response.content,
+        provider: response.provider,
+        model: response.model,
+        cost: response.cost,
+        latency: latency,
+        sessionId: sessionId
       });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const { sesionId } = req.params;
-      const mensajeRepo = AppDataSource.getRepository(Mensaje);
-
-      const mensajes = await mensajeRepo.find({
-        where: { sesionId },
-        order: { criadoEn: 'ASC' }
-      });
-
-      res.json(mensajes);
     } catch (error) {
       next(error);
     }

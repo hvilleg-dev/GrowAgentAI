@@ -1,4 +1,4 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
+import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
@@ -83,25 +83,9 @@ app.get('/api', (_req: Request, res: Response) => {
   });
 });
 
-// Routes (will be added after initialization)
-app.use('/api/chat', (req: Request, res: Response, next: NextFunction) => {
-  if (!providerRouter || !crisisDetector) {
-    res.status(503).json({ error: 'Services not ready' });
-    return;
-  }
-  createChatRoutes(providerRouter, crisisDetector)(req, res, next);
-});
+// Routes will be initialized after services are ready (see start() function below)
 
-app.use('/api/sessions', (req: Request, res: Response, next: NextFunction) => {
-  createSessionRoutes()(req, res, next);
-});
-
-// 404 Handler
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: 'Not found' });
-});
-
-// Error Handler
+// Error Handler (before 404 so it catches errors from routes)
 app.use((err: any, _req: Request, res: Response) => {
   logger.error('Error:', err);
 
@@ -118,15 +102,36 @@ app.use((err: any, _req: Request, res: Response) => {
   }
 });
 
+// 404 Handler (last so it catches anything not matched by routes)
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
 // Start Server
 async function start() {
   try {
     await initializeServices();
 
-    app.listen(PORT, () => {
+    // Mount routes BEFORE listen
+    const chatRoutes = createChatRoutes(providerRouter, crisisDetector);
+    const sessionRoutes = createSessionRoutes();
+
+    app.use('/chat', chatRoutes);
+    app.use('/api/sessions', sessionRoutes);
+
+    console.log('[DEBUG] Routes mounted:', {
+      chat: '/chat',
+      sessions: '/api/sessions'
+    });
+
+    const server = app.listen(PORT, () => {
       console.log(`✅ GrowAgentAI Backend running on http://localhost:${PORT}`);
       console.log(`📍 Health check: http://localhost:${PORT}/health`);
+      console.log(`💬 Chat: POST /chat`);
+      console.log(`📋 Sessions: POST /api/sessions`);
     });
+
+    return server;
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);
