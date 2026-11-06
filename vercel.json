@@ -1,0 +1,46 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "public": false,
+  "buildCommand": "cd frontend/packages/web && npm run build",
+  "outputDirectory": "frontend/packages/web/dist",
+  "installCommand": "npm install -g pnpm && pnpm install",
+  "env": {
+    "VITE_API_URL": "@vite_api_url",
+    "VITE_SENTRY_DSN": "@vite_sentry_dsn",
+    "VITE_APP_NAME": "GrowAgentAI",
+    "VITE_APP_VERSION": "2.0.0"
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    },
+    {
+      "source": "/dist/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "frontend/packages/web/.next": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  }
+}
