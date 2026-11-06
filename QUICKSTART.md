@@ -87,20 +87,36 @@ curl http://localhost:3000/health
 
 **Chat Endpoint (POST)**
 ```bash
+# First, create a user and session
+# Then use this endpoint
+
 curl -X POST http://localhost:3000/chat \
   -H "Content-Type: application/json" \
   -d '{
-    "sessionId": "uuid-here",
-    "userId": "uuid-here",
+    "sessionId": "550e8400-e29b-41d4-a716-446655440001",
+    "userId": "550e8400-e29b-41d4-a716-446655440002",
     "message": "How can I achieve my goals?"
   }'
 
 # Response includes:
-# - AI coach response
-# - Provider used (claude or openai)
-# - Model used
-# - Response latency
-# - Cost in USD
+# {
+#   "response": "AI coach response here...",
+#   "provider": "claude",
+#   "model": "claude-3-5-sonnet-20241022",
+#   "cost": 0.0045,
+#   "latency": 1234,
+#   "sessionId": "550e8400-e29b-41d4-a716-446655440001"
+# }
+```
+
+**Create Session (POST)**
+```bash
+curl -X POST http://localhost:3000/api/sessions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "usuarioId": "550e8400-e29b-41d4-a716-446655440002",
+    "objetivo": "Mejorar mi liderazgo y comunicación"
+  }'
 ```
 
 **Health Check (GET)**

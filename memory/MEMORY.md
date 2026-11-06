@@ -1,0 +1,17 @@
+- [Tabla Precios IA](../Tabla_Precios_IA.md) — Nov 2026: 14 modelos, 5+ casos uso, value/$$ análisis
+- [Resumen Arquitectura](../RESUMEN_ARQUITECTURA_FINAL.md) — Claude+OpenAI, Haiku default, Sonnet crisis
+- [Arquitectura Router](../ARQUITECTURA_PROVIDER_ROUTER.md) — Pseudocódigo 9 sections, extensible
+- [Diagramas](../DIAGRAMA_ARQUITECTURA.md) — 8 ASCII flows: routing, crisis, costs, fallback
+- [CODE REVIEW](../CODE_REVIEW_PSEUDOCODIGO.md) — 11 gaps (added: config flexibility), P1/P2/P3 fixes
+- [PASO 2 Setup](../PASO_2_SETUP_REPO.md) — Estructura + config files, flexible (1+ providers)
+- [PASO 3A Types](../PASO_3A_TYPES_CONSTANTS.md) — Tipos + constantes completos (copy-paste ready)
+- [PASO 3B Errors](../PASO_3B_ERRORS_UTILS.md) — Error classes, Winston logger, Joi validator, hash utils
+- [PASO 3C Database](../PASO_3C_DATABASE.md) — TypeORM entities, migrations, repository pattern (9 models)
+- [PASO 3D-3G Impl](../PASO_3D_PROVIDERS_COMPLETE.md) — Providers, router, controllers, tests (condensed)
+- [PASO 4 Deploy](../PASO_4_DEPLOYMENT.md) — Docker, CI/CD, monitoring, security, runbook
+- [Roadmap](../IMPLEMENTACION_ROADMAP.md) — 4 pasos: Review(✅) Setup(✅) Impl(✅) Deploy(✅)
+- [Seguridad](../GITIGNORE_Y_SECRETOS.md) — NO commitear: secrets, API keys, logs, node_modules
+- [GitHub PR](../GITHUB_PR_READY.md) — 8 commits structure, PR title + description, final checklist
+- [Checkpoint](../SESION_FINAL_CHECKPOINT.md) — Sesión completada: PASO 1+2+3A ready (UPDATED)
+- [Sesión Nov 6](SESION_6_NOV_2026.md) — ✅ BLOCKER RESUELTO: POST /chat fixed by reordering middleware. Backend 90% complete, ready for runtime test
+- [Ejecución Fases](ESTADO_EJECUCION_FASES.md) — 4 fases completas (6-8 semanas): Backend→Web→Desktop→Mobile. Timeline Nov 6 - Jan 1, 2027. Todos los planes listos.

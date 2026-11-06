@@ -1,0 +1,16 @@
+{
+  "name": "growagentai",
+  "version": "2.0.0",
+  "description": "GrowAgentAI - AI-powered coaching platform with GROW framework",
+  "private": true,
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "build": "cd backend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "cd backend && npm test",
+    "lint": "cd backend && npm run lint"
+  },
+  "workspaces": [
+    "backend"
+  ]
+}
