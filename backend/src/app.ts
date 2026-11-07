@@ -7,6 +7,7 @@ import { ProviderRouter } from '@/services/ProviderRouter';
 import { CrisisDetector } from '@/services/CrisisDetector';
 import { createChatRoutes } from '@/routes/chat.routes';
 import { createSessionRoutes } from '@/routes/session.routes';
+import { createAuthRoutes } from '@/routes/auth.routes';
 import { AppError } from '@/errors/AppError';
 import logger from '@/utils/logger';
 
@@ -89,13 +90,16 @@ async function start() {
     await initializeServices();
 
     // Mount routes BEFORE error handlers
+    const authRoutes = createAuthRoutes();
     const chatRoutes = createChatRoutes(providerRouter, crisisDetector);
     const sessionRoutes = createSessionRoutes();
 
+    app.use('/auth', authRoutes);
     app.use('/chat', chatRoutes);
     app.use('/api/sessions', sessionRoutes);
 
     console.log('[DEBUG] Routes mounted:', {
+      auth: '/auth',
       chat: '/chat',
       sessions: '/api/sessions'
     });
