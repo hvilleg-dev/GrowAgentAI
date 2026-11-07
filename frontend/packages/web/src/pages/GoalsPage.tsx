@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { apiClient } from '@/services/apiClient'
 import type { RootState } from '@/store'
 import GrowCard from '@/components/goals/GrowCard'
 import GoalsList from '@/components/goals/GoalsList'
@@ -8,55 +10,39 @@ import GoalForm from '@/components/goals/GoalForm'
 export default function GoalsPage() {
   const [showForm, setShowForm] = useState(false)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
-  const [goals, setGoals] = useState([
-    {
-      id: '1',
-      description: 'Improve productivity',
-      status: 'in_progress' as const,
-      goal: 'Complete 3 major projects this quarter',
-      reality: 'Currently completing 1 project per month',
-      options: [
-        'Dedicate 2 hours daily to focused work',
-        'Use Pomodoro technique',
-        'Eliminate distractions during work hours',
-      ],
-      will: 'Start tomorrow with 2-hour deep work blocks',
-      followUp: 'Check progress weekly on Fridays',
+  const { user } = useSelector((state: RootState) => state.auth)
+
+  const { data: goals = [], isLoading, refetch } = useQuery({
+    queryKey: ['goals', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return []
+      const response = await apiClient.get(`/api/goals/usuario/${user.id}`)
+      return response.data
     },
-    {
-      id: '2',
-      description: 'Learn new skill',
-      status: 'not_started' as const,
-      goal: 'Become proficient in machine learning',
-      reality: 'Have basic Python knowledge',
-      options: [
-        'Take online course (Coursera, Udemy)',
-        'Build personal projects',
-        'Join ML community',
-      ],
-      will: 'Enroll in course by end of week',
-      followUp: 'Complete 1 module per week',
+    enabled: !!user?.id,
+  })
+
+  const createGoalMutation = useMutation({
+    mutationFn: async (goalData: any) => {
+      const response = await apiClient.post('/api/goals', {
+        usuarioId: user?.id,
+        description: goalData.description,
+        goal: goalData.goal,
+        reality: goalData.reality,
+        options: [goalData.option1, goalData.option2, goalData.option3],
+        will: goalData.will,
+      })
+      return response.data
     },
-  ])
+    onSuccess: (newGoal) => {
+      refetch()
+      setSelectedGoal(newGoal.id)
+      setShowForm(false)
+    },
+  })
 
   const handleAddGoal = (newGoal: any) => {
-    console.log('handleAddGoal called with:', newGoal)
-    const goal = {
-      id: String(Date.now()),
-      description: newGoal.description,
-      status: 'not_started' as const,
-      goal: newGoal.goal,
-      reality: newGoal.reality,
-      options: [newGoal.option1, newGoal.option2, newGoal.option3],
-      will: newGoal.will,
-      followUp: 'Set follow-up date',
-    }
-    console.log('New goal object:', goal)
-    console.log('Current goals before:', goals)
-    setGoals([goal, ...goals])
-    console.log('Goals state updated')
-    setSelectedGoal(goal.id)
-    setShowForm(false)
+    createGoalMutation.mutate(newGoal)
   }
 
   const selectedGoalData = goals.find((g) => g.id === selectedGoal)
