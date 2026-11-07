@@ -83,4 +83,29 @@ export class ChatController {
       next(error);
     }
   }
+
+  async getHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sessionId } = req.params;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const mensajeRepo = AppDataSource.getRepository(Mensaje);
+
+      // Verify session exists
+      const sesion = await sesionRepo.findOne({ where: { id: sessionId } });
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      // Get all messages for this session
+      const messages = await mensajeRepo.find({
+        where: { sesionId },
+        order: { criadoEn: 'ASC' }
+      });
+
+      res.json(messages);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

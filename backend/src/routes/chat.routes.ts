@@ -11,5 +11,9 @@ export function createChatRoutes(router: ProviderRouter, crisisDetector: CrisisD
     chatController.chat(req, res, next)
   );
 
+  chatRouter.get('/:sessionId', (req, res, next) =>
+    chatController.getHistory(req, res, next)
+  );
+
   return chatRouter;
 }
