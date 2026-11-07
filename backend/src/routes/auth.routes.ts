@@ -11,11 +11,12 @@ export function createAuthRoutes(): Router {
   // Register
   router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { nombre, email, password } = req.body;
+      const { nombre, name, email, password } = req.body;
+      const fullName = nombre || name;
 
-      if (!nombre || !email || !password) {
+      if (!fullName || !email || !password) {
         res.status(400).json({
-          error: 'Missing required fields: nombre, email, password'
+          error: 'Missing required fields: name, email, password'
         });
         return;
       }
@@ -30,7 +31,7 @@ export function createAuthRoutes(): Router {
 
       const usuario = new Usuario();
       usuario.id = uuidv4();
-      usuario.nombre = nombre;
+      usuario.nombre = fullName;
       usuario.email = email;
       usuario.passwordHash = password; // In production, hash this!
       usuario.idioma = 'es';
@@ -39,10 +40,10 @@ export function createAuthRoutes(): Router {
       await usuarioRepo.save(usuario);
 
       res.status(201).json({
-        message: 'User registered successfully',
+        token: 'mock-jwt-token',
         user: {
           id: usuario.id,
-          nombre: usuario.nombre,
+          name: usuario.nombre,
           email: usuario.email
         }
       });
