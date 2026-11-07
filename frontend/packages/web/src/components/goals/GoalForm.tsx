@@ -139,7 +139,7 @@ export default function GoalForm(props: Props) {
       <div className="flex gap-2 justify-end">
         <button
           type="button"
-          onClick={onClose}
+          onClick={props.onClose}
           className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
         >
           Cancel
