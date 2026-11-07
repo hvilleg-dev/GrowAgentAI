@@ -1,19 +1,21 @@
 # Build stage
 FROM node:18-alpine AS builder
 
-WORKDIR /app/frontend/packages/web
+WORKDIR /app
 
-# Copy package files
-COPY frontend/packages/web/package*.json ./
-COPY frontend/package*.json ../../../
+# Copy all package files first
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+COPY frontend/packages/web/package*.json ./frontend/packages/web/
 
-# Install dependencies
-RUN cd ../../../ && npm install --legacy-peer-deps 2>&1 || npm install
+# Install dependencies at root level
+RUN npm install --legacy-peer-deps 2>&1 || npm install
 
 # Copy source code
-COPY frontend/packages/web ./
+COPY frontend/packages/web ./frontend/packages/web
 
 # Build the app
+WORKDIR /app/frontend/packages/web
 RUN npm run build
 
 # Runtime stage
