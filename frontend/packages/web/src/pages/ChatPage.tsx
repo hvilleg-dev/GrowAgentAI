@@ -79,8 +79,8 @@ export default function ChatPage() {
                     : 'bg-white border-gray-200 hover:bg-gray-50'
                 }`}
               >
-                <p className="text-sm font-medium truncate">{session.objetivo || 'Sin objetivo'}</p>
-                <p className="text-xs text-gray-500">Etapa: {session.etapaActual}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{session.objetivo || 'Sin objetivo'}</p>
+                <p className="text-xs text-gray-600">Etapa: {session.etapaActual}</p>
               </div>
             ))
           )}
