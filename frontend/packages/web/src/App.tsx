@@ -31,11 +31,15 @@ function App() {
   const { theme } = useSelector((state: RootState) => state.ui)
 
   useEffect(() => {
+    const html = document.documentElement
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
+      html.classList.add('dark')
+      html.style.colorScheme = 'dark'
     } else {
-      document.documentElement.classList.remove('dark')
+      html.classList.remove('dark')
+      html.style.colorScheme = 'light'
     }
+    console.log('Theme applied:', theme, 'classes:', html.className)
   }, [theme])
 
   return (

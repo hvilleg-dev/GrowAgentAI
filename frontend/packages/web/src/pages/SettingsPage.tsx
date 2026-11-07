@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@tanstack/react-query'
+import QRCode from 'qrcode.react'
 import type { RootState, AppDispatch } from '@/store'
 import { setTheme, setLanguage } from '@/store/slices/uiSlice'
 import type { Theme, Language } from '@/types'
@@ -297,11 +298,14 @@ export default function SettingsPage() {
                   <div className="bg-gray-100 p-4 rounded-lg text-center">
                     <p className="text-sm text-gray-600 mb-2">Scan this QR code with your authenticator app:</p>
                     <div className="bg-white p-4 inline-block border-2 border-gray-300">
-                      <div className="w-48 h-48 bg-white flex items-center justify-center">
-                        <div className="text-6xl">📱</div>
-                      </div>
+                      <QRCode
+                        value={`otpauth://totp/GrowAgentAI:${user?.email}?secret=JBSWY3DPEBLW64TMMQ======&issuer=GrowAgentAI`}
+                        size={192}
+                        level="H"
+                        includeMargin={true}
+                      />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">QR Code (Placeholder)</p>
+                    <p className="text-xs text-gray-500 mt-2">Scan with Google Authenticator, Authy, or Microsoft Authenticator</p>
                   </div>
                   <button
                     onClick={() => {
