@@ -296,11 +296,12 @@ export default function SettingsPage() {
                   </p>
                   <div className="bg-gray-100 p-4 rounded-lg text-center">
                     <p className="text-sm text-gray-600 mb-2">Scan this QR code with your authenticator app:</p>
-                    <div className="bg-white p-4 inline-block">
-                      <div className="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-500">
-                        [QR Code]
+                    <div className="bg-white p-4 inline-block border-2 border-gray-300">
+                      <div className="w-48 h-48 bg-white flex items-center justify-center">
+                        <div className="text-6xl">📱</div>
                       </div>
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">QR Code (Placeholder)</p>
                   </div>
                   <button
                     onClick={() => {
