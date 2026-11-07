@@ -4,13 +4,13 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 const goalSchema = z.object({
-  description: z.string().min(5, 'Description must be at least 5 characters'),
-  goal: z.string().min(10, 'Goal must be at least 10 characters'),
-  reality: z.string().min(10, 'Reality must be at least 10 characters'),
-  option1: z.string().min(5, 'Option required'),
-  option2: z.string().min(5, 'Option required'),
-  option3: z.string().min(5, 'Option required'),
-  will: z.string().min(10, 'Will/Commitment required'),
+  description: z.string().min(1, 'Description required'),
+  goal: z.string().min(1, 'Goal required'),
+  reality: z.string().min(1, 'Reality required'),
+  option1: z.string().min(1, 'Option 1 required'),
+  option2: z.string().min(1, 'Option 2 required'),
+  option3: z.string().min(1, 'Option 3 required'),
+  will: z.string().min(1, 'Will/Commitment required'),
 })
 
 type GoalFormData = z.infer<typeof goalSchema>
@@ -31,14 +31,19 @@ export default function GoalForm({ onClose, onSubmit: onSubmitProp }: Props) {
   })
 
   const onSubmit = async (data: GoalFormData) => {
+    console.log('Form submitted with data:', data)
     setIsSubmitting(true)
     try {
       if (onSubmitProp) {
+        console.log('Calling onSubmitProp with data')
         onSubmitProp(data)
       } else {
         console.log('Goal created:', data)
       }
+      console.log('Closing form')
       onClose()
+    } catch (err) {
+      console.error('Error in onSubmit:', err)
     } finally {
       setIsSubmitting(false)
     }
