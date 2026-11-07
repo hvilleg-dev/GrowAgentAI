@@ -11,6 +11,7 @@ export default function ChatPage() {
   const dispatch = useDispatch<AppDispatch>()
   const { sessions, isLoading: isLoadingSessions, createSession, isCreating } = useSessions()
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const sessionId = currentSession?.id || sessions[0]?.id
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error } = useChat(sessionId || '')
@@ -38,8 +39,11 @@ export default function ChatPage() {
   }
 
   const handleNewSession = () => {
-    const userId = 'current-user' // Get from Redux auth
-    createSession({ usuarioId: userId, title: `Session ${new Date().toLocaleTimeString()}` })
+    if (!user?.id) {
+      alert('You must be logged in to create a session')
+      return
+    }
+    createSession({ usuarioId: user.id, objetivo: `Sesión ${new Date().toLocaleTimeString()}` })
   }
 
   const handleSelectSession = (session: any) => {
