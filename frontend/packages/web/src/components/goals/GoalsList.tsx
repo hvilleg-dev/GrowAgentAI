@@ -18,11 +18,11 @@ const statusConfig = {
 
 export default function GoalsList({ goals, selectedId, onSelect }: Props) {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-lg font-semibold mb-4">Your Goals</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">Your Goals</h2>
       <div className="space-y-2">
         {goals.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">No goals yet</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No goals yet</p>
         ) : (
           goals.map((goal) => (
             <button
@@ -30,11 +30,11 @@ export default function GoalsList({ goals, selectedId, onSelect }: Props) {
               onClick={() => onSelect(goal.id)}
               className={`w-full text-left p-3 rounded-lg transition ${
                 selectedId === goal.id
-                  ? 'bg-indigo-50 border-2 border-indigo-500'
-                  : 'bg-gray-50 border-2 border-gray-200 hover:bg-gray-100'
+                  ? 'bg-indigo-50 dark:bg-indigo-900 border-2 border-indigo-500'
+                  : 'bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
               }`}
             >
-              <p className="font-medium text-sm text-gray-900 truncate">
+              <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
                 {goal.description}
               </p>
               <div className="mt-2">
