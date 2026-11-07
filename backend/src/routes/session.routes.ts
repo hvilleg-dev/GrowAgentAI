@@ -1,23 +1,24 @@
 import { Router } from 'express';
 import { SessionController } from '@/controllers/SessionController';
+import { authMiddleware } from '@/middleware/auth.middleware';
 
 export function createSessionRoutes(): Router {
   const sessionRouter = Router();
   const sessionController = new SessionController();
 
-  sessionRouter.post('/', (req, res, next) =>
+  sessionRouter.post('/', authMiddleware, (req, res, next) =>
     sessionController.create(req, res, next)
   );
 
-  sessionRouter.get('/:sesionId', (req, res, next) =>
+  sessionRouter.get('/:sesionId', authMiddleware, (req, res, next) =>
     sessionController.getSession(req, res, next)
   );
 
-  sessionRouter.get('/usuario/:usuarioId', (req, res, next) =>
+  sessionRouter.get('/usuario/:usuarioId', authMiddleware, (req, res, next) =>
     sessionController.listSessions(req, res, next)
   );
 
-  sessionRouter.post('/:sesionId/end', (req, res, next) =>
+  sessionRouter.post('/:sesionId/end', authMiddleware, (req, res, next) =>
     sessionController.endSession(req, res, next)
   );
 

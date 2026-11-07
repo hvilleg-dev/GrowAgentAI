@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '@/database/db';
 import { Usuario } from '@/database/entities';
 import logger from '@/utils/logger';
+import { generateToken, authMiddleware, AuthRequest } from '@/middleware/auth.middleware';
 
 export function createAuthRoutes(): Router {
   const router = Router();
@@ -39,8 +40,9 @@ export function createAuthRoutes(): Router {
 
       await usuarioRepo.save(usuario);
 
+      const token = generateToken(usuario.id, usuario.email);
       res.status(201).json({
-        token: 'mock-jwt-token',
+        token,
         user: {
           id: usuario.id,
           name: usuario.nombre,
@@ -73,6 +75,7 @@ export function createAuthRoutes(): Router {
         return;
       }
 
+      const token = generateToken(usuario.id, usuario.email);
       res.status(200).json({
         message: 'Login successful',
         user: {
@@ -80,7 +83,7 @@ export function createAuthRoutes(): Router {
           nombre: usuario.nombre,
           email: usuario.email
         },
-        token: 'mock-jwt-token'
+        token
       });
     } catch (error) {
       logger.error('Login error:', error);
@@ -88,8 +91,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Change password
-  router.post('/change-password', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Change password (requires auth)
+  router.post('/change-password', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, currentPassword, newPassword } = req.body;
       if (!userId || !currentPassword || !newPassword) {
@@ -118,8 +121,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Update language
-  router.put('/language', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Update language (requires auth)
+  router.put('/language', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, language } = req.body;
       if (!userId || !language) {
@@ -143,8 +146,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Update theme
-  router.put('/theme', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Update theme (requires auth)
+  router.put('/theme', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, theme } = req.body;
       if (!userId || !theme) {
@@ -168,8 +171,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Enable 2FA
-  router.post('/enable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Enable 2FA (requires auth)
+  router.post('/enable-2fa', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.body;
       if (!userId) {
@@ -198,8 +201,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Disable 2FA
-  router.post('/disable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Disable 2FA (requires auth)
+  router.post('/disable-2fa', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.body;
       if (!userId) {
@@ -224,8 +227,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Get profile
-  router.get('/profile/:userId', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Get profile (requires auth)
+  router.get('/profile/:userId', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.params;
       if (!userId) {
