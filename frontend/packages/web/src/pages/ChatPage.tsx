@@ -91,7 +91,7 @@ export default function ChatPage() {
       <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800 flex justify-between items-center">
-          <h1 className="text-lg font-semibold dark:text-gray-100">
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {currentSession?.objetivo || 'Chat'}
           </h1>
           {crisisLevel && <CrisisIndicator level={crisisLevel} />}
