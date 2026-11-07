@@ -92,13 +92,13 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="h-full bg-gray-50 p-6">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
 
         {/* User Profile Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile</h2>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -126,8 +126,8 @@ export default function SettingsPage() {
         </div>
 
         {/* Preferences Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Preferences</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Preferences</h2>
 
           {/* Theme */}
           <div className="mb-6">
@@ -189,8 +189,8 @@ export default function SettingsPage() {
         </div>
 
         {/* Privacy & Security */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Privacy & Security
           </h2>
           <div className="space-y-4">
@@ -287,8 +287,8 @@ export default function SettingsPage() {
         {/* 2FA Modal */}
         {show2FAModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md p-6">
-              <h2 className="text-2xl font-bold mb-4">Two-Factor Authentication</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md p-6">
+              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">Two-Factor Authentication</h2>
               {!twoFactorEnabled ? (
                 <div className="space-y-4">
                   <p className="text-gray-600">
@@ -350,9 +350,9 @@ export default function SettingsPage() {
         {/* Privacy Policy Modal */}
         {showPrivacyPolicy && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl max-h-[80vh] overflow-y-auto p-6">
-              <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
-              <div className="prose prose-sm space-y-4 text-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl max-h-[80vh] overflow-y-auto p-6">
+              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">Privacy Policy</h2>
+              <div className="prose prose-sm dark:prose-invert space-y-4 text-gray-700 dark:text-gray-300">
                 <section>
                   <h3 className="font-semibold text-lg mb-2">1. Introduction</h3>
                   <p>GrowAgentAI ("we", "us", "our", or "Company") operates the platform. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
