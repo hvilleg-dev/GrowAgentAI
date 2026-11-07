@@ -41,4 +41,34 @@
   .card {
     @apply bg-white rounded-lg shadow border border-gray-200;
   }
+
+  /* Global dark mode styles */
+  html.dark input,
+  html.dark textarea,
+  html.dark select {
+    @apply bg-gray-700 text-gray-100 border-gray-600;
+  }
+
+  html.dark input:disabled,
+  html.dark textarea:disabled,
+  html.dark select:disabled {
+    @apply bg-gray-800 text-gray-400 border-gray-700;
+  }
+
+  html.dark label {
+    @apply text-gray-300;
+  }
+
+  html.dark input::placeholder,
+  html.dark textarea::placeholder {
+    @apply text-gray-500;
+  }
+
+  html.dark .input {
+    @apply bg-gray-700 text-gray-100 border-gray-600 focus:ring-indigo-500;
+  }
+
+  html.dark .card {
+    @apply bg-gray-800 border-gray-700 text-gray-100;
+  }
 }

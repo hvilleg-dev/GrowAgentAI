@@ -51,10 +51,10 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full bg-gray-50 dark:bg-gray-900">
       {/* Sidebar - Sessions List */}
-      <div className="w-64 border-r border-gray-200 bg-gray-50 p-4 flex flex-col">
-        <h2 className="text-lg font-semibold mb-4">Sessions</h2>
+      <div className="w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 flex flex-col">
+        <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">Sessions</h2>
         <button
           onClick={handleNewSession}
           disabled={isCreating}
@@ -65,9 +65,9 @@ export default function ChatPage() {
 
         <div className="space-y-2 flex-1 overflow-y-auto">
           {isLoadingSessions ? (
-            <p className="text-sm text-gray-500">Loading sessions...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Loading sessions...</p>
           ) : sessions.length === 0 ? (
-            <p className="text-sm text-gray-500">No sessions yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">No sessions yet</p>
           ) : (
             sessions.map((session) => (
               <div
@@ -88,17 +88,17 @@ export default function ChatPage() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <div className="border-b border-gray-200 p-4 bg-white flex justify-between items-center">
-          <h1 className="text-lg font-semibold">
+        <div className="border-b border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800 flex justify-between items-center">
+          <h1 className="text-lg font-semibold dark:text-gray-100">
             {currentSession?.objetivo || 'Chat'}
           </h1>
           {crisisLevel && <CrisisIndicator level={crisisLevel} />}
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
           {!sessionId ? (
             <div className="text-center text-gray-500 py-8">
               <p>Create or select a session to start chatting</p>
@@ -124,7 +124,7 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-gray-200 p-4 bg-white">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
           {error && (
             <div className="bg-red-50 text-red-700 text-sm p-2 rounded mb-2">
               Error sending message. Please try again.

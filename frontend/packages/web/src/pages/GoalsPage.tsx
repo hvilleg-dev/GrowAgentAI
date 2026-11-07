@@ -48,11 +48,11 @@ export default function GoalsPage() {
   const selectedGoalData = goals.find((g) => g.id === selectedGoal)
 
   return (
-    <div className="h-full bg-gray-50 p-6">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Goals & Growth</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Goals & Growth</h1>
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
@@ -63,7 +63,7 @@ export default function GoalsPage() {
 
         {/* New Goal Form */}
         {showForm && (
-          <div className="mb-6 bg-white rounded-lg shadow p-6">
+          <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <GoalForm onClose={() => setShowForm(false)} onSubmit={handleAddGoal} />
           </div>
         )}
