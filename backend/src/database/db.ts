@@ -6,7 +6,8 @@ import {
   Incrustacion,
   AlertaCrisis,
   CostePorProveedor,
-  ConfiguracionSistema
+  ConfiguracionSistema,
+  Goal
 } from './entities';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -21,7 +22,8 @@ export const AppDataSource = new DataSource({
     Incrustacion,
     AlertaCrisis,
     CostePorProveedor,
-    ConfiguracionSistema
+    ConfiguracionSistema,
+    Goal
   ],
   migrations: ['dist/database/migrations/*.js'],
   migrationsTableName: 'migraciones_typeorm',
