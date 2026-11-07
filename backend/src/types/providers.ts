@@ -1,12 +1,7 @@
 export interface ILLMProvider {
   name: 'claude' | 'openai';
   getCompletion(prompt: string, context?: string): Promise<string>;
-  getCompletionWithUsage?(prompt: string, context?: string): Promise<{
-    content: string;
-    tokensInput: number;
-    tokensOutput: number;
-    costo: number;
-  }>;
+  estimateCost(inputTokens: number, outputTokens: number): number;
 }
 
 export interface ProviderConfig {
@@ -21,16 +16,19 @@ export interface RouterConfig {
   fallbackOrder?: string[];
   enableCostTracking?: boolean;
   maxRetries?: number;
+  costLimit?: number;
 }
 
 export interface LLMResponse {
   provider: string;
   content: string;
   model: string;
-  tokensInput?: number;
-  tokensOutput?: number;
-  costo?: number;
-  timestamp: Date;
+  tokens: {
+    input: number;
+    output: number;
+  };
+  cost: number;
+  timestamp?: Date;
 }
 
 export interface CrisisDetectionRequest {
