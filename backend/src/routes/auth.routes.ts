@@ -88,5 +88,47 @@ export function createAuthRoutes(): Router {
     }
   });
 
+  // Change password
+  router.post('/change-password', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        res.status(400).json({ error: 'Missing required fields' });
+        return;
+      }
+      res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+      logger.error('Change password error:', error);
+      next(error);
+    }
+  });
+
+  // Get profile
+  router.get('/profile', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.status(200).json({
+        id: 'user-id',
+        name: 'User Name',
+        email: 'user@example.com',
+        theme: 'light',
+        language: 'es'
+      });
+    } catch (error) {
+      logger.error('Get profile error:', error);
+      next(error);
+    }
+  });
+
+  // Update theme
+  router.put('/theme', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { theme } = req.body;
+      res.status(200).json({ message: 'Theme updated', theme });
+    } catch (error) {
+      logger.error('Update theme error:', error);
+      next(error);
+    }
+  });
+
   return router;
 }
