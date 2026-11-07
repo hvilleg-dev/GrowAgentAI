@@ -3,18 +3,14 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy all package files first
+# Copy all package files
 COPY package*.json ./
-COPY frontend/package*.json ./frontend/
-COPY frontend/packages/web/package*.json ./frontend/packages/web/
+COPY frontend ./frontend
 
-# Install dependencies at root level
-RUN npm install --legacy-peer-deps 2>&1 || npm install
+# Install all dependencies including workspaces
+RUN npm install --legacy-peer-deps --workspace=frontend/packages/web 2>&1 || npm install
 
-# Copy source code
-COPY frontend/packages/web ./frontend/packages/web
-
-# Build the app
+# Build the web frontend
 WORKDIR /app/frontend/packages/web
 RUN npm run build
 
