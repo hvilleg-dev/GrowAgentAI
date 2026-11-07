@@ -79,8 +79,8 @@ export default function ChatPage() {
                     : 'bg-white border-gray-200 hover:bg-gray-50'
                 }`}
               >
-                <p className="text-sm font-medium truncate">{session.title || 'Untitled'}</p>
-                <p className="text-xs text-gray-500">{session.messageCount} messages</p>
+                <p className="text-sm font-medium truncate">{session.objetivo || 'Sin objetivo'}</p>
+                <p className="text-xs text-gray-500">Etapa: {session.etapaActual}</p>
               </div>
             ))
           )}
@@ -92,7 +92,7 @@ export default function ChatPage() {
         {/* Header */}
         <div className="border-b border-gray-200 p-4 bg-white flex justify-between items-center">
           <h1 className="text-lg font-semibold">
-            {currentSession?.title || 'Chat'}
+            {currentSession?.objetivo || 'Chat'}
           </h1>
           {crisisLevel && <CrisisIndicator level={crisisLevel} />}
         </div>

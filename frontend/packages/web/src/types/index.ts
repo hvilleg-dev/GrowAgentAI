@@ -15,13 +15,18 @@ export interface AuthResponse {
 // Session Types
 export interface Session {
   id: string
-  userId: string
-  title?: string
-  status: 'active' | 'ended' | 'archived'
-  startedAt: string
-  endedAt?: string
-  messageCount: number
-  crisisLevel?: 'critico' | 'alto' | 'medio' | 'bajo' | 'ninguno'
+  usuarioId: string
+  objetivo?: string
+  etapaActual: string
+  realidad?: string
+  opciones?: string[]
+  voluntad?: string
+  resumen?: string
+  reflexion?: string
+  planAccion?: string
+  criadaEn: string
+  actualizadaEn: string
+  finalizadaEn?: string
 }
 
 export interface CreateSessionRequest {
