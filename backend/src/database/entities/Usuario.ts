@@ -33,8 +33,17 @@ export class Usuario {
   @Column({ default: 'es', length: 2 })
   idioma: string;
 
+  @Column({ default: 'light', length: 10 })
+  tema: string;
+
   @Column({ default: true })
   activo: boolean;
+
+  @Column({ default: false })
+  twoFactorEnabled: boolean;
+
+  @Column({ nullable: true })
+  twoFactorSecret?: string;
 
   @CreateDateColumn()
   criadoEn: Date;

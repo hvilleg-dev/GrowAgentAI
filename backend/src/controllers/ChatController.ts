@@ -99,7 +99,7 @@ export class ChatController {
 
       // Get all messages for this session
       const messages = await mensajeRepo.find({
-        where: { sesionId },
+        where: { sesionId: sessionId },
         order: { criadoEn: 'ASC' }
       });
 

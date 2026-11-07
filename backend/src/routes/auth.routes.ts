@@ -91,11 +91,26 @@ export function createAuthRoutes(): Router {
   // Change password
   router.post('/change-password', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { currentPassword, newPassword } = req.body;
-      if (!currentPassword || !newPassword) {
-        res.status(400).json({ error: 'Missing required fields' });
+      const { userId, currentPassword, newPassword } = req.body;
+      if (!userId || !currentPassword || !newPassword) {
+        res.status(400).json({ error: 'Missing required fields: userId, currentPassword, newPassword' });
         return;
       }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      if (usuario.passwordHash !== currentPassword) {
+        res.status(401).json({ error: 'Current password is incorrect' });
+        return;
+      }
+
+      usuario.passwordHash = newPassword;
+      await usuarioRepo.save(usuario);
+
       res.status(200).json({ message: 'Password changed successfully' });
     } catch (error) {
       logger.error('Change password error:', error);
@@ -103,18 +118,27 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Get profile
-  router.get('/profile', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // Update language
+  router.put('/language', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      res.status(200).json({
-        id: 'user-id',
-        name: 'User Name',
-        email: 'user@example.com',
-        theme: 'light',
-        language: 'es'
-      });
+      const { userId, language } = req.body;
+      if (!userId || !language) {
+        res.status(400).json({ error: 'Missing required fields: userId, language' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      usuario.idioma = language;
+      await usuarioRepo.save(usuario);
+
+      res.status(200).json({ message: 'Language updated', language });
     } catch (error) {
-      logger.error('Get profile error:', error);
+      logger.error('Update language error:', error);
       next(error);
     }
   });
@@ -122,10 +146,109 @@ export function createAuthRoutes(): Router {
   // Update theme
   router.put('/theme', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { theme } = req.body;
+      const { userId, theme } = req.body;
+      if (!userId || !theme) {
+        res.status(400).json({ error: 'Missing required fields: userId, theme' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      usuario.tema = theme;
+      await usuarioRepo.save(usuario);
+
       res.status(200).json({ message: 'Theme updated', theme });
     } catch (error) {
       logger.error('Update theme error:', error);
+      next(error);
+    }
+  });
+
+  // Enable 2FA
+  router.post('/enable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        res.status(400).json({ error: 'Missing required field: userId' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      usuario.twoFactorEnabled = true;
+      usuario.twoFactorSecret = 'mock-2fa-secret-' + Date.now();
+      await usuarioRepo.save(usuario);
+
+      res.status(200).json({
+        message: '2FA enabled',
+        qrCode: 'mock-qr-code',
+        secret: usuario.twoFactorSecret
+      });
+    } catch (error) {
+      logger.error('Enable 2FA error:', error);
+      next(error);
+    }
+  });
+
+  // Disable 2FA
+  router.post('/disable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        res.status(400).json({ error: 'Missing required field: userId' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      usuario.twoFactorEnabled = false;
+      usuario.twoFactorSecret = null;
+      await usuarioRepo.save(usuario);
+
+      res.status(200).json({ message: '2FA disabled' });
+    } catch (error) {
+      logger.error('Disable 2FA error:', error);
+      next(error);
+    }
+  });
+
+  // Get profile
+  router.get('/profile/:userId', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId } = req.params;
+      if (!userId) {
+        res.status(400).json({ error: 'Missing required field: userId' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      res.status(200).json({
+        id: usuario.id,
+        name: usuario.nombre,
+        email: usuario.email,
+        theme: usuario.tema || 'light',
+        language: usuario.idioma || 'es',
+        twoFactorEnabled: usuario.twoFactorEnabled
+      });
+    } catch (error) {
+      logger.error('Get profile error:', error);
       next(error);
     }
   });
