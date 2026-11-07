@@ -8,13 +8,11 @@ import GoalForm from '@/components/goals/GoalForm'
 export default function GoalsPage() {
   const [showForm, setShowForm] = useState(false)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
-
-  // Mock data - will be replaced with React Query
-  const goals = [
+  const [goals, setGoals] = useState([
     {
       id: '1',
       description: 'Improve productivity',
-      status: 'in_progress',
+      status: 'in_progress' as const,
       goal: 'Complete 3 major projects this quarter',
       reality: 'Currently completing 1 project per month',
       options: [
@@ -28,7 +26,7 @@ export default function GoalsPage() {
     {
       id: '2',
       description: 'Learn new skill',
-      status: 'not_started',
+      status: 'not_started' as const,
       goal: 'Become proficient in machine learning',
       reality: 'Have basic Python knowledge',
       options: [
@@ -39,7 +37,23 @@ export default function GoalsPage() {
       will: 'Enroll in course by end of week',
       followUp: 'Complete 1 module per week',
     },
-  ]
+  ])
+
+  const handleAddGoal = (newGoal: any) => {
+    const goal = {
+      id: String(Date.now()),
+      description: newGoal.description,
+      status: 'not_started' as const,
+      goal: newGoal.goal,
+      reality: newGoal.reality,
+      options: [newGoal.option1, newGoal.option2, newGoal.option3],
+      will: newGoal.will,
+      followUp: 'Set follow-up date',
+    }
+    setGoals([goal, ...goals])
+    setSelectedGoal(goal.id)
+    setShowForm(false)
+  }
 
   const selectedGoalData = goals.find((g) => g.id === selectedGoal)
 
@@ -60,7 +74,7 @@ export default function GoalsPage() {
         {/* New Goal Form */}
         {showForm && (
           <div className="mb-6 bg-white rounded-lg shadow p-6">
-            <GoalForm onClose={() => setShowForm(false)} />
+            <GoalForm onClose={() => setShowForm(false)} onSubmit={handleAddGoal} />
           </div>
         )}
 

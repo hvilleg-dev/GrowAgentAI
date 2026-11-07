@@ -17,9 +17,10 @@ type GoalFormData = z.infer<typeof goalSchema>
 
 interface Props {
   onClose: () => void
+  onSubmit?: (data: GoalFormData) => void
 }
 
-export default function GoalForm({ onClose }: Props) {
+export default function GoalForm({ onClose, onSubmit: onSubmitProp }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const {
     register,
@@ -32,8 +33,11 @@ export default function GoalForm({ onClose }: Props) {
   const onSubmit = async (data: GoalFormData) => {
     setIsSubmitting(true)
     try {
-      // TODO: Send to API
-      console.log('Goal created:', data)
+      if (onSubmitProp) {
+        onSubmitProp(data)
+      } else {
+        console.log('Goal created:', data)
+      }
       onClose()
     } finally {
       setIsSubmitting(false)
