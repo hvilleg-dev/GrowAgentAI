@@ -22,7 +22,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', {
+      const response = await apiClient.post<AuthResponse>('/api/auth/login', {
         email,
         password,
       })
@@ -42,7 +42,7 @@ export const register = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/register', {
+      const response = await apiClient.post<AuthResponse>('/api/auth/register', {
         email,
         password,
         name,

@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const updateThemeMutation = useMutation({
     mutationFn: async (newTheme: Theme) => {
       if (!user?.id) throw new Error('No user ID')
-      await apiClient.put('/auth/theme', { userId: user.id, theme: newTheme })
+      await apiClient.put('/api/auth/theme', { userId: user.id, theme: newTheme })
       return newTheme
     },
     onSuccess: (newTheme) => {
@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const updateLanguageMutation = useMutation({
     mutationFn: async (newLang: Language) => {
       if (!user?.id) throw new Error('No user ID')
-      await apiClient.put('/auth/language', { userId: user.id, language: newLang })
+      await apiClient.put('/api/auth/language', { userId: user.id, language: newLang })
       return newLang
     },
     onSuccess: (newLang) => {
@@ -58,7 +58,7 @@ export default function SettingsPage() {
       if (newPassword !== confirmPassword) {
         throw new Error('Passwords do not match')
       }
-      await apiClient.post('/auth/change-password', {
+      await apiClient.post('/api/auth/change-password', {
         userId: user.id,
         currentPassword,
         newPassword

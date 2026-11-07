@@ -96,14 +96,14 @@ async function start() {
     const sessionRoutes = createSessionRoutes();
     const goalRoutes = createGoalRoutes();
 
-    app.use('/auth', authRoutes);
-    app.use('/chat', chatRoutes);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/chat', chatRoutes);
     app.use('/api/sessions', sessionRoutes);
     app.use('/api/goals', goalRoutes);
 
     console.log('[DEBUG] Routes mounted:', {
-      auth: '/auth',
-      chat: '/chat',
+      auth: '/api/auth',
+      chat: '/api/chat',
       sessions: '/api/sessions',
       goals: '/api/goals'
     });

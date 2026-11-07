@@ -16,7 +16,7 @@ export function useChat(sessionId: string) {
     queryFn: async () => {
       try {
         const response = await apiClient.get<Message[]>(
-          `/chat/${sessionId}`,
+          `/api/chat/${sessionId}`,
         )
         return response.data
       } catch (error) {
