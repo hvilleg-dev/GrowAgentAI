@@ -8,6 +8,7 @@ import type { ChatRequest, ChatResponse, Message } from '@/types'
 export function useChat(sessionId: string) {
   const dispatch = useDispatch<AppDispatch>()
   const { messages, crisisLevel } = useSelector((state: RootState) => state.chat)
+  const { user } = useSelector((state: RootState) => state.auth)
 
   // Load chat history
   const { data: chatHistory = [], isLoading: isLoadingHistory } = useQuery({
@@ -30,7 +31,7 @@ export function useChat(sessionId: string) {
     mutationFn: async (message: string) => {
       const request: ChatRequest = {
         sessionId,
-        userId: 'current-user', // Get from Redux auth
+        userId: user?.id || '',
         message,
       }
       const response = await apiClient.post<ChatResponse>('/api/chat', request)
