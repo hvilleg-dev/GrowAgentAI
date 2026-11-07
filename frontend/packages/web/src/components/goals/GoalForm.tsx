@@ -20,8 +20,9 @@ interface Props {
   onSubmit?: (data: GoalFormData) => void
 }
 
-export default function GoalForm({ onClose, onSubmit: onSubmitProp }: Props) {
+export default function GoalForm(props: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  console.log('GoalForm rendered, onSubmit:', props.onSubmit ? 'exists' : 'undefined')
   const {
     register,
     handleSubmit,
@@ -34,14 +35,14 @@ export default function GoalForm({ onClose, onSubmit: onSubmitProp }: Props) {
     console.log('Form submitted with data:', data)
     setIsSubmitting(true)
     try {
-      if (onSubmitProp) {
-        console.log('Calling onSubmitProp with data')
-        onSubmitProp(data)
+      if (props.onSubmit) {
+        console.log('Calling props.onSubmit with data')
+        props.onSubmit(data)
       } else {
         console.log('Goal created:', data)
       }
       console.log('Closing form')
-      onClose()
+      props.onClose()
     } catch (err) {
       console.error('Error in onSubmit:', err)
     } finally {

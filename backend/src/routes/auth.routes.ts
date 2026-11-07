@@ -104,7 +104,7 @@ export function createAuthRoutes(): Router {
   });
 
   // Get profile
-  router.get('/profile', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  router.get('/profile', async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200).json({
         id: 'user-id',

@@ -8,6 +8,7 @@ import { CrisisDetector } from '@/services/CrisisDetector';
 import { createChatRoutes } from '@/routes/chat.routes';
 import { createSessionRoutes } from '@/routes/session.routes';
 import { createAuthRoutes } from '@/routes/auth.routes';
+import { createGoalRoutes } from '@/routes/goal.routes';
 import { AppError } from '@/errors/AppError';
 import logger from '@/utils/logger';
 
@@ -93,15 +94,18 @@ async function start() {
     const authRoutes = createAuthRoutes();
     const chatRoutes = createChatRoutes(providerRouter, crisisDetector);
     const sessionRoutes = createSessionRoutes();
+    const goalRoutes = createGoalRoutes();
 
     app.use('/auth', authRoutes);
     app.use('/chat', chatRoutes);
     app.use('/api/sessions', sessionRoutes);
+    app.use('/api/goals', goalRoutes);
 
     console.log('[DEBUG] Routes mounted:', {
       auth: '/auth',
       chat: '/chat',
-      sessions: '/api/sessions'
+      sessions: '/api/sessions',
+      goals: '/api/goals'
     });
 
     // Error Handler (after routes so it catches errors from routes)

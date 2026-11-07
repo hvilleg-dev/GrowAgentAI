@@ -5,3 +5,4 @@ export { Incrustacion } from './Incrustacion';
 export { AlertaCrisis } from './AlertaCrisis';
 export { CostePorProveedor } from './CostePorProveedor';
 export { ConfiguracionSistema } from './ConfiguracionSistema';
+export { Goal } from './Goal';

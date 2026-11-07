@@ -40,6 +40,7 @@ export default function GoalsPage() {
   ])
 
   const handleAddGoal = (newGoal: any) => {
+    console.log('handleAddGoal called with:', newGoal)
     const goal = {
       id: String(Date.now()),
       description: newGoal.description,
@@ -50,7 +51,10 @@ export default function GoalsPage() {
       will: newGoal.will,
       followUp: 'Set follow-up date',
     }
+    console.log('New goal object:', goal)
+    console.log('Current goals before:', goals)
     setGoals([goal, ...goals])
+    console.log('Goals state updated')
     setSelectedGoal(goal.id)
     setShowForm(false)
   }

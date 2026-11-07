@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Sesion } from './Sesion';
 import { AlertaCrisis } from './AlertaCrisis';
+import { Goal } from './Goal';
 
 @Entity('usuarios')
 export class Usuario {
@@ -46,4 +47,7 @@ export class Usuario {
 
   @OneToMany(() => AlertaCrisis, alerta => alerta.usuario)
   alertas: AlertaCrisis[];
+
+  @OneToMany(() => Goal, goal => goal.usuario)
+  goals: Goal[];
 }
