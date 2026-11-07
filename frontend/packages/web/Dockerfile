@@ -1,17 +1,18 @@
 # Build stage
 FROM node:18-alpine AS builder
 
-WORKDIR /app
+WORKDIR /app/frontend/packages/web
 
-# Copy all package files
-COPY package*.json ./
-COPY frontend ./frontend
+# Copy package files
+COPY frontend/packages/web/package*.json ./
 
-# Install all dependencies including workspaces
-RUN npm install --legacy-peer-deps --workspace=frontend/packages/web 2>&1 || npm install
+# Install dependencies
+RUN npm install --legacy-peer-deps 2>&1 || npm install
+
+# Copy source code
+COPY frontend/packages/web ./
 
 # Build the web frontend
-WORKDIR /app/frontend/packages/web
 RUN npm run build
 
 # Runtime stage
