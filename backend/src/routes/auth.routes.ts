@@ -2,7 +2,6 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '@/database/db';
 import { Usuario } from '@/database/entities';
-import { AppError } from '@/errors/AppError';
 import logger from '@/utils/logger';
 
 export function createAuthRoutes(): Router {
@@ -10,21 +9,23 @@ export function createAuthRoutes(): Router {
   const usuarioRepo = AppDataSource.getRepository(Usuario);
 
   // Register
-  router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { nombre, email, password } = req.body;
 
       if (!nombre || !email || !password) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Missing required fields: nombre, email, password'
         });
+        return;
       }
 
       const existingUser = await usuarioRepo.findOne({ where: { email } });
       if (existingUser) {
-        return res.status(409).json({
+        res.status(409).json({
           error: 'Email already exists'
         });
+        return;
       }
 
       const usuario = new Usuario();
@@ -52,21 +53,23 @@ export function createAuthRoutes(): Router {
   });
 
   // Login
-  router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/login', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Missing required fields: email, password'
         });
+        return;
       }
 
       const usuario = await usuarioRepo.findOne({ where: { email } });
       if (!usuario || usuario.passwordHash !== password) {
-        return res.status(401).json({
+        res.status(401).json({
           error: 'Invalid credentials'
         });
+        return;
       }
 
       res.status(200).json({
