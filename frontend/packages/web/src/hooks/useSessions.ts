@@ -1,20 +1,23 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { apiClient } from '@/services/apiClient'
 import { setSessions, addSession, setCurrentSession } from '@/store/slices/sessionsSlice'
-import type { AppDispatch } from '@/store'
+import type { AppDispatch, RootState } from '@/store'
 import type { Session, CreateSessionRequest } from '@/types'
 
 export function useSessions() {
   const dispatch = useDispatch<AppDispatch>()
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ['sessions'],
+    queryKey: ['sessions', user?.id],
     queryFn: async () => {
-      const response = await apiClient.get<Session[]>('/api/sessions')
+      if (!user?.id) return []
+      const response = await apiClient.get<Session[]>(`/api/sessions/usuario/${user.id}`)
       dispatch(setSessions(response.data))
       return response.data
     },
+    enabled: !!user?.id,
   })
 
   const createSessionMutation = useMutation({
