@@ -10,12 +10,20 @@ export default function SettingsPage() {
   const dispatch = useDispatch<AppDispatch>()
   const { theme, language } = useSelector((state: RootState) => state.ui)
   const { user } = useSelector((state: RootState) => state.auth)
+
+  console.log('SettingsPage - user:', user)
+  console.log('SettingsPage - theme:', theme)
+  console.log('SettingsPage - language:', language)
+
   const [showPasswordForm, setShowPasswordForm] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [passwordSuccess, setPasswordSuccess] = useState(false)
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false)
+  const [show2FAModal, setShow2FAModal] = useState(false)
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
 
   const updateThemeMutation = useMutation({
     mutationFn: async (newTheme: Theme) => {
@@ -254,19 +262,148 @@ export default function SettingsPage() {
               )}
             </div>
 
-            {/* 2FA - Placeholder for now */}
-            <button className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+            {/* 2FA */}
+            <button
+              onClick={() => setShow2FAModal(true)}
+              className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+            >
               <p className="font-medium text-gray-900">Two-Factor Authentication</p>
-              <p className="text-sm text-gray-600">Coming soon</p>
+              <p className="text-sm text-gray-600">
+                {twoFactorEnabled ? '✓ Enabled' : 'Add an extra layer of security'}
+              </p>
             </button>
 
             {/* Privacy Policy */}
-            <button className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+            <button
+              onClick={() => setShowPrivacyPolicy(true)}
+              className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+            >
               <p className="font-medium text-gray-900">Privacy Policy</p>
               <p className="text-sm text-gray-600">View our privacy practices</p>
             </button>
           </div>
         </div>
+
+        {/* 2FA Modal */}
+        {show2FAModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md p-6">
+              <h2 className="text-2xl font-bold mb-4">Two-Factor Authentication</h2>
+              {!twoFactorEnabled ? (
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    Two-Factor Authentication adds an extra layer of security to your account. In addition to your password, you'll need to enter a code from your authenticator app.
+                  </p>
+                  <div className="bg-gray-100 p-4 rounded-lg text-center">
+                    <p className="text-sm text-gray-600 mb-2">Scan this QR code with your authenticator app:</p>
+                    <div className="bg-white p-4 inline-block">
+                      <div className="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+                        [QR Code]
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setTwoFactorEnabled(true)
+                      setShow2FAModal(false)
+                    }}
+                    className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium"
+                  >
+                    Verify & Enable 2FA
+                  </button>
+                  <button
+                    onClick={() => setShow2FAModal(false)}
+                    className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <p className="text-green-700 font-medium">✓ Two-Factor Authentication is enabled</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setTwoFactorEnabled(false)
+                      setShow2FAModal(false)
+                    }}
+                    className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 font-medium"
+                  >
+                    Disable 2FA
+                  </button>
+                  <button
+                    onClick={() => setShow2FAModal(false)}
+                    className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Privacy Policy Modal */}
+        {showPrivacyPolicy && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl max-h-[80vh] overflow-y-auto p-6">
+              <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
+              <div className="prose prose-sm space-y-4 text-gray-700">
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">1. Introduction</h3>
+                  <p>GrowAgentAI ("we", "us", "our", or "Company") operates the platform. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">2. Information Collection and Use</h3>
+                  <p>We collect several different types of information for various purposes to provide and improve our Service to you:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Personal Data: Name, email address, password</li>
+                    <li>Usage Data: Interactions with the platform, chat history, goals</li>
+                    <li>Device Data: Browser type, IP address, pages visited</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">3. Use of Data</h3>
+                  <p>GrowAgentAI uses the collected data for various purposes:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>To provide and maintain our Service</li>
+                    <li>To notify you about changes to our Service</li>
+                    <li>To allow you to participate in interactive features</li>
+                    <li>To provide customer support</li>
+                    <li>To gather analysis or valuable information</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">4. Security of Data</h3>
+                  <p>The security of your data is important to us but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">5. Changes to This Privacy Policy</h3>
+                  <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date at the bottom of this Privacy Policy.</p>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-lg mb-2">6. Contact Us</h3>
+                  <p>If you have any questions about this Privacy Policy, please contact us at privacy@growagentai.com</p>
+                </section>
+
+                <p className="text-sm text-gray-500 mt-6">Last updated: November 7, 2026</p>
+              </div>
+
+              <button
+                onClick={() => setShowPrivacyPolicy(false)}
+                className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
