@@ -1,87 +1,70 @@
 version: '3.8'
 
 services:
-  database:
-    image: pgvector/pgvector:pg16
-    environment:
-      POSTGRES_USER: growagentai_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_change_this}
-      POSTGRES_DB: growagentai
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U growagentai_user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - growagentai_network
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - growagentai_network
-
+  # GrowAgentAI Backend
   backend:
-    build: .
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      DATABASE_URL: postgresql://growagentai_user:${DB_PASSWORD:-secure_password_change_this}@database:5432/growagentai
-      REDIS_URL: redis://redis:6379/0
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      PORT: ${PORT:-3000}
-      API_PORT: ${API_PORT:-3001}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-    ports:
-      - "3000:3000"
-      - "3001:3001"
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - growagentai_network
-
-  frontend:
     build:
       context: .
-      dockerfile: frontend/packages/web/Dockerfile
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      dockerfile: backend/Dockerfile
+    container_name: growagentai-backend
     ports:
-      - "5173:5173"
-    depends_on:
-      backend:
-        condition: service_healthy
+      - "3001:3001"
+    environment:
+      # Database
+      DATABASE_URL: ${DATABASE_URL}
+
+      # API Keys
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+      # GitHub OAuth
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      GITHUB_REDIRECT_URI: ${GITHUB_REDIRECT_URI}
+
+      # Frontend
+      FRONTEND_URL: ${FRONTEND_URL}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+
+      # App Config
+      NODE_ENV: production
+      PORT: 3001
+      LOG_LEVEL: info
+
+      # Sentry (optional)
+      SENTRY_DSN: ${SENTRY_DSN:-}
+
+    restart: unless-stopped
+
+    # Health check
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
-    networks:
-      - growagentai_network
+      start_period: 10s
 
-volumes:
-  postgres_data:
+    # Resource limits (adjust for your VM)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Network
+    networks:
+      - growagentai-network
 
 networks:
-  growagentai_network:
+  growagentai-network:
     driver: bridge
