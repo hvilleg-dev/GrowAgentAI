@@ -7,7 +7,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const KB_PATH = path.resolve(__dirname, '../../base_conocimientos');
 const BATCH_SIZE = 20;
 const CHUNK_SIZE_TOKENS = 400;
-const OVERLAP_TOKENS = 100;
+// const OVERLAP_TOKENS = 100;
 
 if (!OPENAI_API_KEY) {
   console.error('❌ OPENAI_API_KEY not set in .env');
@@ -177,10 +177,12 @@ async function saveChunks(chunks: Chunk[]) {
   console.log(`\n📝 Saving ${chunksWithEmbeddings.length} chunks to DB...`);
 
   for (const chunk of chunksWithEmbeddings) {
+    // Convert vector array to pgvector format: [x,y,z...]
+    const vectorStr = `[${chunk.vector?.join(',')}]`;
     await pool.query(
       `INSERT INTO knowledge_chunks (archivo, seccion, contenido, tokens, vector, idioma)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [chunk.archivo, chunk.seccion, chunk.contenido, chunk.tokens, JSON.stringify(chunk.vector), chunk.idioma]
+       VALUES ($1, $2, $3, $4, $5::vector, $6)`,
+      [chunk.archivo, chunk.seccion, chunk.contenido, chunk.tokens, vectorStr, chunk.idioma]
     );
   }
 

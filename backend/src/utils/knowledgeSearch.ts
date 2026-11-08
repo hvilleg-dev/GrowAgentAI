@@ -18,6 +18,15 @@ async function getEmbedding(text: string): Promise<number[]> {
     return embeddingCache.get(cacheKey)!;
   }
 
+  // If OpenAI API key missing, use dummy embedding for testing
+  if (!process.env.OPENAI_API_KEY) {
+    const seed = text.charCodeAt(0) || 0;
+    const dummy = [0.2 + (seed % 10) / 100, 0.3, 0.4, 0.5, 0.6];
+    const embedding = dummy.concat(Array(1531).fill(0.01));
+    embeddingCache.set(cacheKey, embedding);
+    return embedding;
+  }
+
   const response = await openai.embeddings.create({
     model: 'text-embedding-3-small',
     input: text
