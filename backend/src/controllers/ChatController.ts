@@ -107,7 +107,16 @@ export class ChatController {
         order: { criadoEn: 'ASC' }
       });
 
-      res.json(messages);
+      // Map to frontend format: criadoEn -> timestamp, rol -> role
+      const formattedMessages = messages.map(msg => ({
+        id: msg.id,
+        sessionId: msg.sesionId,
+        role: msg.rol === 'usuario' ? 'user' : 'assistant',
+        content: msg.contenido,
+        timestamp: msg.criadoEn?.toISOString() || new Date().toISOString()
+      }));
+
+      res.json(formattedMessages);
     } catch (error) {
       next(error);
     }
