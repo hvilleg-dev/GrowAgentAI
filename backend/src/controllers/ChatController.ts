@@ -72,12 +72,16 @@ export class ChatController {
       const latency = Date.now() - startTime;
 
       res.json({
-        response: response.content,
+        id: coachMessage.id,
+        content: response.content,
+        role: 'assistant',
         provider: response.provider,
         model: response.model,
         cost: response.cost,
         latency: latency,
-        sessionId: sessionId
+        sessionId: sessionId,
+        timestamp: coachMessage.criadoEn.toISOString(),
+        crisisLevel: crisisResult?.level
       });
     } catch (error) {
       next(error);
