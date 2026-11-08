@@ -30,7 +30,10 @@ export const login = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user))
       return response.data
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed')
+      const errorMsg = error.response?.data?.error ||
+                       error.response?.data?.message ||
+                       'Login failed'
+      return rejectWithValue(errorMsg)
     }
   },
 )
@@ -51,7 +54,10 @@ export const register = createAsyncThunk(
       localStorage.setItem('user', JSON.stringify(response.data.user))
       return response.data
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed')
+      const errorMsg = error.response?.data?.error ||
+                       error.response?.data?.message ||
+                       'Registration failed'
+      return rejectWithValue(errorMsg)
     }
   },
 )
