@@ -3,66 +3,86 @@
 .gitignore
 .gitattributes
 
-# Node
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies (will be installed fresh)
 node_modules
-npm-debug.log
-yarn-error.log
-.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Dependencies
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Tests
-coverage
-.nyc_output
-jest.config.js
+# Production builds (will be rebuilt)
+dist
+build
+*.tsbuildinfo
 
 # IDE
 .vscode
 .idea
-.DS_Store
 *.swp
 *.swo
+*~
+.DS_Store
 
-# Build
-dist
-build
-out
-.next
-.nuxt
-.cache
+# Testing
+coverage
+.nyc_output
+test-results
 
-# Documentation
-docs
-README.md
-CONTRIBUTING.md
-
-# Docker
-docker-compose*
-Dockerfile.dev
-.dockerignore
-
-# CI/CD
-.github
-.gitlab-ci.yml
-.circleci
-
-# Temporary
-tmp
-temp
-*.tmp
+# Logs
+logs
 *.log
 
-# Environment
-.env
-.env.*
-!.env.example
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
 
-# Development files
-.editorconfig
-.prettierrc
-.eslintrc*
-tsconfig.json
-jest.config.js
+# Heavy media files - DO NOT INCLUDE
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.mov
+*.avi
+*.pdf
+
+# Knowledge base (large files)
+base_conocimientos
+base_de_conocimientos
+
+# Frontend (not needed in backend image)
+frontend
+
+# Documentation (only essentials copied)
+docs
+wiki
+
+# CI/CD configs
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Development only
+docker-compose.dev.yml
+Dockerfile.dev
+.nvmrc
+.tool-versions
+
+# Cache and temp
+.cache
+.turbo
+.next
+public
+.prettierignore
+.eslintignore
+
+# Misc
+*.md
+LICENSE
+README.md

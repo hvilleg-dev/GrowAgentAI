@@ -1,53 +1,57 @@
-# Multi-stage build - optimized for production
-# Stage 1: Builder
+# Build stage
 FROM node:18-alpine AS builder
 
-WORKDIR /build
+WORKDIR /app
 
-# Copy package files from backend
-COPY backend/package.json ./
+# Copy package files
+COPY backend/package*.json ./
 
-# Install ALL dependencies (including dev for build)
-RUN npm install && npm cache clean --force
+# Install dependencies
+RUN npm install --legacy-peer-deps 2>&1 || npm install
 
-# Copy source code
+# Copy source code and config
 COPY backend/src ./src
 COPY backend/tsconfig.json ./
-COPY backend/knowledgeBase.sql ./
+COPY backend/tsconfig.dev.json ./
 
 # Build TypeScript
 RUN npm run build
 
-# Stage 2: Runtime - minimal image
+# Runtime stage
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Install only dumb-init for signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init (process manager) and curl (for health checks)
+RUN apk add --no-cache dumb-init curl
 
-# Copy from builder - only what's needed
-COPY --from=builder /build/node_modules ./node_modules
-COPY --from=builder /build/dist ./dist
-COPY --from=builder /build/package.json ./package.json
-COPY backend/knowledgeBase.sql ./
-
-# Create non-root user for security
+# Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 && \
-    chown -R nodejs:nodejs /app
+    adduser -S nodejs -u 1001
 
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY backend/package*.json ./
+COPY backend/tsconfig.json ./
+COPY backend/tsconfig.dev.json ./
+COPY backend/src ./src
+COPY base_conocimientos ./base_conocimientos
+
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
 USER nodejs
 
+# Expose port
+EXPOSE 3000
+
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
 
-# Expose API port
-EXPOSE 3001
-
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["/sbin/dumb-init", "--"]
-
-# Start application
-CMD ["node", "dist/index.js"]
+# Run application with dumb-init as PID 1
+# Use ts-node to handle path mapping correctly
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npx", "ts-node", "-P", "tsconfig.json", "-r", "tsconfig-paths/register", "src/app.ts"]
