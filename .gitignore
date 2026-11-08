@@ -161,5 +161,16 @@ notes.md
 TODO.md
 NOTES.md
 
+# Image and media files (local assets)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.svg
+*.mp4
+*.mov
+*.mp3
+
 # Claude Code local settings
 .claude/
