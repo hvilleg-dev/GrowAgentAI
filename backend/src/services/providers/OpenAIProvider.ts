@@ -38,7 +38,7 @@ export class OpenAIProvider implements ILLMProvider {
     } catch (error) {
       if (error instanceof OpenAI.APIError) {
         const retryable = error.status === 429 || error.status === 500;
-        throw new ProviderError('openai', error.message, error.status, retryable);
+        throw new ProviderError('openai', error.message, 502, retryable);
       }
       throw error;
     }

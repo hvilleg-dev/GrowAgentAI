@@ -37,7 +37,7 @@ export class ClaudeProvider implements ILLMProvider {
     } catch (error) {
       if (error instanceof Anthropic.APIError) {
         const retryable = error.status === 429 || error.status === 500;
-        throw new ProviderError('claude', error.message, error.status, retryable);
+        throw new ProviderError('claude', error.message, 502, retryable);
       }
       throw error;
     }
