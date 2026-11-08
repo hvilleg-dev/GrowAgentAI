@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '@/database/db';
 import { Usuario } from '@/database/entities';
 import logger from '@/utils/logger';
-import { generateToken, authMiddleware, AuthRequest } from '@/middleware/auth.middleware';
+import { generateToken } from '@/middleware/auth.middleware';
 
 export function createAuthRoutes(): Router {
   const router = Router();
@@ -12,12 +12,12 @@ export function createAuthRoutes(): Router {
   // Register
   router.post('/register', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { nombre, name, email, password } = req.body;
+      const { nombre, name, email, password, edad, genero } = req.body;
       const fullName = nombre || name;
 
-      if (!fullName || !email || !password) {
+      if (!fullName || !email || !password || !edad || !genero) {
         res.status(400).json({
-          error: 'Missing required fields: name, email, password'
+          error: 'Missing required fields: name, email, password, edad, genero'
         });
         return;
       }
@@ -35,6 +35,8 @@ export function createAuthRoutes(): Router {
       usuario.nombre = fullName;
       usuario.email = email;
       usuario.passwordHash = password; // In production, hash this!
+      usuario.edad = edad;
+      usuario.genero = genero;
       usuario.idioma = 'es';
       usuario.activo = true;
 
@@ -46,7 +48,9 @@ export function createAuthRoutes(): Router {
         user: {
           id: usuario.id,
           name: usuario.nombre,
-          email: usuario.email
+          email: usuario.email,
+          edad: usuario.edad,
+          genero: usuario.genero
         }
       });
     } catch (error) {
@@ -91,8 +95,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Change password (requires auth)
-  router.post('/change-password', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Change password
+  router.post('/change-password', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, currentPassword, newPassword } = req.body;
       if (!userId || !currentPassword || !newPassword) {
@@ -121,8 +125,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Update language (requires auth)
-  router.put('/language', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Update language
+  router.put('/language', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, language } = req.body;
       if (!userId || !language) {
@@ -146,8 +150,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Update theme (requires auth)
-  router.put('/theme', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Update theme
+  router.put('/theme', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, theme } = req.body;
       if (!userId || !theme) {
@@ -171,8 +175,50 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Enable 2FA (requires auth)
-  router.post('/enable-2fa', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Update profile (new endpoint for coaching profile data)
+  router.put('/profile', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId, edad, genero, ocupacion, estiloCoaching } = req.body;
+      if (!userId) {
+        res.status(400).json({ error: 'Missing required field: userId' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      if (edad !== undefined) usuario.edad = edad;
+      if (genero !== undefined) usuario.genero = genero;
+      if (ocupacion !== undefined) usuario.ocupacion = ocupacion;
+      if (estiloCoaching !== undefined) usuario.estiloCoaching = estiloCoaching;
+
+      await usuarioRepo.save(usuario);
+
+      res.status(200).json({
+        message: 'Profile updated',
+        user: {
+          id: usuario.id,
+          nombre: usuario.nombre,
+          email: usuario.email,
+          edad: usuario.edad,
+          genero: usuario.genero,
+          ocupacion: usuario.ocupacion,
+          estiloCoaching: usuario.estiloCoaching,
+          idioma: usuario.idioma,
+          tema: usuario.tema
+        }
+      });
+    } catch (error) {
+      logger.error('Update profile error:', error);
+      next(error);
+    }
+  });
+
+  // Enable 2FA
+  router.post('/enable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.body;
       if (!userId) {
@@ -201,8 +247,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Disable 2FA (requires auth)
-  router.post('/disable-2fa', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Disable 2FA
+  router.post('/disable-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.body;
       if (!userId) {
@@ -227,8 +273,8 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Get profile (requires auth)
-  router.get('/profile/:userId', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  // Get profile
+  router.get('/profile/:userId', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.params;
       if (!userId) {
@@ -246,6 +292,10 @@ export function createAuthRoutes(): Router {
         id: usuario.id,
         name: usuario.nombre,
         email: usuario.email,
+        edad: usuario.edad,
+        genero: usuario.genero,
+        ocupacion: usuario.ocupacion,
+        estiloCoaching: usuario.estiloCoaching,
         theme: usuario.tema || 'light',
         language: usuario.idioma || 'es',
         twoFactorEnabled: usuario.twoFactorEnabled

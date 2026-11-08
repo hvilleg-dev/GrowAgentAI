@@ -36,6 +36,18 @@ export class Usuario {
   @Column({ default: 'light', length: 10 })
   tema: string;
 
+  @Column()
+  edad: number;
+
+  @Column({ length: 20 })
+  genero: string;
+
+  @Column({ nullable: true, length: 100 })
+  ocupacion?: string;
+
+  @Column({ nullable: true, length: 50 })
+  estiloCoaching?: string;
+
   @Column({ default: true })
   activo: boolean;
 

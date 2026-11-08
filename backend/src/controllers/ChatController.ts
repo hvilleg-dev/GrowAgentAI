@@ -28,6 +28,12 @@ export class ChatController {
       const mensajeRepo = AppDataSource.getRepository(Mensaje);
       const usuarioRepo = AppDataSource.getRepository(Usuario);
 
+      // Get user profile for context
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        throw new NotFoundError('Usuario');
+      }
+
       // Verify session exists
       const sesion = await sesionRepo.findOne({ where: { id: sessionId } });
       if (!sesion) {
@@ -53,8 +59,23 @@ export class ChatController {
       userMessage.criadoEn = new Date();
       await mensajeRepo.save(userMessage);
 
-      // Get AI response
-      const response = await this.router.route(message);
+      // Build coaching context with user profile
+      const userContext = `You are a professional GROW framework coach.
+
+Client Profile:
+- Name: ${usuario.nombre}
+- Age: ${usuario.edad}
+- Gender: ${usuario.genero}
+${usuario.ocupacion ? `- Occupation: ${usuario.ocupacion}` : ''}
+${usuario.estiloCoaching ? `- Preferred coaching style: ${usuario.estiloCoaching}` : '- Preferred coaching style: supportive and empowering'}
+- Language: ${usuario.idioma === 'es' ? 'Spanish' : 'English'}
+
+Apply your coaching strategy based on the client's age, gender, and professional context.
+Ask powerful questions following the GROW methodology (Goal, Reality, Options, Will).
+Be personalized, empathetic, and culturally aware.`;
+
+      // Get AI response with user context
+      const response = await this.router.route(message, userContext);
 
       // Save coach message
       const coachMessage = new Mensaje();
