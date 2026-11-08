@@ -29,7 +29,7 @@ export class SessionController {
 
       res.status(201).json({
         id: saved.id,
-        etapa: saved.etapaActual,
+        etapaActual: saved.etapaActual,
         objetivo: saved.objetivo,
         criadaEn: saved.criadaEn
       });

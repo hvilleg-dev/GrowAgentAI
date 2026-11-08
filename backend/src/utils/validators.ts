@@ -4,8 +4,8 @@ import { ValidationError } from '@/errors/AppError';
 export const schemas = {
   createSession: Joi.object({
     usuarioId: Joi.string().uuid().required(),
-    objetivo: Joi.string().min(10).max(500),
-    idioma: Joi.string().length(2).default('es')
+    objetivo: Joi.string().min(1).max(500).optional(),
+    tema: Joi.string().optional()
   }),
 
   chat: Joi.object({

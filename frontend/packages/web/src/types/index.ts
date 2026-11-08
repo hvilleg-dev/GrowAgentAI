@@ -30,8 +30,9 @@ export interface Session {
 }
 
 export interface CreateSessionRequest {
-  objetivo?: string
   usuarioId: string
+  objetivo?: string
+  tema?: string
 }
 
 // Message Types
