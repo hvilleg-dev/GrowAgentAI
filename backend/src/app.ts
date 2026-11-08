@@ -40,7 +40,7 @@ async function initializeServices() {
         {
           provider: 'openai' as const,
           apiKey: process.env.OPENAI_API_KEY || '',
-          model: 'gpt-4-mini'
+          model: 'gpt-4o-mini'
         }
       ],
       crisis: {
