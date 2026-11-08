@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@tanstack/react-query'
 import type { RootState, AppDispatch } from '@/store'
@@ -24,6 +24,14 @@ export default function SettingsPage() {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false)
   const [show2FAModal, setShow2FAModal] = useState(false)
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+
+  // Coaching Profile Fields
+  const [edad, setEdad] = useState<number | string>(user?.edad || '')
+  const [genero, setGenero] = useState(user?.genero || '')
+  const [ocupacion, setOcupacion] = useState(user?.ocupacion || '')
+  const [estiloCoaching, setEstiloCoaching] = useState(user?.estiloCoaching || 'supportive')
+  const [profileSuccess, setProfileSuccess] = useState(false)
+  const [profileError, setProfileError] = useState<string | null>(null)
 
   const updateThemeMutation = useMutation({
     mutationFn: async (newTheme: Theme) => {
@@ -77,6 +85,28 @@ export default function SettingsPage() {
     }
   })
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async () => {
+      if (!user?.id) throw new Error('No user ID')
+      if (!edad || !genero) throw new Error('Age and gender are required')
+      await apiClient.put('/api/auth/profile', {
+        userId: user.id,
+        edad: parseInt(String(edad)),
+        genero,
+        ocupacion: ocupacion || undefined,
+        estiloCoaching: estiloCoaching || undefined
+      })
+    },
+    onSuccess: () => {
+      setProfileSuccess(true)
+      setProfileError(null)
+      setTimeout(() => setProfileSuccess(false), 3000)
+    },
+    onError: (error: any) => {
+      setProfileError(error.message || 'Error updating profile')
+    }
+  })
+
   const handleThemeChange = (newTheme: Theme) => {
     updateThemeMutation.mutate(newTheme)
   }
@@ -122,6 +152,99 @@ export default function SettingsPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Coaching Profile Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Coaching Profile</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">This information helps personalize your coaching experience</p>
+
+          {profileSuccess && (
+            <div className="mb-4 p-3 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 rounded text-sm">
+              ✓ Profile updated successfully
+            </div>
+          )}
+          {profileError && (
+            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded text-sm">
+              ✗ {profileError}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {/* Age */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Age *
+              </label>
+              <input
+                type="number"
+                min="18"
+                max="120"
+                value={edad}
+                onChange={(e) => setEdad(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="Enter your age"
+              />
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Gender *
+              </label>
+              <select
+                value={genero}
+                onChange={(e) => setGenero(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="">Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+              </select>
+            </div>
+
+            {/* Occupation */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Occupation (optional)
+              </label>
+              <input
+                type="text"
+                value={ocupacion}
+                onChange={(e) => setOcupacion(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder="e.g., Software Engineer, Teacher, Entrepreneur"
+              />
+            </div>
+
+            {/* Coaching Style */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Preferred Coaching Style (optional)
+              </label>
+              <select
+                value={estiloCoaching}
+                onChange={(e) => setEstiloCoaching(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="supportive">Supportive & Empowering</option>
+                <option value="directive">Directive & Results-focused</option>
+                <option value="socratic">Socratic & Questioning</option>
+                <option value="collaborative">Collaborative & Partnership</option>
+              </select>
+            </div>
+
+            {/* Save Button */}
+            <button
+              onClick={() => updateProfileMutation.mutate()}
+              disabled={updateProfileMutation.isPending}
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium transition"
+            >
+              {updateProfileMutation.isPending ? 'Saving...' : 'Save Coaching Profile'}
+            </button>
           </div>
         </div>
 

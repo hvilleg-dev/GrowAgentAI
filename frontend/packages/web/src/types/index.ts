@@ -4,6 +4,10 @@ export interface User {
   email: string
   name: string
   avatar?: string
+  edad?: number
+  genero?: string
+  ocupacion?: string
+  estiloCoaching?: string
   createdAt: string
 }
 
