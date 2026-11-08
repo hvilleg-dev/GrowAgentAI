@@ -17,3 +17,4 @@
 - [Ejecución Fases](ESTADO_EJECUCION_FASES.md) — 4 fases completas (6-8 semanas): Backend→Web→Desktop→Mobile. Timeline Nov 6 - Jan 1, 2027. Todos los planes listos.
 - [Auth JWT Completo](./AUTH_JWT_COMPLETADO.md) — ✅ Middleware JWT, rutas /api/* protegidas, logout fix
 - [Sync JWT Completo](./SYNC_JWT_COMPLETO.md) — ✅ JWT testeado en Docker, sincronizado Dev→Test→GitHub (3 capas)
+- [Frontend JWT Integration](./FRONTEND_JWT_INTEGRATION.md) — ✅ API client verified, 8/8 E2E tests, ready for Vercel
