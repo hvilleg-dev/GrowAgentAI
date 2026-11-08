@@ -4,6 +4,7 @@ import type { RootState, AppDispatch } from '@/store'
 import { useSessions } from '@/hooks/useSessions'
 import { useChat } from '@/hooks/useChat'
 import { setCurrentSession } from '@/store/slices/sessionsSlice'
+import { clearChat } from '@/store/slices/chatSlice'
 import CrisisIndicator from '@/components/CrisisIndicator'
 import MessageBubble from '@/components/MessageBubble'
 
@@ -30,6 +31,11 @@ export default function ChatPage() {
       dispatch(setCurrentSession(sessions[0]))
     }
   }, [sessions, currentSession, dispatch])
+
+  // Clear chat when session changes
+  useEffect(() => {
+    dispatch(clearChat())
+  }, [sessionId, dispatch])
 
   const handleSendMessage = () => {
     if (inputText.trim() && sessionId) {
