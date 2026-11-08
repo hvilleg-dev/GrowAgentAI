@@ -24,10 +24,16 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      // Don't redirect if it's the login endpoint itself (invalid credentials)
+      const isLoginEndpoint = error.config?.url?.includes('/api/auth/login') ||
+                              error.config?.url?.includes('/api/auth/register')
+
+      if (!isLoginEndpoint) {
+        // Token expired or invalid on protected endpoints
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   },
