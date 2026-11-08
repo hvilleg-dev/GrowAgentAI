@@ -16,3 +16,4 @@
 - [Sesión Nov 6](SESION_6_NOV_2026.md) — ✅ BLOCKER RESUELTO: POST /chat fixed by reordering middleware. Backend 90% complete, ready for runtime test
 - [Ejecución Fases](ESTADO_EJECUCION_FASES.md) — 4 fases completas (6-8 semanas): Backend→Web→Desktop→Mobile. Timeline Nov 6 - Jan 1, 2027. Todos los planes listos.
 - [Auth JWT Completo](./AUTH_JWT_COMPLETADO.md) — ✅ Middleware JWT, rutas /api/* protegidas, logout fix
+- [Sync JWT Completo](./SYNC_JWT_COMPLETO.md) — ✅ JWT testeado en Docker, sincronizado Dev→Test→GitHub (3 capas)
