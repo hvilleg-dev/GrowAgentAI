@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "migrate": "typeorm migration:run -d dist/database/db.js",
     "migrate:revert": "typeorm migration:revert -d dist/database/db.js",
-    "seed": "node dist/database/seeds.js"
+    "seed": "node dist/database/seeds.js",
+    "seed:kb": "ts-node -P tsconfig.json -r tsconfig-paths/register src/scripts/seedKnowledgeBase.ts"
   },
   "keywords": [
     "coaching",

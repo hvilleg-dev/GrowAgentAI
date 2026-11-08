@@ -6,6 +6,7 @@ import { AppDataSource } from '@/database/db';
 import { Sesion, Mensaje, Usuario, Goal } from '@/database/entities';
 import { NotFoundError } from '@/errors/AppError';
 import { getSystemPrompt } from '@/utils/knowledgeBase';
+import { searchKnowledge } from '@/utils/knowledgeSearch';
 
 export class ChatController {
   constructor(
@@ -108,6 +109,14 @@ Current GROW stage: ${sesion.etapaActual}
       };
       const styleDescription = styleMap[usuario.estiloCoaching || 'supportive'] || styleMap['supportive'];
 
+      // Search knowledge base for relevant context
+      const relevantChunks = await searchKnowledge(message, usuario.idioma, 3);
+      const knowledgeContext = relevantChunks.length > 0
+        ? `\n--- RELEVANT KNOWLEDGE BASE ---\n${relevantChunks
+            .map(c => `[${c.archivo}/${c.seccion}] ${c.contenido.substring(0, 200)}...`)
+            .join('\n')}\n---`
+        : '';
+
       // Append client-specific context to KB system prompt
       const userContext = `${kbSystemPrompt}
 
@@ -119,7 +128,7 @@ PERFIL DEL CLIENTE EN ESTA SESIÓN:
 ${usuario.ocupacion ? `- Ocupación: ${usuario.ocupacion}` : ''}
 - Estilo de coaching preferido: ${styleDescription}
 - Idioma de respuesta: ${usuario.idioma === 'en' ? 'English' : 'Español'}
-${goalContext}`;
+${goalContext}${knowledgeContext}`;
 
       // Get AI response with full conversation history
       const response = await this.router.route(message, userContext, undefined, history);
