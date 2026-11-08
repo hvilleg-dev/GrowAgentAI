@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ProviderRouter } from '@/services/ProviderRouter';
 import { CrisisDetector } from '@/services/CrisisDetector';
 import { AppDataSource } from '@/database/db';
-import { Sesion, Mensaje, Usuario } from '@/database/entities';
+import { Sesion, Mensaje, Usuario, Goal } from '@/database/entities';
 import { NotFoundError } from '@/errors/AppError';
+import { getSystemPrompt } from '@/utils/knowledgeBase';
 
 export class ChatController {
   constructor(
@@ -40,11 +41,40 @@ export class ChatController {
         throw new NotFoundError('Sesión');
       }
 
-      // Verify user exists
-      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
-      if (!usuario) {
-        throw new NotFoundError('Usuario');
+      // Get Goal context if session has goalId
+      let goalContext = '';
+      if (sesion.goalId) {
+        const goalRepo = AppDataSource.getRepository(Goal);
+        const goal = await goalRepo.findOne({ where: { id: sesion.goalId } });
+        if (goal) {
+          // Auto-advance status when coaching starts
+          if (goal.status === 'not_started') {
+            goal.status = 'in_progress';
+            await goalRepo.save(goal);
+          }
+          goalContext = `
+--- GOAL CONTEXT ---
+Goal: ${goal.goal}
+${goal.description ? `Description: ${goal.description}` : ''}
+Current Reality: ${goal.reality || 'Not yet explored'}
+Options identified: ${goal.options?.join(', ') || 'Not yet explored'}
+Commitment: ${goal.will || 'Not yet defined'}
+Status: ${goal.status}
+Current GROW stage: ${sesion.etapaActual}
+--------------------`;
+        }
       }
+
+      // Fetch conversation history from DB (last 20 messages, excluding current)
+      const priorMessages = await mensajeRepo.find({
+        where: { sesionId: sessionId },
+        order: { criadoEn: 'ASC' },
+        take: 20
+      });
+      const history = priorMessages.map(m => ({
+        role: (m.rol === 'usuario' ? 'user' : 'assistant') as 'user' | 'assistant',
+        content: m.contenido
+      }));
 
       // Crisis detection
       const crisisResult = await this.crisisDetector.detectCrisis(message);
@@ -59,23 +89,40 @@ export class ChatController {
       userMessage.criadoEn = new Date();
       await mensajeRepo.save(userMessage);
 
-      // Build coaching context with user profile
-      const userContext = `You are a professional GROW framework coach.
+      // Load system prompt from knowledge base (language-aware)
+      const kbSystemPrompt = getSystemPrompt(usuario.idioma || 'es');
 
-Client Profile:
-- Name: ${usuario.nombre}
-- Age: ${usuario.edad}
-- Gender: ${usuario.genero}
-${usuario.ocupacion ? `- Occupation: ${usuario.ocupacion}` : ''}
-${usuario.estiloCoaching ? `- Preferred coaching style: ${usuario.estiloCoaching}` : '- Preferred coaching style: supportive and empowering'}
-- Language: ${usuario.idioma === 'es' ? 'Spanish' : 'English'}
+      const styleMap: Record<string, string> = {
+        supportive: usuario.idioma === 'en'
+          ? 'warm, empathetic, encouraging — celebrate progress, normalize difficulty'
+          : 'cálido, empático y motivador — celebra avances, normaliza la dificultad',
+        directive: usuario.idioma === 'en'
+          ? 'direct, action-oriented — give clear steps, challenge complacency'
+          : 'directo y orientado a la acción — pasos claros, desafía la complacencia',
+        socratic: usuario.idioma === 'en'
+          ? 'Socratic — guide with questions, never give solutions directly'
+          : 'socrático — guía con preguntas, nunca des soluciones directamente',
+        collaborative: usuario.idioma === 'en'
+          ? 'collaborative partner — think out loud together, co-create solutions'
+          : 'compañero colaborativo — piensa en voz alta juntos, co-crea soluciones'
+      };
+      const styleDescription = styleMap[usuario.estiloCoaching || 'supportive'] || styleMap['supportive'];
 
-Apply your coaching strategy based on the client's age, gender, and professional context.
-Ask powerful questions following the GROW methodology (Goal, Reality, Options, Will).
-Be personalized, empathetic, and culturally aware.`;
+      // Append client-specific context to KB system prompt
+      const userContext = `${kbSystemPrompt}
 
-      // Get AI response with user context
-      const response = await this.router.route(message, userContext);
+---
+PERFIL DEL CLIENTE EN ESTA SESIÓN:
+- Nombre: ${usuario.nombre}
+- Edad: ${usuario.edad || 'no indicada'}
+- Género: ${usuario.genero || 'no indicado'}
+${usuario.ocupacion ? `- Ocupación: ${usuario.ocupacion}` : ''}
+- Estilo de coaching preferido: ${styleDescription}
+- Idioma de respuesta: ${usuario.idioma === 'en' ? 'English' : 'Español'}
+${goalContext}`;
+
+      // Get AI response with full conversation history
+      const response = await this.router.route(message, userContext, undefined, history);
 
       // Save coach message
       const coachMessage = new Mensaje();

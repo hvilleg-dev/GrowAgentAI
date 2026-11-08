@@ -5,6 +5,7 @@ export const schemas = {
   createSession: Joi.object({
     usuarioId: Joi.string().uuid().required(),
     objetivo: Joi.string().min(1).max(500).optional(),
+    goalId: Joi.string().uuid().optional(),
     tema: Joi.string().optional()
   }),
 
@@ -45,7 +46,7 @@ export async function validateData<T>(
   try {
     const validated = await schema.validateAsync(data, {
       abortEarly: false,
-      stripUnknown: true
+      stripUnknown: false
     });
     return validated as T;
   } catch (error) {

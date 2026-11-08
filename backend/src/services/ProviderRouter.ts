@@ -1,4 +1,4 @@
-import { ILLMProvider, RouterConfig, LLMResponse } from '@/types/providers';
+import { ILLMProvider, RouterConfig, LLMResponse, ChatMessage } from '@/types/providers';
 import { ProviderError } from '@/errors/AppError';
 import { ClaudeProvider } from './providers/ClaudeProvider';
 import { OpenAIProvider } from './providers/OpenAIProvider';
@@ -39,15 +39,16 @@ export class ProviderRouter {
   async route(
     prompt: string,
     context?: string,
-    preferredProvider?: string
+    preferredProvider?: string,
+    history?: ChatMessage[]
   ): Promise<LLMResponse> {
     if (preferredProvider && this.providers.has(preferredProvider)) {
-      return this.useProvider(preferredProvider, prompt, context);
+      return this.useProvider(preferredProvider, prompt, context, history);
     }
 
     for (const [name] of this.providers) {
       try {
-        return await this.useProvider(name, prompt, context);
+        return await this.useProvider(name, prompt, context, history);
       } catch (error) {
         logger.warn(`Provider ${name} failed:`, error);
         if (error instanceof ProviderError && !error.retryable) {
@@ -63,14 +64,15 @@ export class ProviderRouter {
   private async useProvider(
     providerName: string,
     prompt: string,
-    context?: string
+    context?: string,
+    history?: ChatMessage[]
   ): Promise<LLMResponse> {
     const provider = this.providers.get(providerName);
     if (!provider) {
       throw new Error(`Provider ${providerName} not found`);
     }
 
-    const content = await provider.getCompletion(prompt, context);
+    const content = await provider.getCompletion(prompt, context, history);
 
     const inputTokens = Math.ceil(prompt.length / 4);
     const outputTokens = Math.ceil(content.length / 4);

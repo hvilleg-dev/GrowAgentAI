@@ -1,6 +1,11 @@
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export interface ILLMProvider {
   name: 'claude' | 'openai';
-  getCompletion(prompt: string, context?: string): Promise<string>;
+  getCompletion(prompt: string, context?: string, history?: ChatMessage[]): Promise<string>;
   estimateCost(inputTokens: number, outputTokens: number): number;
 }
 

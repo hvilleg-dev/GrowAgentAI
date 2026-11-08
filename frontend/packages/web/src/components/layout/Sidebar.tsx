@@ -19,6 +19,9 @@ export default function Sidebar() {
         <Link to="/settings" className="block px-4 py-2 rounded-lg hover:bg-gray-800">
           ⚙️ Settings
         </Link>
+        <Link to="/instructions" className="block px-4 py-2 rounded-lg hover:bg-gray-800">
+          📖 Instructions
+        </Link>
       </nav>
     </aside>
   )

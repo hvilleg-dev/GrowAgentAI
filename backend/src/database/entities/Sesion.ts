@@ -22,6 +22,9 @@ export class Sesion {
   @Column('uuid')
   usuarioId: string;
 
+  @Column({ nullable: true, type: 'uuid' })
+  goalId?: string;
+
   @Column({
     type: 'enum',
     enum: GROWStage,

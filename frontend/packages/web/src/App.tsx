@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage'
 import ChatPage from './pages/ChatPage'
 import GoalsPage from './pages/GoalsPage'
 import SettingsPage from './pages/SettingsPage'
+import InstructionsPage from './pages/InstructionsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Layout & Components
@@ -87,6 +88,7 @@ function App() {
             <Route path="/chat" element={<ErrorBoundary><ChatPage /></ErrorBoundary>} />
             <Route path="/goals" element={<ErrorBoundary><GoalsPage /></ErrorBoundary>} />
             <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
+            <Route path="/instructions" element={<ErrorBoundary><InstructionsPage /></ErrorBoundary>} />
           </Route>
 
           {/* 404 */}

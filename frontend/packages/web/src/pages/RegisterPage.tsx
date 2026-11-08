@@ -38,7 +38,11 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     setServerError(null)
     const result = await dispatch(
-      registerAction({ email: data.email, password: data.password, name: data.name }),
+      registerAction({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      }),
     )
     if (registerAction.fulfilled.match(result)) {
       navigate('/')
@@ -126,6 +130,10 @@ export default function RegisterPage() {
               </p>
             )}
           </div>
+
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+            After registering, complete your Coaching Profile in Settings.
+          </p>
 
           <button
             type="submit"

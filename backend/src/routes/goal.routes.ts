@@ -10,7 +10,7 @@ export function createGoalRoutes(): Router {
     goalController.create(req, res, next)
   );
 
-  goalRouter.get('/usuario/:usuarioId', authMiddleware, (req, res, next) =>
+  goalRouter.get('/:usuarioId', authMiddleware, (req, res, next) =>
     goalController.list(req, res, next)
   );
 

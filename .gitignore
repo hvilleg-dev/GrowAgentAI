@@ -100,7 +100,7 @@ secrets.json
 prisma/migrations/
 generated/
 dist/
-types/
+frontend/node_modules/@types/
 
 # Internal documentation (private - keep local only)
 .internal/
@@ -161,16 +161,11 @@ notes.md
 TODO.md
 NOTES.md
 
-# Image and media files (local assets)
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
-*.svg
-*.mp4
-*.mov
-*.mp3
-
 # Claude Code local settings
 .claude/
+
+# Image files
+*.jpg
+*.jpeg
+jpg/
+jpeg/

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppDataSource } from '@/database/db';
 import { Usuario } from '@/database/entities';
 import logger from '@/utils/logger';
-import { generateToken } from '@/middleware/auth.middleware';
+import { generateToken, authMiddleware } from '@/middleware/auth.middleware';
 
 export function createAuthRoutes(): Router {
   const router = Router();
@@ -15,14 +15,22 @@ export function createAuthRoutes(): Router {
       const { nombre, name, email, password, edad, genero } = req.body;
       const fullName = nombre || name;
 
-      if (!fullName || !email || !password || !edad || !genero) {
+      if (!fullName || !email || !password) {
         res.status(400).json({
-          error: 'Missing required fields: name, email, password, edad, genero'
+          error: 'Missing required fields: name, email, password'
         });
         return;
       }
 
-      const existingUser = await usuarioRepo.findOne({ where: { email } });
+      // Normalize email and password
+      const normalizedEmail = email.toLowerCase().trim();
+      const normalizedPassword = password.trim();
+      const edadNumber = edad ? (typeof edad === 'string' ? parseInt(edad, 10) : Number(edad)) : undefined;
+
+      const existingUser = await usuarioRepo
+        .createQueryBuilder('usuario')
+        .where('LOWER(usuario.email) = :email', { email: normalizedEmail })
+        .getOne();
       if (existingUser) {
         res.status(409).json({
           error: 'Email already exists'
@@ -33,10 +41,10 @@ export function createAuthRoutes(): Router {
       const usuario = new Usuario();
       usuario.id = uuidv4();
       usuario.nombre = fullName;
-      usuario.email = email;
-      usuario.passwordHash = password; // In production, hash this!
-      usuario.edad = edad;
-      usuario.genero = genero;
+      usuario.email = normalizedEmail;
+      usuario.passwordHash = normalizedPassword; // In production, hash this!
+      usuario.edad = edadNumber;
+      usuario.genero = genero || undefined;
       usuario.idioma = 'es';
       usuario.activo = true;
 
@@ -71,8 +79,23 @@ export function createAuthRoutes(): Router {
         return;
       }
 
-      const usuario = await usuarioRepo.findOne({ where: { email } });
-      if (!usuario || usuario.passwordHash !== password) {
+      // Trim and lowercase email for case-insensitive search
+      const normalizedEmail = email.toLowerCase().trim();
+      const usuario = await usuarioRepo
+        .createQueryBuilder('usuario')
+        .where('LOWER(usuario.email) = :email', { email: normalizedEmail })
+        .getOne();
+
+      if (!usuario) {
+        res.status(401).json({
+          error: 'Invalid credentials'
+        });
+        return;
+      }
+
+      // Trim password for comparison (in case of accidental spaces)
+      const normalizedPassword = password.trim();
+      if (usuario.passwordHash !== normalizedPassword) {
         res.status(401).json({
           error: 'Invalid credentials'
         });
@@ -176,7 +199,7 @@ export function createAuthRoutes(): Router {
   });
 
   // Update profile (new endpoint for coaching profile data)
-  router.put('/profile', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  router.put('/profile', authMiddleware, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId, edad, genero, ocupacion, estiloCoaching } = req.body;
       if (!userId) {
@@ -274,7 +297,7 @@ export function createAuthRoutes(): Router {
   });
 
   // Get profile
-  router.get('/profile/:userId', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  router.get('/profile/:userId', authMiddleware, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { userId } = req.params;
       if (!userId) {

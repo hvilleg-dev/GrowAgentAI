@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { ILLMProvider } from '@/types/providers';
+import { ILLMProvider, ChatMessage } from '@/types/providers';
 import { ProviderError } from '@/errors/AppError';
 import { LIMITES_COSTO } from '@/constants/coaching';
 
@@ -13,19 +13,21 @@ export class ClaudeProvider implements ILLMProvider {
     this.model = model;
   }
 
-  async getCompletion(prompt: string, context?: string): Promise<string> {
+  async getCompletion(prompt: string, context?: string, history?: ChatMessage[]): Promise<string> {
     try {
       const systemMessage = context || 'Eres un coach profesional de GROW framework.';
+      const messages: Anthropic.MessageParam[] = [
+        ...(history || []).map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content
+        })),
+        { role: 'user' as const, content: prompt }
+      ];
       const response = await this.client.messages.create({
         model: this.model,
         max_tokens: 1024,
         system: systemMessage,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
+        messages
       });
 
       const content = response.content[0];

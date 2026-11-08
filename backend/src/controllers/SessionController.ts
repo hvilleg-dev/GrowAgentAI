@@ -9,6 +9,7 @@ export class SessionController {
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const body: any = await validateData(req.body, schemas.createSession);
+      console.log('[SessionController.create] validated body:', JSON.stringify(body));
 
       const usuarioRepo = AppDataSource.getRepository(Usuario);
       const usuario = await usuarioRepo.findOne({ where: { id: body.usuarioId as string } });
@@ -17,21 +18,40 @@ export class SessionController {
         throw new NotFoundError('Usuario');
       }
 
-      const sesionRepo = AppDataSource.getRepository(Sesion);
-      const sesion = new Sesion();
-      sesion.id = uuidv4();
-      sesion.usuarioId = body.usuarioId as string;
-      sesion.objetivo = body.objetivo as string;
-      sesion.criadaEn = new Date();
-      sesion.actualizadaEn = new Date();
+      const sesionId = uuidv4();
+      const now = new Date();
+      const values = [
+        sesionId,
+        body.usuarioId,
+        body.goalId || null,
+        'GOAL',
+        body.objetivo || null,
+        null, // realidad
+        null, // opciones
+        null, // voluntad
+        null, // resumen
+        null, // reflexion
+        null, // planAccion
+        now,
+        now,
+        null  // finalizadaEn
+      ];
 
-      const saved = await sesionRepo.save(sesion);
+      const query = `
+        INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        RETURNING "etapaActual", "criadaEn", "actualizadaEn", "goalId"
+      `;
+
+      const result = await AppDataSource.query(query, values);
+      const returned = result[0];
 
       res.status(201).json({
-        id: saved.id,
-        etapaActual: saved.etapaActual,
-        objetivo: saved.objetivo,
-        criadaEn: saved.criadaEn
+        id: sesionId,
+        etapaActual: returned.etapaActual,
+        objetivo: body.objetivo,
+        goalId: returned.goalId,
+        criadaEn: returned.criadaEn
       });
     } catch (error) {
       next(error);

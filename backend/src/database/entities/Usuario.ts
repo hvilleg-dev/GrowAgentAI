@@ -36,11 +36,11 @@ export class Usuario {
   @Column({ default: 'light', length: 10 })
   tema: string;
 
-  @Column()
-  edad: number;
+  @Column({ nullable: true })
+  edad?: number;
 
-  @Column({ length: 20 })
-  genero: string;
+  @Column({ length: 20, nullable: true })
+  genero?: string;
 
   @Column({ nullable: true, length: 100 })
   ocupacion?: string;

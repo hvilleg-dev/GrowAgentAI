@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { ILLMProvider } from '@/types/providers';
+import { ILLMProvider, ChatMessage } from '@/types/providers';
 import { ProviderError } from '@/errors/AppError';
 import { LIMITES_COSTO } from '@/constants/coaching';
 
@@ -13,8 +13,12 @@ export class OpenAIProvider implements ILLMProvider {
     this.model = model;
   }
 
-  async getCompletion(prompt: string, context?: string): Promise<string> {
+  async getCompletion(prompt: string, context?: string, history?: ChatMessage[]): Promise<string> {
     try {
+      const historyMessages = (history || []).map(m => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content
+      }));
       const response = await this.client.chat.completions.create({
         model: this.model,
         messages: [
@@ -22,6 +26,7 @@ export class OpenAIProvider implements ILLMProvider {
             role: 'system',
             content: context || 'Eres un coach profesional de GROW framework.'
           },
+          ...historyMessages,
           {
             role: 'user',
             content: prompt

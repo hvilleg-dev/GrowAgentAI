@@ -16,7 +16,7 @@ export default function GoalsPage() {
     queryKey: ['goals', user?.id],
     queryFn: async () => {
       if (!user?.id) return []
-      const response = await apiClient.get(`/api/goals/usuario/${user.id}`)
+      const response = await apiClient.get(`/api/goals/${user.id}`)
       return response.data
     },
     enabled: !!user?.id,
