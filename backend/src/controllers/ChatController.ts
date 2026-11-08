@@ -66,16 +66,10 @@ Current GROW stage: ${sesion.etapaActual}
         }
       }
 
-      // RAG: Search knowledge base for relevant chunks
-      let ragContext = '';
+      // RAG: Search knowledge base for relevant chunks (non-critical, failures don't break coaching)
       try {
         const relevantChunks = await searchKnowledge(message, usuario.idioma || 'es', 3);
-        if (relevantChunks.length > 0) {
-          ragContext = `
---- RELEVANT COACHING KNOWLEDGE ---
-${relevantChunks.map((c, i) => `${i + 1}. [${c.archivo}] ${c.seccion}\n${c.contenido}`).join('\n\n')}
------------------------------------`;
-        }
+        // RAG context is injected into system prompt via knowledgeContext below
       } catch (error) {
         // RAG failures are non-critical, coaching continues without it
       }
