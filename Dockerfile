@@ -37,7 +37,6 @@ COPY backend/tsconfig.json ./
 COPY backend/tsconfig.dev.json ./
 COPY backend/src ./src
 COPY backend/knowledgeBase.sql ./knowledgeBase.sql
-COPY base_conocimientos ./base_conocimientos
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app

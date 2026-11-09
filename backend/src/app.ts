@@ -130,9 +130,9 @@ async function start() {
       res.status(404).json({ error: 'Not found' });
     });
 
-    const server = app.listen(PORT, () => {
-      console.log(`✅ GrowAgentAI Backend running on http://localhost:${PORT}`);
-      console.log(`📍 Health check: http://localhost:${PORT}/health`);
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ GrowAgentAI Backend running on http://0.0.0.0:${PORT}`);
+      console.log(`📍 Health check: http://0.0.0.0:${PORT}/health`);
       console.log(`💬 Chat: POST /chat`);
       console.log(`📋 Sessions: POST /api/sessions`);
     });
