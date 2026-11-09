@@ -5,19 +5,26 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "env": {
-    "VITE_API_URL": "http://129.158.255.62:3000",
+    "VITE_API_URL": "https://129.158.255.62:3001",
     "VITE_SENTRY_DSN": "",
     "VITE_APP_NAME": "GrowAgentAI",
     "VITE_APP_VERSION": "2.0.0"
   },
-  "routes": [
+  "headers": [
     {
-      "src": "/assets/(.+)",
-      "dest": "/assets/$1"
-    },
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31556952, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
     {
-      "src": "/(?!assets/)",
-      "dest": "/index.html"
+      "source": "/((?!assets/).*)",
+      "destination": "/index.html"
     }
   ]
 }
