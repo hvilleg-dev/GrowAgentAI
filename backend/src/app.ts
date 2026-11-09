@@ -134,11 +134,11 @@ async function start() {
 
     let server;
 
-    // Use HTTPS if certs exist, otherwise HTTP
-    const certPath = process.env.CERT_PATH || '/home/ubuntu/cert.pem';
-    const keyPath = process.env.KEY_PATH || '/home/ubuntu/key.pem';
+    // Use HTTPS with Let's Encrypt certs
+    const certPath = process.env.CERT_PATH || '/etc/letsencrypt/live/growagentai.solucionesvirtuales.net/fullchain.pem';
+    const keyPath = process.env.KEY_PATH || '/etc/letsencrypt/live/growagentai.solucionesvirtuales.net/privkey.pem';
 
-    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
+    try {
       const https_options = {
         cert: fs.readFileSync(certPath),
         key: fs.readFileSync(keyPath)
@@ -147,7 +147,8 @@ async function start() {
         console.log(`✅ GrowAgentAI Backend running on https://0.0.0.0:${PORT}`);
         console.log(`📍 Health check: https://0.0.0.0:${PORT}/health`);
       });
-    } else {
+    } catch (error) {
+      console.log('⚠️ HTTPS certs not found, falling back to HTTP');
       server = app.listen(PORT, '0.0.0.0', () => {
         console.log(`✅ GrowAgentAI Backend running on http://0.0.0.0:${PORT}`);
         console.log(`📍 Health check: http://0.0.0.0:${PORT}/health`);
