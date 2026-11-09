@@ -47,7 +47,7 @@ out/
 # Package managers
 package-lock.json
 yarn.lock
-pnpm-lock.yaml
+# pnpm-lock.yaml committed for Vercel deployment
 
 # Database
 *.db

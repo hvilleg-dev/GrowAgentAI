@@ -2,9 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "rootDirectory": "frontend/packages/web",
-  "buildCommand": "pnpm run build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install -g pnpm && pnpm install --frozen-lockfile",
   "env": {
     "VITE_API_URL": "http://129.158.255.62:3001",
     "VITE_SENTRY_DSN": "",
@@ -15,17 +15,6 @@
     {
       "src": "/(.*)",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
-        }
-      ]
     }
   ]
 }
