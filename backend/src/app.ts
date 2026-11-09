@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import https from 'https';
+import fs from 'fs';
 import { initializeDatabase } from '@/database/db';
 import { ProviderRouter } from '@/services/ProviderRouter';
 import { CrisisDetector } from '@/services/CrisisDetector';
@@ -130,12 +132,27 @@ async function start() {
       res.status(404).json({ error: 'Not found' });
     });
 
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`✅ GrowAgentAI Backend running on http://0.0.0.0:${PORT}`);
-      console.log(`📍 Health check: http://0.0.0.0:${PORT}/health`);
-      console.log(`💬 Chat: POST /chat`);
-      console.log(`📋 Sessions: POST /api/sessions`);
-    });
+    let server;
+
+    // Use HTTPS if certs exist, otherwise HTTP
+    const certPath = process.env.CERT_PATH || '/home/ubuntu/cert.pem';
+    const keyPath = process.env.KEY_PATH || '/home/ubuntu/key.pem';
+
+    if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
+      const https_options = {
+        cert: fs.readFileSync(certPath),
+        key: fs.readFileSync(keyPath)
+      };
+      server = https.createServer(https_options, app).listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ GrowAgentAI Backend running on https://0.0.0.0:${PORT}`);
+        console.log(`📍 Health check: https://0.0.0.0:${PORT}/health`);
+      });
+    } else {
+      server = app.listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ GrowAgentAI Backend running on http://0.0.0.0:${PORT}`);
+        console.log(`📍 Health check: http://0.0.0.0:${PORT}/health`);
+      });
+    }
 
     return server;
   } catch (error) {
