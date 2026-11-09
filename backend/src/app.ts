@@ -135,8 +135,8 @@ async function start() {
     let server;
 
     // Use HTTPS with Let's Encrypt certs
-    const certPath = process.env.CERT_PATH || '/etc/letsencrypt/live/growagentai.solucionesvirtuales.net/fullchain.pem';
-    const keyPath = process.env.KEY_PATH || '/etc/letsencrypt/live/growagentai.solucionesvirtuales.net/privkey.pem';
+    const certPath = process.env.CERT_PATH || '/home/ubuntu/certs/fullchain.pem';
+    const keyPath = process.env.KEY_PATH || '/home/ubuntu/certs/privkey.pem';
 
     try {
       const https_options = {
