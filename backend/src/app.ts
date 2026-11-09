@@ -1,7 +1,10 @@
+// CRITICAL: Load environment variables FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import https from 'https';
 import fs from 'fs';
 import { initializeDatabase } from '@/database/db';
@@ -13,8 +16,6 @@ import { createAuthRoutes } from '@/routes/auth.routes';
 import { createGoalRoutes } from '@/routes/goal.routes';
 import { AppError } from '@/errors/AppError';
 import logger from '@/utils/logger';
-
-dotenv.config();
 
 const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -62,8 +63,18 @@ async function initializeServices() {
   }
 }
 
-// Health Check Endpoint
+// Health Check Endpoints (must be before error handlers)
 app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '2.0.0',
+    port: PORT
+  });
+});
+
+app.get('/api/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),

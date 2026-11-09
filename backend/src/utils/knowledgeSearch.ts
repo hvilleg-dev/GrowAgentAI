@@ -2,8 +2,18 @@ import OpenAI from 'openai';
 import { AppDataSource } from '@/database/db';
 import logger from './logger';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let openai: OpenAI | null = null;
 const embeddingCache = new Map<string, number[]>();
+
+function getOpenAIClient(): OpenAI {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  if (!openai) {
+    throw new Error('OpenAI API key not configured');
+  }
+  return openai;
+}
 
 export interface KnowledgeChunk {
   archivo: string;
@@ -27,7 +37,8 @@ async function getEmbedding(text: string): Promise<number[]> {
     return embedding;
   }
 
-  const response = await openai.embeddings.create({
+  const client = getOpenAIClient();
+  const response = await client.embeddings.create({
     model: 'text-embedding-3-small',
     input: text
   });
