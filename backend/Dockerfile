@@ -36,6 +36,7 @@ COPY backend/package*.json ./
 COPY backend/tsconfig.json ./
 COPY backend/tsconfig.dev.json ./
 COPY backend/src ./src
+COPY base_conocimientos ./base_conocimientos
 
 # Change ownership to nodejs user
 RUN chown -R nodejs:nodejs /app
@@ -50,6 +51,7 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-# Run compiled application with dumb-init as PID 1
+# Run application with dumb-init as PID 1
+# Use ts-node to handle path mapping correctly
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "-r", "tsconfig-paths/register", "dist/app.js"]
+CMD ["npx", "ts-node", "-P", "tsconfig.json", "-r", "tsconfig-paths/register", "src/app.ts"]
