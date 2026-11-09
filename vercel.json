@@ -5,8 +5,8 @@
   "outputDirectory": "frontend/packages/web/dist",
   "installCommand": "npm install -g pnpm && pnpm install",
   "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_SENTRY_DSN": "@vite_sentry_dsn",
+    "VITE_API_URL": "http://129.158.255.62:3001",
+    "VITE_SENTRY_DSN": "",
     "VITE_APP_NAME": "GrowAgentAI",
     "VITE_APP_VERSION": "2.0.0"
   },
