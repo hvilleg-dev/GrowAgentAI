@@ -35,11 +35,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "frontend/packages/web/.next": {
-      "memory": 512,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
