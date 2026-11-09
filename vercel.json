@@ -13,11 +13,7 @@
   },
   "routes": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
+      "src": "^(?!/assets/).*",
       "destination": "/index.html"
     }
   ]
