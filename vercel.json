@@ -3,7 +3,7 @@
   "version": 2,
   "buildCommand": "cd frontend/packages/web && npm run build",
   "outputDirectory": "frontend/packages/web/dist",
-  "installCommand": "npm install -g pnpm && pnpm install",
+  "installCommand": "npm install",
   "env": {
     "VITE_API_URL": "http://129.158.255.62:3001",
     "VITE_SENTRY_DSN": "",
