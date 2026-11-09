@@ -27,7 +27,7 @@ export const AppDataSource = new DataSource({
   ],
   migrations: ['dist/database/migrations/*.js'],
   migrationsTableName: 'migraciones_typeorm',
-  synchronize: isDev,
+  synchronize: true,
   logging: isDev ? ['query', 'error'] : ['error'],
   logger: 'simple-console',
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -41,7 +41,7 @@ export async function initializeDatabase(): Promise<void> {
       await AppDataSource.initialize();
       console.log('✅ Database initialized');
 
-      if (isDev) {
+      if (isDev || process.env.NODE_ENV === 'production') {
         console.log('🔄 Synchronizing database schema...');
         await AppDataSource.synchronize();
         console.log('✅ Schema synchronized');
