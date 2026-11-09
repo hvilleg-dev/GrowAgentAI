@@ -11,13 +11,11 @@
     "VITE_APP_NAME": "GrowAgentAI",
     "VITE_APP_VERSION": "2.0.0"
   },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "http://129.158.255.62:3001/api/:path*"
-    }
-  ],
   "routes": [
+    {
+      "src": "^/assets/.*",
+      "dest": "/assets/$1"
+    },
     {
       "src": "^(?!/assets/).*",
       "destination": "/index.html"
