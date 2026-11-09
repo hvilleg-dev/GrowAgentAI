@@ -13,12 +13,12 @@
   },
   "routes": [
     {
-      "src": "^/assets/.*",
+      "src": "/assets/(.+)",
       "dest": "/assets/$1"
     },
     {
-      "src": "^(?!/assets/).*",
-      "destination": "/index.html"
+      "src": "/(?!assets/)",
+      "dest": "/index.html"
     }
   ]
 }
