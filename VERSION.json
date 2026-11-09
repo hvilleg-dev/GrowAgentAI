@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2026-11-09",
+  "releaseStage": "stable",
+  "apiVersion": "v1",
+  "compatibility": {
+    "nodeVersion": ">=18.0.0",
+    "postgresVersion": ">=13.0",
+    "dockerVersion": ">=20.10"
+  },
+  "breakingChanges": []
+}
