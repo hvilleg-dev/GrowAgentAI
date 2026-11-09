@@ -143,28 +143,12 @@ async function start() {
       res.status(404).json({ error: 'Not found' });
     });
 
-    let server;
-
-    // Use HTTPS with Let's Encrypt certs
-    const certPath = process.env.CERT_PATH || '/home/ubuntu/certs/fullchain.pem';
-    const keyPath = process.env.KEY_PATH || '/home/ubuntu/certs/privkey.pem';
-
-    try {
-      const https_options = {
-        cert: fs.readFileSync(certPath),
-        key: fs.readFileSync(keyPath)
-      };
-      server = https.createServer(https_options, app).listen(PORT, '0.0.0.0', () => {
-        console.log(`✅ GrowAgentAI Backend running on https://0.0.0.0:${PORT}`);
-        console.log(`📍 Health check: https://0.0.0.0:${PORT}/health`);
-      });
-    } catch (error) {
-      console.log('⚠️ HTTPS certs not found, falling back to HTTP');
-      server = app.listen(PORT, '0.0.0.0', () => {
-        console.log(`✅ GrowAgentAI Backend running on http://0.0.0.0:${PORT}`);
-        console.log(`📍 Health check: http://0.0.0.0:${PORT}/health`);
-      });
-    }
+    // Run HTTP only - Caddy reverse proxy handles HTTPS
+    const server = app.listen(PORT, 'localhost', () => {
+      console.log(`✅ GrowAgentAI Backend running on http://localhost:${PORT}`);
+      console.log(`📍 Health check: http://localhost:${PORT}/health`);
+      console.log(`📍 Caddy proxy forwards HTTPS from growagentai.solucionesvirtuales.net`);
+    });
 
     return server;
   } catch (error) {
