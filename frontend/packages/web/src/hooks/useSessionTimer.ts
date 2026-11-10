@@ -21,7 +21,7 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
   const dispatch = useDispatch()
   const { notifyWarning } = useNotification()
   const lastActivityAt = useSelector((state: RootState) => state.sessions.lastActivityAt)
-  const sessions = useSelector((state: RootState) => state.sessions.sessions)
+  const sessions = useSelector((state: RootState) => state.sessions.items)
   const [remainingMs, setRemainingMs] = useState(45 * 60 * 1000) // Initialize to 45 minutes
   const [status, setStatus] = useState<SessionStatus>('ACTIVE')
   const [warningShown, setWarningShown] = useState(false)

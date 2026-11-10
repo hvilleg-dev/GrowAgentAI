@@ -97,8 +97,8 @@ export default function ChatPage() {
       alert('You must be logged in to create a session')
       return
     }
-    // Prevent creating new session if one is already active or doesn't have status
-    const activeSession = sessions.find(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status)
+    // Prevent creating new session if one is already active or paused
+    const activeSession = sessions.find(s => s.status === 'ACTIVE' || s.status === 'PAUSED')
     if (activeSession) {
       alert('Solo puedes tener una sesión activa. Termina la sesión actual antes de crear una nueva.')
       return
@@ -173,10 +173,10 @@ export default function ChatPage() {
 
         <button
           onClick={handleNewSession}
-          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || sessions.some(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status)}
+          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED')}
           title={
             profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
-            sessions.some(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status) ? 'Solo una sesión activa permitida' :
+            sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED') ? 'Solo una sesión activa permitida' :
             ''
           }
           className="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
