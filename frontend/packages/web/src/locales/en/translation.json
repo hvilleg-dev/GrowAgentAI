@@ -171,10 +171,14 @@
   },
   "menu": {
     "home": "Home",
+    "chatLabel": "💬 Chat",
     "chat": "Chat",
+    "goalsLabel": "🎯 Goals",
     "settings": "Settings",
+    "settingsLabel": "⚙️ Settings",
     "logout": "Logout",
     "goals": "Goals",
+    "instructionsLabel": "📖 Instructions",
     "instructions": "Instructions"
   },
   "crisis": {
