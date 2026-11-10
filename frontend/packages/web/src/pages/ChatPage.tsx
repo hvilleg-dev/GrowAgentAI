@@ -165,7 +165,7 @@ export default function ChatPage() {
             <option value="">{t('common.none')}</option>
             {goals.map((goal) => (
               <option key={goal.id} value={goal.id}>
-                {goal.goal}
+                {goal.description}
               </option>
             ))}
           </select>
@@ -273,7 +273,7 @@ export default function ChatPage() {
               </h1>
               {currentGoal && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {t('chat.goal')}: {currentGoal.goal}
+                  {t('chat.goal')}: {currentGoal.description}
                 </p>
               )}
             </div>
@@ -304,7 +304,7 @@ export default function ChatPage() {
                 className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition-colors w-full text-left"
               >
                 <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-medium truncate max-w-xs">
-                  🎯 {currentGoal.goal}
+                  🎯 {currentGoal.description}
                 </span>
                 <span className="ml-auto shrink-0 text-gray-400">{showGoalDetail ? '▲' : '▼'}</span>
               </button>
