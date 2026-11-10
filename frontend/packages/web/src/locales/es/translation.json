@@ -86,7 +86,15 @@
     "supportiveStyleDesc": "El coach proporciona calidez, empatía y motivación. Ideal si necesitas ánimo y apoyo emocional mientras trabajas en tus metas.",
     "directiveStyleDesc": "El coach da pasos claros y te desafía a tomar acción inmediatamente. Ideal si prefieres consejos concretos y resultados rápidos.",
     "socraticStyleDesc": "El coach hace preguntas profundas para que encuentres tus propias respuestas. Ideal si quieres desarrollar tu pensamiento crítico y autoconciencia.",
-    "collaborativeStyleDesc": "El coach trabaja como socio, explorando opciones juntos contigo. Ideal si te gusta pensar en voz alta y co-crear soluciones."
+    "collaborativeStyleDesc": "El coach trabaja como socio, explorando opciones juntos contigo. Ideal si te gusta pensar en voz alta y co-crear soluciones.",
+    "twoFactorAuthTitle": "Autenticación de Dos Factores",
+    "twoFactorAuthDesc": "La autenticación de dos factores agrega una capa extra de seguridad a tu cuenta. Además de tu contraseña, necesitarás ingresar un código de tu aplicación autenticadora.",
+    "twoFactorAuthEnabled": "✓ Autenticación de Dos Factores habilitada",
+    "scanQRCode": "Escanea este código QR con tu aplicación autenticadora:",
+    "scanWith": "Escanea con Google Authenticator, Authy, o Microsoft Authenticator",
+    "verifyEnable2FA": "Verificar y Habilitar 2FA",
+    "disable2FA": "Deshabilitar 2FA",
+    "close": "Cerrar"
   },
   "goals": {
     "createNewGoal": "Crear Nueva Meta",

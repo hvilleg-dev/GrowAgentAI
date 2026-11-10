@@ -86,7 +86,15 @@
     "supportiveStyleDesc": "The coach provides warmth, empathy and motivation. Ideal if you need encouragement and emotional support while working on your goals.",
     "directiveStyleDesc": "The coach gives clear steps and challenges you to take action immediately. Ideal if you prefer concrete advice and fast results.",
     "socraticStyleDesc": "The coach asks deep questions so you find your own answers. Ideal if you want to develop your critical thinking and self-awareness.",
-    "collaborativeStyleDesc": "The coach works as a partner, exploring options together with you. Ideal if you like to think out loud and co-create solutions."
+    "collaborativeStyleDesc": "The coach works as a partner, exploring options together with you. Ideal if you like to think out loud and co-create solutions.",
+    "twoFactorAuthTitle": "Two-Factor Authentication",
+    "twoFactorAuthDesc": "Two-Factor Authentication adds an extra layer of security to your account. In addition to your password, you'll need to enter a code from your authenticator app.",
+    "twoFactorAuthEnabled": "✓ Two-Factor Authentication is enabled",
+    "scanQRCode": "Scan this QR code with your authenticator app:",
+    "scanWith": "Scan with Google Authenticator, Authy, or Microsoft Authenticator",
+    "verifyEnable2FA": "Verify & Enable 2FA",
+    "disable2FA": "Disable 2FA",
+    "close": "Close"
   },
   "goals": {
     "createNewGoal": "Create New Goal",

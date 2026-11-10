@@ -443,14 +443,14 @@ export default function SettingsPage() {
         {show2FAModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md p-6">
-              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">Two-Factor Authentication</h2>
+              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">{t('profile.twoFactorAuthTitle')}</h2>
               {!twoFactorEnabled ? (
                 <div className="space-y-4">
                   <p className="text-gray-600">
-                    Two-Factor Authentication adds an extra layer of security to your account. In addition to your password, you'll need to enter a code from your authenticator app.
+                    {t('profile.twoFactorAuthDesc')}
                   </p>
                   <div className="bg-gray-100 p-4 rounded-lg text-center">
-                    <p className="text-sm text-gray-600 mb-2">Scan this QR code with your authenticator app:</p>
+                    <p className="text-sm text-gray-600 mb-2">{t('profile.scanQRCode')}</p>
                     <div className="bg-white p-4 inline-block border-2 border-gray-300">
                       <img
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/GrowAgentAI:${encodeURIComponent(user?.email || 'user@growagentai.com')}?secret=JBSWY3DPEBLW64TMMQ======&issuer=GrowAgentAI`}
@@ -458,7 +458,7 @@ export default function SettingsPage() {
                         className="w-48 h-48"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">Scan with Google Authenticator, Authy, or Microsoft Authenticator</p>
+                    <p className="text-xs text-gray-500 mt-2">{t('profile.scanWith')}</p>
                   </div>
                   <button
                     onClick={() => {
@@ -467,19 +467,19 @@ export default function SettingsPage() {
                     }}
                     className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium"
                   >
-                    Verify & Enable 2FA
+                    {t('profile.verifyEnable2FA')}
                   </button>
                   <button
                     onClick={() => setShow2FAModal(false)}
                     className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-700 font-medium">✓ Two-Factor Authentication is enabled</p>
+                    <p className="text-green-700 font-medium">{t('profile.twoFactorAuthEnabled')}</p>
                   </div>
                   <button
                     onClick={() => {
@@ -488,13 +488,13 @@ export default function SettingsPage() {
                     }}
                     className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 font-medium"
                   >
-                    Disable 2FA
+                    {t('profile.disable2FA')}
                   </button>
                   <button
                     onClick={() => setShow2FAModal(false)}
                     className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
                   >
-                    Close
+                    {t('profile.close')}
                   </button>
                 </div>
               )}
