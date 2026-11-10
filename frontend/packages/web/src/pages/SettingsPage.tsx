@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import type { RootState, AppDispatch } from '@/store'
 import { setTheme, setLanguage } from '@/store/slices/uiSlice'
 import type { Theme, Language } from '@/types'
 import { apiClient } from '@/services/apiClient'
 
 export default function SettingsPage() {
+  const { t, i18n } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
   const { theme, language } = useSelector((state: RootState) => state.ui)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -112,6 +114,7 @@ export default function SettingsPage() {
   }
 
   const handleLanguageChange = (newLang: Language) => {
+    i18n.changeLanguage(newLang)
     updateLanguageMutation.mutate(newLang)
   }
 
@@ -124,15 +127,15 @@ export default function SettingsPage() {
   return (
     <div className="h-full bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">{t('profile.settings')}</h1>
 
         {/* User Profile Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('profile.settings')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('profile.name')}
               </label>
               <input
                 type="text"
@@ -142,8 +145,8 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('profile.email')}
               </label>
               <input
                 type="email"
@@ -158,11 +161,12 @@ export default function SettingsPage() {
         {/* Coaching Profile Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Coaching Profile</h2>
+          {/* TODO: Traducir "Coaching Profile" */}
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             This information is used by your AI coach to personalize every conversation.
           </p>
           <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded text-sm text-amber-800 dark:text-amber-200">
-            All fields are required. Complete your profile to get the best coaching experience.
+            {t('profile.completeProfile')}
           </div>
 
           {profileSuccess && (
@@ -180,7 +184,7 @@ export default function SettingsPage() {
             {/* Age */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Age <span className="text-red-500">*</span>
+                {t('profile.age')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -196,7 +200,7 @@ export default function SettingsPage() {
             {/* Gender */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Gender <span className="text-red-500">*</span>
+                {t('profile.gender')} <span className="text-red-500">*</span>
               </label>
               <select
                 value={genero}
@@ -204,9 +208,9 @@ export default function SettingsPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">Select gender</option>
-                <option value="Masculino">Male</option>
-                <option value="Femenino">Female</option>
-                <option value="Otro">Other / Prefer not to say</option>
+                <option value="Masculino">{t('profile.male')}</option>
+                <option value="Femenino">{t('profile.female')}</option>
+                <option value="Otro">{t('profile.other')}</option>
               </select>
             </div>
 
@@ -277,7 +281,7 @@ export default function SettingsPage() {
 
           {/* Theme */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Theme
             </label>
             <div className="flex gap-3">
@@ -306,29 +310,29 @@ export default function SettingsPage() {
 
           {/* Language */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Language
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              {t('profile.language')}
             </label>
             <div className="flex gap-3">
               <button
                 onClick={() => handleLanguageChange('en')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
                   language === 'en'
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300'
+                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                    : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300'
                 }`}
               >
-                🇺🇸 English
+                🇺🇸 {t('profile.english')}
               </button>
               <button
                 onClick={() => handleLanguageChange('es')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
                   language === 'es'
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300'
+                    ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                    : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300'
                 }`}
               >
-                🇪🇸 Español
+                🇪🇸 {t('profile.spanish')}
               </button>
             </div>
           </div>

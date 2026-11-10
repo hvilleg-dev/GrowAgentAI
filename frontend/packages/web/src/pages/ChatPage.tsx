@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import type { RootState, AppDispatch } from '@/store'
 import { useSessions } from '@/hooks/useSessions'
 import { useChat } from '@/hooks/useChat'
@@ -10,6 +11,7 @@ import MessageBubble from '@/components/MessageBubble'
 import { apiClient } from '@/services/apiClient'
 
 export default function ChatPage() {
+  const { t } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
   const { sessions, isLoading: isLoadingSessions, createSession, isCreating } = useSessions()
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
@@ -123,12 +125,12 @@ export default function ChatPage() {
     <div className="flex h-full bg-gray-50 dark:bg-gray-900">
       {/* Sidebar - Sessions List */}
       <div className="w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 flex flex-col">
-        <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">Sessions</h2>
+        <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">{t('sidebar.sessions')}</h2>
 
         {/* Goal Selector */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select Goal (optional)
+            {t('sidebar.selectGoal')}
           </label>
           <select
             value={selectedGoalId || ''}
@@ -148,17 +150,17 @@ export default function ChatPage() {
         <button
           onClick={handleNewSession}
           disabled={isCreating || (profileStatus && !profileStatus.isComplete)}
-          title={profileStatus && !profileStatus.isComplete ? 'Complete your profile first' : ''}
+          title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
           className="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isCreating ? 'Creating...' : '+ New Session'}
+          {isCreating ? t('common.loading') : t('sidebar.newSession')}
         </button>
 
         <div className="space-y-2 flex-1 overflow-y-auto">
           {isLoadingSessions ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading sessions...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('sidebar.loadingSessions')}</p>
           ) : sessions.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No sessions yet</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('sidebar.noSessions')}</p>
           ) : (
             sessions.map((session) => {
               const isPastSession = session.id !== latestSession?.id
@@ -176,9 +178,9 @@ export default function ChatPage() {
                     className="cursor-pointer flex items-center gap-1.5"
                   >
                     {session.id === latestSession?.id ? (
-                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active session" />
+                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title={t('sidebar.activeSession')} />
                     ) : (
-                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title="Past session" />
+                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={t('sidebar.pastSession')} />
                     )}
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || 'Session'}</p>
                     {isPastSession && (
@@ -189,13 +191,13 @@ export default function ChatPage() {
                         }}
                         disabled={isDeleting}
                         className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 shrink-0 ml-1 text-xs"
-                        title="Delete session"
+                        title={t('sidebar.deleteSession')}
                       >
                         🗑️
                       </button>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-3.5">Stage: {session.etapaActual}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-3.5">{t('sidebar.stage')}: {session.etapaActual}</p>
                 </div>
               )
             })
@@ -210,9 +212,9 @@ export default function ChatPage() {
           <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700 p-4 flex items-start gap-3">
             <span className="text-xl">⚠️</span>
             <div className="flex-1">
-              <h3 className="font-semibold text-amber-900 dark:text-amber-200">Complete Your Profile</h3>
+              <h3 className="font-semibold text-amber-900 dark:text-amber-200">{t('profile.completeYourProfile')}</h3>
               <p className="text-sm text-amber-800 dark:text-amber-300 mt-1">
-                Please complete your profile in Settings before starting to chat. Missing: {profileStatus.missingFields.join(', ')}
+                {t('profile.pleaseComplete')} {profileStatus.missingFields.join(', ')}
               </p>
             </div>
             <button
@@ -229,11 +231,11 @@ export default function ChatPage() {
           <div className="p-4 flex justify-between items-center">
             <div>
               <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {currentSession?.objetivo || 'Chat'}
+                {currentSession?.objetivo || t('chat.title')}
               </h1>
               {currentGoal && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Goal: {currentGoal.goal}
+                  {t('chat.goal')}: {currentGoal.goal}
                 </p>
               )}
             </div>
@@ -254,10 +256,10 @@ export default function ChatPage() {
               </button>
               {showGoalDetail && (
                 <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-200 space-y-1">
-                  <p><span className="font-medium">Reality:</span> {currentGoal.reality}</p>
-                  <p><span className="font-medium">Options:</span> {currentGoal.options && currentGoal.options.length > 0 ? currentGoal.options.join(', ') : 'Not specified'}</p>
-                  <p><span className="font-medium">Will:</span> {currentGoal.will || 'Not specified'}</p>
-                  <p><span className="font-medium">Stage:</span> {currentSession?.etapaActual} · <span className="font-medium">Status:</span> {currentGoal.status}</p>
+                  <p><span className="font-medium">{t('chat.reality')}:</span> {currentGoal.reality}</p>
+                  <p><span className="font-medium">{t('chat.options')}:</span> {currentGoal.options && currentGoal.options.length > 0 ? currentGoal.options.join(', ') : t('chat.notSpecified')}</p>
+                  <p><span className="font-medium">{t('chat.will')}:</span> {currentGoal.will || t('chat.notSpecified')}</p>
+                  <p><span className="font-medium">{t('chat.stage')}:</span> {currentSession?.etapaActual} · <span className="font-medium">{t('chat.status')}:</span> {currentGoal.status}</p>
                 </div>
               )}
             </div>
@@ -268,15 +270,15 @@ export default function ChatPage() {
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
           {!sessionId ? (
             <div className="text-center text-gray-500 py-8">
-              <p>Create or select a session to start chatting</p>
+              <p>{t('chat.createSession')}</p>
             </div>
           ) : isChatLoading && messages.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
-              <p>Loading messages...</p>
+              <p>{t('chat.loadingMessages')}</p>
             </div>
           ) : messages.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
-              <p>Start a new conversation!</p>
+              <p>{t('chat.startConversation')}</p>
             </div>
           ) : (
             messages.map((message) => (
@@ -295,13 +297,13 @@ export default function ChatPage() {
           {isReadOnly ? (
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-3">
               <span>🔒</span>
-              <span>This is a past session — read only. Create a new session to continue coaching.</span>
+              <span>{t('chat.readOnly')}</span>
             </div>
           ) : (
           <>
           {error && (
             <div className="bg-red-50 text-red-700 text-sm p-2 rounded mb-2">
-              Error sending message. Please try again.
+              {t('common.error')} sending message. {t('common.error')} try again.
             </div>
           )}
           <div className="flex gap-2">
@@ -310,17 +312,17 @@ export default function ChatPage() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={profileStatus && !profileStatus.isComplete ? 'Complete your profile first...' : 'Type a message...'}
+              placeholder={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : t('chat.typeMessage')}
               disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
             />
             <button
               onClick={handleSendMessage}
               disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete)}
-              title={profileStatus && !profileStatus.isComplete ? 'Complete your profile first' : ''}
+              title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
               className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isChatLoading ? '...' : 'Send'}
+              {isChatLoading ? '...' : t('chat.send')}
             </button>
           </div>
           </>
