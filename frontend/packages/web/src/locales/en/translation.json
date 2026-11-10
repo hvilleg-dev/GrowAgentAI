@@ -176,6 +176,20 @@
     "readyToBegin": "Ready to begin?",
     "completeProfileRequired2": "Complete your Coaching Profile in Settings (required)",
     "createFirstGoal": "Create your first Goal",
-    "openChatLinkGoal": "Open Chat, link the goal, and start your session"
+    "openChatLinkGoal": "Open Chat, link the goal, and start your session",
+    "createYourGoal": "Create Your Goal",
+    "recommendedStartHere": "Recommended: Start here BEFORE your first chat session",
+    "goToGoalsTab": "Go to the Goals tab and create a goal using the GROW framework:",
+    "goalQuestion": "What do you want to achieve? Be specific and measurable.",
+    "realityQuestion": "Where are you now? What is the current situation?",
+    "optionsQuestion": "What are possible approaches to reach your goal?",
+    "willQuestion": "What is your commitment? What action will you take first?",
+    "createChatSession": "Create a Chat Session",
+    "goToChatTab": "Go to the Chat tab and click \"+ New Session\"",
+    "selectGoalDropdown": "Select a goal from the dropdown — the coach will have full GROW context",
+    "withoutGoalSelected": "Without a goal selected, the coach still works but with less personalization",
+    "chatWithCoach": "Chat with Your AI Coach",
+    "coachGuideGrow": "The coach will guide you through GROW stages based on your goal",
+    "beHonestDetailed": "Be honest and detailed — the more context you share, the better"
   }
 }

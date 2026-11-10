@@ -62,18 +62,18 @@ export default function InstructionsPage() {
       <div className="mb-10 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center mb-4">
           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-600 text-white font-bold mr-4 shrink-0">1</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Your Goal</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('instructions.createYourGoal')}</h2>
         </div>
         <div className="ml-14 space-y-3 text-gray-700 dark:text-gray-300">
           <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-500 text-sm text-blue-900 dark:text-blue-100 font-medium mb-3">
-            Recommended: Start here BEFORE your first chat session
+            {t('instructions.recommendedStartHere')}
           </div>
-          <p>Go to the <strong>Goals</strong> tab and create a goal using the GROW framework:</p>
+          <p>{t('instructions.goToGoalsTab')}</p>
           <ul className="list-disc list-inside space-y-2 ml-4">
-            <li><strong>Goal</strong>: What do you want to achieve? Be specific and measurable.</li>
-            <li><strong>Reality</strong>: Where are you now? What is the current situation?</li>
-            <li><strong>Options</strong>: What are possible approaches to reach your goal?</li>
-            <li><strong>Will</strong>: What is your commitment? What action will you take first?</li>
+            <li><strong>Goal</strong>: {t('instructions.goalQuestion')}</li>
+            <li><strong>Reality</strong>: {t('instructions.realityQuestion')}</li>
+            <li><strong>Options</strong>: {t('instructions.optionsQuestion')}</li>
+            <li><strong>Will</strong>: {t('instructions.willQuestion')}</li>
           </ul>
           <p className="mt-3 text-sm italic text-gray-500 dark:text-gray-400">{t('instructions.example')}</p>
         </div>
@@ -83,13 +83,13 @@ export default function InstructionsPage() {
       <div className="mb-10 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center mb-4">
           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-600 text-white font-bold mr-4 shrink-0">2</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create a Chat Session</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('instructions.createChatSession')}</h2>
         </div>
         <div className="ml-14 space-y-2 text-gray-700 dark:text-gray-300">
           <ul className="list-disc list-inside space-y-2 ml-4">
-            <li>Go to the <strong>Chat</strong> tab and click <strong>"+ New Session"</strong></li>
-            <li><strong>Select a goal</strong> from the dropdown — the coach will have full GROW context</li>
-            <li>Without a goal selected, the coach still works but with less personalization</li>
+            <li>{t('instructions.goToChatTab')}</li>
+            <li>{t('instructions.selectGoalDropdown')}</li>
+            <li>{t('instructions.withoutGoalSelected')}</li>
           </ul>
         </div>
       </div>
@@ -98,12 +98,12 @@ export default function InstructionsPage() {
       <div className="mb-10 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center mb-4">
           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-600 text-white font-bold mr-4 shrink-0">3</div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Chat with Your AI Coach</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('instructions.chatWithCoach')}</h2>
         </div>
         <div className="ml-14 space-y-2 text-gray-700 dark:text-gray-300">
           <ul className="list-disc list-inside space-y-2 ml-4">
-            <li>The coach will guide you through GROW stages based on your goal</li>
-            <li>Be honest and detailed {t('instructions.shareContext')}</li>
+            <li>{t('instructions.coachGuideGrow')}</li>
+            <li>{t('instructions.beHonestDetailed')}</li>
             <li>{t('instructions.multipleSessions')}</li>
           </ul>
           <p className="mt-3 font-semibold text-indigo-600 dark:text-indigo-400 text-sm">{t('instructions.tipMoreSessions')}</p>

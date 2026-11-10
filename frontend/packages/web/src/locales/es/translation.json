@@ -176,6 +176,20 @@
     "readyToBegin": "¿Listo para comenzar?",
     "completeProfileRequired2": "Completa tu Perfil de Coaching en Configuración (requerido)",
     "createFirstGoal": "Crea tu primera Meta",
-    "openChatLinkGoal": "Abre Chat, vincula la meta, e inicia tu sesión"
+    "openChatLinkGoal": "Abre Chat, vincula la meta, e inicia tu sesión",
+    "createYourGoal": "Crea Tu Meta",
+    "recommendedStartHere": "Recomendado: Comienza aquí ANTES de tu primera sesión de chat",
+    "goToGoalsTab": "Ve a la pestaña Goals y crea una meta usando el framework GROW:",
+    "goalQuestion": "¿Qué quieres lograr? Sé específico y medible.",
+    "realityQuestion": "¿Dónde estás ahora? ¿Cuál es la situación actual?",
+    "optionsQuestion": "¿Cuáles son los posibles enfoques para alcanzar tu meta?",
+    "willQuestion": "¿Cuál es tu compromiso? ¿Qué acción tomarás primero?",
+    "createChatSession": "Crea una Sesión de Chat",
+    "goToChatTab": "Ve a la pestaña Chat y haz clic en \"+ Nueva Sesión\"",
+    "selectGoalDropdown": "Selecciona una meta del dropdown — el coach tendrá contexto GROW completo",
+    "withoutGoalSelected": "Sin una meta seleccionada, el coach aún funciona pero con menos personalización",
+    "chatWithCoach": "Chatea con Tu Coach de IA",
+    "coachGuideGrow": "El coach te guiará a través de etapas GROW basadas en tu meta",
+    "beHonestDetailed": "Sé honesto y detallado — cuanto más contexto compartas, mejor"
   }
 }
