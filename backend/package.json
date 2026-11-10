@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node -P tsconfig.dev.json src/app.ts",
     "build": "tsc",
-    "start": "node -r tsconfig-paths/register dist/app.js",
+    "start": "node start.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
