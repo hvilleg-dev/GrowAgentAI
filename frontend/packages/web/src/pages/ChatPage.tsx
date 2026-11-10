@@ -345,44 +345,33 @@ export default function ChatPage() {
               <span>🔒</span>
               <span>{t('chat.readOnly')}</span>
             </div>
-          ) : sessionStatus === 'CLOSED' ? (
-            <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded-lg px-4 py-3">
-              <span>🔴</span>
-              <span>Session has ended. Create a new session to continue.</span>
-            </div>
-          ) : sessionStatus === 'PAUSED' ? (
-            <div className="flex items-center gap-2 text-sm text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg px-4 py-3">
-              <span>⏸</span>
-              <span>Session paused due to inactivity. Click to resume.</span>
-            </div>
           ) : (
-          <>
-          {error && (
-            <div className="bg-red-50 text-red-700 text-sm p-2 rounded mb-2">
-              {t('chat.errorSending')}
-            </div>
-          )}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              onFocus={handleInputFocus}
-              placeholder={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : t('chat.typeMessage')}
-              disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete) || sessionStatus !== 'ACTIVE'}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete) || sessionStatus !== 'ACTIVE'}
-              title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isChatLoading ? '...' : t('chat.send')}
-            </button>
-          </div>
-          </>
+            <>
+              {error && (
+                <div className="bg-red-50 text-red-700 text-sm p-2 rounded mb-2">
+                  {t('chat.errorSending')}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : t('chat.typeMessage')}
+                  disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete)}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete)}
+                  title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
+                  className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isChatLoading ? '...' : t('chat.send')}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
