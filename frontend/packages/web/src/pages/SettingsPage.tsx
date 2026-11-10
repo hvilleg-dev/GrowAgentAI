@@ -243,27 +243,27 @@ export default function SettingsPage() {
                 onChange={(e) => setEstiloCoaching(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 mb-3"
               >
-                <option value="supportive">Supportive — Empathetic and encouraging</option>
-                <option value="directive">Directive — Direct, action-oriented and results-focused</option>
-                <option value="socratic">Socratic — Deep questions to guide self-discovery</option>
-                <option value="collaborative">Collaborative — Partnership, exploring together</option>
+                <option value="supportive">{t('profile.supportiveStyle')}</option>
+                <option value="directive">{t('profile.directiveStyle')}</option>
+                <option value="socratic">{t('profile.socraticStyle')}</option>
+                <option value="collaborative">{t('profile.collaborativeStyle')}</option>
               </select>
               {/* Style descriptions */}
               <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-xs">
                 <div className={`p-3 ${estiloCoaching === 'supportive' ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">Supportive</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t('profile.supportiveStyle')}</span>
                   <span className="text-gray-600 dark:text-gray-400"> — {t('profile.supportiveStyleDesc')}</span>
                 </div>
                 <div className={`p-3 ${estiloCoaching === 'directive' ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">Directive</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t('profile.directiveStyle')}</span>
                   <span className="text-gray-600 dark:text-gray-400"> — {t('profile.directiveStyleDesc')}</span>
                 </div>
                 <div className={`p-3 ${estiloCoaching === 'socratic' ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">Socratic</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t('profile.socraticStyle')}</span>
                   <span className="text-gray-600 dark:text-gray-400"> — {t('profile.socraticStyleDesc')}</span>
                 </div>
                 <div className={`p-3 ${estiloCoaching === 'collaborative' ? 'bg-indigo-50 dark:bg-indigo-900/30 border-l-4 border-indigo-500' : 'bg-gray-50 dark:bg-gray-700/50'}`}>
-                  <span className="font-semibold text-gray-800 dark:text-gray-200">Collaborative</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">{t('profile.collaborativeStyle')}</span>
                   <span className="text-gray-600 dark:text-gray-400"> — {t('profile.collaborativeStyleDesc')}</span>
                 </div>
               </div>
