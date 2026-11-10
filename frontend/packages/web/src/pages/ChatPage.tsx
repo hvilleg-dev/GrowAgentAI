@@ -5,7 +5,10 @@ import type { RootState, AppDispatch } from '@/store'
 import { useSessions } from '@/hooks/useSessions'
 import { useChat } from '@/hooks/useChat'
 import { useGoals } from '@/hooks/useGoals'
-import { setCurrentSession } from '@/store/slices/sessionsSlice'
+import { useSessionTimer } from '@/hooks/useSessionTimer'
+import { useActivityDetector } from '@/hooks/useActivityDetector'
+import { setCurrentSession, setLastActivity } from '@/store/slices/sessionsSlice'
+import { useNotification } from '@/hooks/useNotification'
 import CrisisIndicator from '@/components/CrisisIndicator'
 import MessageBubble from '@/components/MessageBubble'
 import { apiClient } from '@/services/apiClient'
@@ -13,6 +16,7 @@ import { apiClient } from '@/services/apiClient'
 export default function ChatPage() {
   const { t } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
+  const { notifyInfo } = useNotification()
   const { sessions, isLoading: isLoadingSessions, createSession, isCreating } = useSessions()
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -20,6 +24,10 @@ export default function ChatPage() {
 
   const sessionId = currentSession?.id || sessions[0]?.id
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error } = useChat(sessionId || '')
+
+  // Session timer and activity detection
+  const { timeRemaining, status: sessionStatus, isPaused } = useSessionTimer(sessionId, currentSession?.expiresAt || null)
+  useActivityDetector(sessionId, sessionStatus === 'PAUSED')
 
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
@@ -69,9 +77,17 @@ export default function ChatPage() {
   }, [sessions, currentSession, dispatch])
 
   const handleSendMessage = () => {
-    if (inputText.trim() && sessionId) {
+    if (inputText.trim() && sessionId && sessionStatus === 'ACTIVE') {
+      dispatch(setLastActivity())
       sendMessage(inputText)
       setInputText('')
+    }
+  }
+
+  const handleInputFocus = () => {
+    if (sessionStatus === 'PAUSED') {
+      dispatch(setLastActivity())
+      notifyInfo({ message: t('chat.sessionResumed'), duration: 3000 })
     }
   }
 
@@ -178,7 +194,17 @@ export default function ChatPage() {
                     className="cursor-pointer flex items-center gap-1.5"
                   >
                     {session.id === latestSession?.id ? (
-                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title={t('sidebar.activeSession')} />
+                      <>
+                        {session.status === 'ACTIVE' && (
+                          <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
+                        )}
+                        {session.status === 'PAUSED' && (
+                          <span className="w-2 h-2 rounded-full bg-yellow-500 shrink-0" title="Session paused" />
+                        )}
+                        {session.status === 'CLOSED' && (
+                          <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" title="Session closed" />
+                        )}
+                      </>
                     ) : (
                       <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={t('sidebar.pastSession')} />
                     )}
@@ -239,7 +265,23 @@ export default function ChatPage() {
                 </p>
               )}
             </div>
-            {crisisLevel && <CrisisIndicator level={crisisLevel} />}
+            <div className="flex items-center gap-4">
+              {sessionStatus !== 'CLOSED' && (
+                <div className={`text-sm font-mono font-semibold px-3 py-1 rounded ${
+                  sessionStatus === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                  sessionStatus === 'PAUSED' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                }`}>
+                  {timeRemaining} {isPaused && '⏸'}
+                </div>
+              )}
+              {sessionStatus === 'CLOSED' && (
+                <div className="text-sm font-semibold px-3 py-1 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                  Closed
+                </div>
+              )}
+              {crisisLevel && <CrisisIndicator level={crisisLevel} />}
+            </div>
           </div>
 
           {/* Goal Context — compact chip */}
@@ -299,6 +341,16 @@ export default function ChatPage() {
               <span>🔒</span>
               <span>{t('chat.readOnly')}</span>
             </div>
+          ) : sessionStatus === 'CLOSED' ? (
+            <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30 rounded-lg px-4 py-3">
+              <span>🔴</span>
+              <span>Session has ended. Create a new session to continue.</span>
+            </div>
+          ) : sessionStatus === 'PAUSED' ? (
+            <div className="flex items-center gap-2 text-sm text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg px-4 py-3">
+              <span>⏸</span>
+              <span>Session paused due to inactivity. Click to resume.</span>
+            </div>
           ) : (
           <>
           {error && (
@@ -312,13 +364,14 @@ export default function ChatPage() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              onFocus={handleInputFocus}
               placeholder={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : t('chat.typeMessage')}
-              disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete)}
+              disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete) || sessionStatus !== 'ACTIVE'}
               className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
             />
             <button
               onClick={handleSendMessage}
-              disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete)}
+              disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete) || sessionStatus !== 'ACTIVE'}
               title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
               className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
