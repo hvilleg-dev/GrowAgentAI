@@ -17,6 +17,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import MainLayout from './components/layout/MainLayout'
 import ErrorBoundary from './components/ErrorBoundary'
 import { UpdateNotification } from './components/UpdateNotification'
+import ToastContainer from './components/ToastContainer'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -69,6 +70,7 @@ function App() {
   return (
     <ErrorBoundary>
       <UpdateNotification />
+      <ToastContainer />
       <Router>
         <Routes>
           {/* Public Routes */}
