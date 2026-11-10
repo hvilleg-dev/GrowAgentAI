@@ -506,58 +506,58 @@ export default function SettingsPage() {
         {showPrivacyPolicy && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl max-h-[80vh] overflow-y-auto p-6">
-              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">Privacy Policy</h2>
+              <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">{t('profile.privacyPolicyTitle')}</h2>
               <div className="prose prose-sm dark:prose-invert space-y-4 text-gray-700 dark:text-gray-300">
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">1. Introduction</h3>
-                  <p>GrowAgentAI ("we", "us", "our", or "Company") operates the platform. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section1Title')}</h3>
+                  <p>{t('profile.section1Text')}</p>
                 </section>
 
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">2. Information Collection and Use</h3>
-                  <p>We collect several different types of information for various purposes to provide and improve our Service to you:</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section2Title')}</h3>
+                  <p>{t('profile.section2Intro')}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Personal Data: Name, email address, password</li>
-                    <li>Usage Data: Interactions with the platform, chat history, goals</li>
-                    <li>Device Data: Browser type, IP address, pages visited</li>
+                    <li>{t('profile.personalData')}</li>
+                    <li>{t('profile.usageData')}</li>
+                    <li>{t('profile.deviceData')}</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">3. Use of Data</h3>
-                  <p>GrowAgentAI uses the collected data for various purposes:</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section3Title')}</h3>
+                  <p>{t('profile.section3Intro')}</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>To provide and maintain our Service</li>
-                    <li>To notify you about changes to our Service</li>
-                    <li>To allow you to participate in interactive features</li>
-                    <li>To provide customer support</li>
-                    <li>To gather analysis or valuable information</li>
+                    <li>{t('profile.usePoint1')}</li>
+                    <li>{t('profile.usePoint2')}</li>
+                    <li>{t('profile.usePoint3')}</li>
+                    <li>{t('profile.usePoint4')}</li>
+                    <li>{t('profile.usePoint5')}</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">4. Security of Data</h3>
-                  <p>The security of your data is important to us but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section4Title')}</h3>
+                  <p>{t('profile.section4Text')}</p>
                 </section>
 
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">5. Changes to This Privacy Policy</h3>
-                  <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date at the bottom of this Privacy Policy.</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section5Title')}</h3>
+                  <p>{t('profile.section5Text')}</p>
                 </section>
 
                 <section>
-                  <h3 className="font-semibold text-lg mb-2">6. Contact Us</h3>
-                  <p>If you have any questions about this Privacy Policy, please contact us at privacy@growagentai.com</p>
+                  <h3 className="font-semibold text-lg mb-2">{t('profile.section6Title')}</h3>
+                  <p>{t('profile.section6Text')}</p>
                 </section>
 
-                <p className="text-sm text-gray-500 mt-6">Last updated: November 7, 2026</p>
+                <p className="text-sm text-gray-500 mt-6">{t('profile.lastUpdated')}</p>
               </div>
 
               <button
                 onClick={() => setShowPrivacyPolicy(false)}
                 className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium"
               >
-                Close
+                {t('profile.close')}
               </button>
             </div>
           </div>
