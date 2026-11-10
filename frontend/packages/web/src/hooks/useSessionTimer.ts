@@ -21,17 +21,29 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
   const dispatch = useDispatch()
   const { notifyWarning } = useNotification()
   const lastActivityAt = useSelector((state: RootState) => state.sessions.lastActivityAt)
+  const sessions = useSelector((state: RootState) => state.sessions.sessions)
   const [remainingMs, setRemainingMs] = useState(0)
   const [status, setStatus] = useState<SessionStatus>('ACTIVE')
   const [warningShown, setWarningShown] = useState(false)
 
+  // Get expiresAt from current session if not provided
+  const getExpiresAt = useCallback(() => {
+    if (expiresAt) return expiresAt
+    if (sessionId) {
+      const session = sessions.find(s => s.id === sessionId)
+      if (session?.expiresAt) return session.expiresAt
+    }
+    return null
+  }, [expiresAt, sessionId, sessions])
+
   // Calculate remaining time
   const calculateRemaining = useCallback(() => {
-    if (!expiresAt) return 0
+    const expires = getExpiresAt()
+    if (!expires) return 45 * 60 * 1000 // Default to 45 minutes
     const now = Date.now()
-    const expiry = new Date(expiresAt).getTime()
+    const expiry = new Date(expires).getTime()
     return Math.max(0, expiry - now)
-  }, [expiresAt])
+  }, [getExpiresAt])
 
   // Format time as MM:SS
   const formatTime = useCallback((ms: number): string => {
@@ -43,7 +55,7 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
 
   // Update timer state
   useEffect(() => {
-    if (!expiresAt || !sessionId) return
+    if (!sessionId) return
 
     const interval = setInterval(() => {
       const remaining = calculateRemaining()
@@ -69,7 +81,7 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     }, TIMER_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [expiresAt, sessionId, calculateRemaining, formatTime, notifyWarning, warningShown])
+  }, [sessionId, calculateRemaining, formatTime, notifyWarning, warningShown])
 
   // Check inactivity and pause if needed
   useEffect(() => {

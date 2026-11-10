@@ -97,8 +97,8 @@ export default function ChatPage() {
       alert('You must be logged in to create a session')
       return
     }
-    // Prevent creating new session if one is already active
-    const activeSession = sessions.find(s => s.status === 'ACTIVE' || s.status === 'PAUSED')
+    // Prevent creating new session if one is already active or doesn't have status
+    const activeSession = sessions.find(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status)
     if (activeSession) {
       alert('Solo puedes tener una sesión activa. Termina la sesión actual antes de crear una nueva.')
       return
@@ -173,8 +173,12 @@ export default function ChatPage() {
 
         <button
           onClick={handleNewSession}
-          disabled={isCreating || (profileStatus && !profileStatus.isComplete)}
-          title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
+          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || sessions.some(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status)}
+          title={
+            profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
+            sessions.some(s => (s.status === 'ACTIVE' || s.status === 'PAUSED') || !s.status) ? 'Solo una sesión activa permitida' :
+            ''
+          }
           className="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isCreating ? t('common.loading') : t('sidebar.newSession')}
@@ -203,7 +207,7 @@ export default function ChatPage() {
                   >
                     {currentSession?.id === session.id ? (
                       <>
-                        {session.status === 'ACTIVE' && (
+                        {(session.status === 'ACTIVE' || !session.status) && (
                           <span className="w-3 h-3 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
                         )}
                         {session.status === 'PAUSED' && (

@@ -92,6 +92,11 @@ export class SessionController {
         throw new NotFoundError('Sesión');
       }
 
+      // Ensure session has expiresAt set
+      if (!sesion.expiresAt && sesion.criadaEn) {
+        sesion.expiresAt = new Date(new Date(sesion.criadaEn).getTime() + 45 * 60 * 1000);
+      }
+
       res.json(sesion);
     } catch (error) {
       next(error);
@@ -115,7 +120,18 @@ export class SessionController {
         order: { criadaEn: 'DESC' }
       });
 
-      res.json(sesiones);
+      // Ensure all sessions have expiresAt set
+      const sessionsWithExpiry = sesiones.map(s => {
+        if (!s.expiresAt && s.criadaEn) {
+          return {
+            ...s,
+            expiresAt: new Date(new Date(s.criadaEn).getTime() + 45 * 60 * 1000)
+          };
+        }
+        return s;
+      });
+
+      res.json(sessionsWithExpiry);
     } catch (error) {
       next(error);
     }
