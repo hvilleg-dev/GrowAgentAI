@@ -90,7 +90,7 @@ describe('2FA Verification', () => {
     })
 
     it('should require userId field', () => {
-      const userId = null
+      const userId: string | null = null
       const code = '123456'
 
       const hasRequiredFields = userId && code
@@ -99,7 +99,7 @@ describe('2FA Verification', () => {
 
     it('should require code field', () => {
       const userId = 'user-123'
-      const code = null
+      const code: string | null = null
 
       const hasRequiredFields = userId && code
       expect(hasRequiredFields).toBe(false)
@@ -108,7 +108,6 @@ describe('2FA Verification', () => {
 
   describe('2FA Error Cases', () => {
     it('should handle user not found error', () => {
-      const userId = 'non-existent-user'
       const userExists = false
 
       if (!userExists) {
@@ -118,7 +117,6 @@ describe('2FA Verification', () => {
     })
 
     it('should handle 2FA not enabled error', () => {
-      const userId = 'user-123'
       const twoFactorEnabled = false
 
       if (!twoFactorEnabled) {
