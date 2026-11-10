@@ -94,7 +94,9 @@
     "scanWith": "Escanea con Google Authenticator, Authy, o Microsoft Authenticator",
     "verifyEnable2FA": "Verificar y Habilitar 2FA",
     "disable2FA": "Deshabilitar 2FA",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "updatePassword": "Actualizar Contraseña",
+    "updating": "Actualizando..."
   },
   "goals": {
     "createNewGoal": "Crear Nueva Meta",

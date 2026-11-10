@@ -402,14 +402,14 @@ export default function SettingsPage() {
                         disabled={updatePasswordMutation.isPending}
                         className="flex-1 bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 disabled:opacity-50 text-sm font-medium"
                       >
-                        {updatePasswordMutation.isPending ? 'Updating...' : 'Update Password'}
+                        {updatePasswordMutation.isPending ? t('profile.updating') : t('profile.updatePassword')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowPasswordForm(false)}
                         className="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400 text-sm font-medium"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>

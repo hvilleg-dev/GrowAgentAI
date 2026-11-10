@@ -94,7 +94,9 @@
     "scanWith": "Scan with Google Authenticator, Authy, or Microsoft Authenticator",
     "verifyEnable2FA": "Verify & Enable 2FA",
     "disable2FA": "Disable 2FA",
-    "close": "Close"
+    "close": "Close",
+    "updatePassword": "Update Password",
+    "updating": "Updating..."
   },
   "goals": {
     "createNewGoal": "Create New Goal",
