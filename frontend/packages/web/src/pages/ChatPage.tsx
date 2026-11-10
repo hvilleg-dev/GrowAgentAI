@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import type { RootState, AppDispatch } from '@/store'
 import { useSessions } from '@/hooks/useSessions'
+// Force Vercel redeploy - ensure all UI updates are deployed
 import { useChat } from '@/hooks/useChat'
 import { useGoals } from '@/hooks/useGoals'
 import { useSessionTimer } from '@/hooks/useSessionTimer'
