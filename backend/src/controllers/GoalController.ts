@@ -30,14 +30,14 @@ export class GoalController {
       newGoal.goal = goal;
       newGoal.reality = reality;
 
-      // OPTIONAL fields with defaults
-      if (Array.isArray(options) && options.length > 0 && options.some((o: any) => o && String(o).trim())) {
-        newGoal.options = options.map((o: any) => (o && String(o).trim()) ? String(o).trim() : 'I am not sure yet');
+      // OPTIONAL fields - empty if not provided
+      if (Array.isArray(options) && options.length > 0) {
+        newGoal.options = options.filter((o: any) => o && String(o).trim());
       } else {
-        newGoal.options = ['I am not sure yet', 'I am not sure yet', 'I am not sure yet'];
+        newGoal.options = [];
       }
 
-      newGoal.will = (will && String(will).trim()) ? String(will).trim() : 'I am not sure yet';
+      newGoal.will = (will && String(will).trim()) ? String(will).trim() : '';
       newGoal.status = 'not_started';
 
       const saved = await goalRepo.save(newGoal);

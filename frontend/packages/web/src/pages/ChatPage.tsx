@@ -255,8 +255,8 @@ export default function ChatPage() {
               {showGoalDetail && (
                 <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-200 space-y-1">
                   <p><span className="font-medium">Reality:</span> {currentGoal.reality}</p>
-                  <p><span className="font-medium">Options:</span> {currentGoal.options?.join(', ')}</p>
-                  <p><span className="font-medium">Will:</span> {currentGoal.will}</p>
+                  <p><span className="font-medium">Options:</span> {currentGoal.options && currentGoal.options.length > 0 ? currentGoal.options.join(', ') : 'Not specified'}</p>
+                  <p><span className="font-medium">Will:</span> {currentGoal.will || 'Not specified'}</p>
                   <p><span className="font-medium">Stage:</span> {currentSession?.etapaActual} · <span className="font-medium">Status:</span> {currentGoal.status}</p>
                 </div>
               )}
