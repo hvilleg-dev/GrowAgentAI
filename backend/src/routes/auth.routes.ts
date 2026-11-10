@@ -1,5 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import * as speakeasy from 'speakeasy';
+import * as qrcode from 'qrcode';
 import { AppDataSource } from '@/database/db';
 import { Usuario } from '@/database/entities';
 import logger from '@/utils/logger';
@@ -277,14 +279,25 @@ export function createAuthRoutes(): Router {
         return;
       }
 
-      usuario.twoFactorEnabled = true;
-      usuario.twoFactorSecret = 'mock-2fa-secret-' + Date.now();
+      // Generate a real TOTP secret
+      const secret = speakeasy.generateSecret({
+        name: `GrowAgentAI (${usuario.email})`,
+        issuer: 'GrowAgentAI',
+        length: 32
+      });
+
+      // Generate QR code as data URL
+      const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+
+      // Save secret but DON'T enable 2FA yet (enable after verification)
+      usuario.twoFactorSecret = secret.base32;
       await usuarioRepo.save(usuario);
 
       res.status(200).json({
-        message: '2FA enabled',
-        qrCode: 'mock-qr-code',
-        secret: usuario.twoFactorSecret
+        message: '2FA secret generated. Scan QR code and enter code to enable.',
+        qrCode: qrCodeUrl,
+        secret: secret.base32,
+        manualEntryKey: secret.base32
       });
     } catch (error) {
       logger.error('Enable 2FA error:', error);
@@ -318,10 +331,10 @@ export function createAuthRoutes(): Router {
     }
   });
 
-  // Verify 2FA code
+  // Verify 2FA code - both for login and setup verification
   router.post('/verify-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { userId, code } = req.body;
+      const { userId, code, setupMode } = req.body;
       if (!userId || !code) {
         res.status(400).json({ error: 'Missing required fields: userId, code' });
         return;
@@ -333,17 +346,31 @@ export function createAuthRoutes(): Router {
         return;
       }
 
-      if (!usuario.twoFactorEnabled) {
-        res.status(400).json({ error: '2FA not enabled for this user' });
+      // Verify the code against the secret
+      if (!usuario.twoFactorSecret) {
+        res.status(400).json({ error: 'No 2FA secret found for this user' });
         return;
       }
 
-      // Mock 2FA verification - in production, use a library like speakeasy
-      // For now, accept any 6-digit code as valid
-      const isCodeValid = /^\d{6}$/.test(code);
+      const isCodeValid = speakeasy.totp.verify({
+        secret: usuario.twoFactorSecret,
+        encoding: 'base32',
+        token: code,
+        window: 2 // Allow 2 time windows (±30 seconds)
+      });
 
       if (!isCodeValid) {
         res.status(401).json({ error: 'Invalid 2FA code' });
+        return;
+      }
+
+      // If in setup mode, enable 2FA now
+      if (setupMode) {
+        usuario.twoFactorEnabled = true;
+        await usuarioRepo.save(usuario);
+      } else if (!usuario.twoFactorEnabled) {
+        // During login, 2FA must already be enabled
+        res.status(400).json({ error: '2FA not enabled for this user' });
         return;
       }
 
