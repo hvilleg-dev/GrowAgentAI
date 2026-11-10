@@ -26,9 +26,8 @@ export default function ChatPage() {
   const sessionId = currentSession?.id || sessions[0]?.id
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error } = useChat(sessionId || '')
 
-  // Session timer and activity detection
-  const { timeRemaining, status: sessionStatus, isPaused } = useSessionTimer(sessionId, currentSession?.expiresAt || null)
-  useActivityDetector(sessionId, sessionStatus === 'PAUSED')
+  // Session timer - starts on first message
+  const { timeRemaining, isTimerRunning, startTimer, canCreateNewSession } = useSessionTimer(sessionId)
 
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
@@ -78,17 +77,14 @@ export default function ChatPage() {
   }, [sessions, currentSession, dispatch])
 
   const handleSendMessage = () => {
-    if (inputText.trim() && sessionId && sessionStatus === 'ACTIVE') {
+    if (inputText.trim() && sessionId) {
+      // Start timer on first message
+      if (!isTimerRunning) {
+        startTimer()
+      }
       dispatch(setLastActivity())
       sendMessage(inputText)
       setInputText('')
-    }
-  }
-
-  const handleInputFocus = () => {
-    if (sessionStatus === 'PAUSED') {
-      dispatch(setLastActivity())
-      notifyInfo({ message: t('chat.sessionResumed'), duration: 3000 })
     }
   }
 
@@ -173,9 +169,10 @@ export default function ChatPage() {
 
         <button
           onClick={handleNewSession}
-          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)}
+          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)}
           title={
             profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
+            !canCreateNewSession ? `Espera ${timeRemaining} para nueva sesión` :
             sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status) ? 'Solo una sesión activa permitida' :
             ''
           }
@@ -278,18 +275,14 @@ export default function ChatPage() {
               )}
             </div>
             <div className="flex items-center gap-4">
-              {sessionStatus !== 'CLOSED' && (
-                <div className={`text-lg font-mono font-bold px-4 py-2 rounded ${
-                  sessionStatus === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                  sessionStatus === 'PAUSED' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
-                  {timeRemaining} {isPaused && '⏸'}
+              {isTimerRunning && (
+                <div className="text-lg font-mono font-bold px-4 py-2 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  {timeRemaining}
                 </div>
               )}
-              {sessionStatus === 'CLOSED' && (
-                <div className="text-sm font-semibold px-3 py-1 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                  Closed
+              {!isTimerRunning && currentSession && (
+                <div className="text-lg font-mono font-bold px-4 py-2 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                  {timeRemaining}
                 </div>
               )}
               {crisisLevel && <CrisisIndicator level={crisisLevel} />}

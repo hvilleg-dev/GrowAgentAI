@@ -1,57 +1,59 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import type { RootState } from '@/store'
-import { updateSessionStatus } from '@/store/slices/sessionsSlice'
 import { useNotification } from './useNotification'
-import { apiClient } from '@/services/apiClient'
-import type { SessionStatus } from '@/types'
 
-const INACTIVITY_THRESHOLD = 10 * 60 * 1000 // 10 minutes
-const WARNING_TIME = 2 * 60 * 1000 // 2 minutes
+const SESSION_DURATION = 45 * 60 * 1000 // 45 minutes
+const WARNING_TIME = 2 * 60 * 1000 // 2 minutes before expiry
 const TIMER_INTERVAL = 100 // 100ms for smooth countdown
 
 interface UseSessionTimerReturn {
   remainingMs: number
-  status: SessionStatus
   timeRemaining: string
-  isPaused: boolean
+  isTimerRunning: boolean
+  startTimer: () => void
+  canCreateNewSession: boolean
 }
 
-export function useSessionTimer(sessionId: string | null, expiresAt: string | null): UseSessionTimerReturn {
-  const dispatch = useDispatch()
+export function useSessionTimer(sessionId: string | null): UseSessionTimerReturn {
   const { notifyWarning } = useNotification()
-  const lastActivityAt = useSelector((state: RootState) => state.sessions.lastActivityAt)
-  const sessions = useSelector((state: RootState) => state.sessions.items)
-  const [remainingMs, setRemainingMs] = useState(45 * 60 * 1000) // Initialize to 45 minutes
-  const [status, setStatus] = useState<SessionStatus>('ACTIVE')
+  const [remainingMs, setRemainingMs] = useState(SESSION_DURATION)
   const [warningShown, setWarningShown] = useState(false)
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [timerStartTime, setTimerStartTime] = useState<number | null>(null)
 
-  // Get expiresAt from current session if not provided
-  const getExpiresAt = useCallback(() => {
-    if (expiresAt) return expiresAt
-    if (sessionId) {
-      const session = sessions.find(s => s.id === sessionId)
-      if (session?.expiresAt) return session.expiresAt
+  // Get localStorage key for this session
+  const getStorageKey = useCallback(() => `timer_${sessionId}`, [sessionId])
+
+  // Initialize timer state from localStorage
+  useEffect(() => {
+    if (!sessionId) return
+    const storageKey = getStorageKey()
+    const stored = localStorage.getItem(storageKey)
+    if (stored) {
+      const { startTime } = JSON.parse(stored)
+      setTimerStartTime(startTime)
+      setIsTimerRunning(true)
+      // Check if timer already expired while app was closed
+      const elapsed = Date.now() - startTime
+      if (elapsed >= SESSION_DURATION) {
+        setRemainingMs(0)
+        setIsTimerRunning(false)
+        localStorage.removeItem(storageKey)
+      } else {
+        setRemainingMs(SESSION_DURATION - elapsed)
+      }
     }
-    return null
-  }, [expiresAt, sessionId, sessions])
+  }, [sessionId, getStorageKey])
 
-  // Calculate remaining time
-  const calculateRemaining = useCallback(() => {
-    const expires = getExpiresAt()
-    if (!expires) return 45 * 60 * 1000 // Default to 45 minutes
+  // Start timer function - called from ChatPage when message is sent
+  const startTimer = useCallback(() => {
+    if (isTimerRunning || !sessionId) return
     const now = Date.now()
-    const expiry = typeof expires === 'string'
-      ? new Date(expires).getTime()
-      : (expires instanceof Date ? expires.getTime() : parseInt(expires as string, 10))
-
-    const remaining = Math.max(0, expiry - now)
-    // Debug: log if timer is showing 0 but should have time
-    if (remaining === 0 && expiry > now) {
-      console.warn('[useSessionTimer] Timer calculated as 0 but expiry is in future:', { now, expiry, expires })
-    }
-    return remaining
-  }, [getExpiresAt])
+    setTimerStartTime(now)
+    setIsTimerRunning(true)
+    setRemainingMs(SESSION_DURATION)
+    setWarningShown(false)
+    localStorage.setItem(getStorageKey(), JSON.stringify({ startTime: now }))
+  }, [isTimerRunning, sessionId, getStorageKey])
 
   // Format time as MM:SS
   const formatTime = useCallback((ms: number): string => {
@@ -61,24 +63,20 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   }, [])
 
-  // Update timer state - only when expiresAt is set
+  // Timer countdown effect
   useEffect(() => {
-    if (!sessionId || !getExpiresAt()) return
-
-    // Calculate immediately on mount
-    const remaining = calculateRemaining()
-    setRemainingMs(remaining)
+    if (!isTimerRunning || !sessionId || !timerStartTime) return
 
     const interval = setInterval(() => {
-      const remaining = calculateRemaining()
+      const elapsed = Date.now() - timerStartTime
+      const remaining = Math.max(0, SESSION_DURATION - elapsed)
       setRemainingMs(remaining)
 
       // Check if session expired
       if (remaining <= 0) {
-        setStatus('CLOSED')
+        setIsTimerRunning(false)
         clearInterval(interval)
-        // Auto-close session on backend
-        apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' }).catch(console.error)
+        localStorage.removeItem(getStorageKey())
         return
       }
 
@@ -93,31 +91,16 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     }, TIMER_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [sessionId, calculateRemaining, formatTime, notifyWarning, warningShown, getExpiresAt])
+  }, [isTimerRunning, timerStartTime, sessionId, formatTime, notifyWarning, warningShown, getStorageKey])
 
-  // Check inactivity and pause if needed
-  useEffect(() => {
-    if (!sessionId || status !== 'ACTIVE') return
-
-    const inactivityInterval = setInterval(() => {
-      const timeSinceLastActivity = Date.now() - lastActivityAt
-      if (timeSinceLastActivity > INACTIVITY_THRESHOLD) {
-        setStatus('PAUSED')
-        dispatch(updateSessionStatus({ sessionId, status: 'PAUSED' }))
-        // Pause session on backend
-        apiClient.post(`/api/sessions/${sessionId}/pause`, {}).catch(console.error)
-      }
-    }, 1000) // Check every second
-
-    return () => clearInterval(inactivityInterval)
-  }, [sessionId, status, lastActivityAt, dispatch])
-
-  const isPaused = status === 'PAUSED'
+  // Can create new session only if timer is not running or already finished
+  const canCreateNewSession = !isTimerRunning || remainingMs <= 0
 
   return {
     remainingMs,
-    status,
     timeRemaining: formatTime(remainingMs),
-    isPaused,
+    isTimerRunning,
+    startTimer,
+    canCreateNewSession,
   }
 }
