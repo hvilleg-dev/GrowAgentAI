@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useQuery, useMutation } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/services/apiClient'
 import type { RootState } from '@/store'
 import GrowCard from '@/components/goals/GrowCard'
@@ -8,6 +9,7 @@ import GoalsList from '@/components/goals/GoalsList'
 import GoalForm from '@/components/goals/GoalForm'
 
 export default function GoalsPage() {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
   const { user } = useSelector((state: RootState) => state.auth)
@@ -57,7 +59,7 @@ export default function GoalsPage() {
             onClick={() => setShowForm(!showForm)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
           >
-            {showForm ? 'Cancel' : '+ New Goal'}
+            {showForm ? t('common.cancel') : `+ ${t('goals.create')}`}
           </button>
         </div>
 
@@ -83,31 +85,31 @@ export default function GoalsPage() {
             {selectedGoalData ? (
               <div className="space-y-4">
                 <GrowCard
-                  title="Goal"
+                  title={t('chat.goal')}
                   icon="🎯"
                   content={selectedGoalData.goal}
                   color="bg-blue-50"
                 />
                 <GrowCard
-                  title="Reality"
+                  title={t('chat.reality')}
                   icon="📊"
                   content={selectedGoalData.reality}
                   color="bg-purple-50"
                 />
                 <GrowCard
-                  title="Options"
+                  title={t('chat.options')}
                   icon="🔄"
                   items={selectedGoalData.options}
                   color="bg-green-50"
                 />
                 <GrowCard
-                  title="Will"
+                  title={t('chat.will')}
                   icon="💪"
                   content={selectedGoalData.will}
                   color="bg-orange-50"
                 />
                 <GrowCard
-                  title="Follow-up"
+                  title={t('goals.followUp')}
                   icon="📅"
                   content={selectedGoalData.followUp}
                   color="bg-red-50"

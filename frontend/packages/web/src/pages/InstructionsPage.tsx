@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function InstructionsPage() {
+  const { t } = useTranslation()
   return (
     <div className="p-8 max-w-3xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">How to Get Started</h1>
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{t('instructions.howToUse')}</h1>
       <p className="text-gray-600 dark:text-gray-400 mb-8">Follow these steps to get the best experience with your AI coach.</p>
 
       {/* Step 0: Complete Profile — REQUIRED */}
@@ -73,7 +75,7 @@ export default function InstructionsPage() {
             <li><strong>Options</strong>: What are possible approaches to reach your goal?</li>
             <li><strong>Will</strong>: What is your commitment? What action will you take first?</li>
           </ul>
-          <p className="mt-3 text-sm italic text-gray-500 dark:text-gray-400">Example: Goal "Improve my leadership" → Reality "I struggle with quick decisions" → Options "Take a course, find a mentor" → Will "Dedicate 2 hours weekly starting Monday"</p>
+          <p className="mt-3 text-sm italic text-gray-500 dark:text-gray-400">{t('instructions.example')}</p>
         </div>
       </div>
 
