@@ -13,6 +13,8 @@ interface UseSessionTimerReturn {
   canCreateNewSession: boolean
 }
 
+const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+
 export function useSessionTimer(sessionId: string | null): UseSessionTimerReturn {
   const { notifyWarning } = useNotification()
   const [remainingMs, setRemainingMs] = useState(SESSION_DURATION)
@@ -25,22 +27,26 @@ export function useSessionTimer(sessionId: string | null): UseSessionTimerReturn
 
   // Initialize timer state from localStorage
   useEffect(() => {
-    if (!sessionId) return
-    const storageKey = getStorageKey()
-    const stored = localStorage.getItem(storageKey)
-    if (stored) {
-      const { startTime } = JSON.parse(stored)
-      setTimerStartTime(startTime)
-      setIsTimerRunning(true)
-      // Check if timer already expired while app was closed
-      const elapsed = Date.now() - startTime
-      if (elapsed >= SESSION_DURATION) {
-        setRemainingMs(0)
-        setIsTimerRunning(false)
-        localStorage.removeItem(storageKey)
-      } else {
-        setRemainingMs(SESSION_DURATION - elapsed)
+    if (!sessionId || !isBrowser) return
+    try {
+      const storageKey = getStorageKey()
+      const stored = localStorage.getItem(storageKey)
+      if (stored) {
+        const { startTime } = JSON.parse(stored)
+        setTimerStartTime(startTime)
+        setIsTimerRunning(true)
+        // Check if timer already expired while app was closed
+        const elapsed = Date.now() - startTime
+        if (elapsed >= SESSION_DURATION) {
+          setRemainingMs(0)
+          setIsTimerRunning(false)
+          localStorage.removeItem(storageKey)
+        } else {
+          setRemainingMs(SESSION_DURATION - elapsed)
+        }
       }
+    } catch (error) {
+      console.error('Error reading timer from localStorage:', error)
     }
   }, [sessionId, getStorageKey])
 
@@ -52,7 +58,13 @@ export function useSessionTimer(sessionId: string | null): UseSessionTimerReturn
     setIsTimerRunning(true)
     setRemainingMs(SESSION_DURATION)
     setWarningShown(false)
-    localStorage.setItem(getStorageKey(), JSON.stringify({ startTime: now }))
+    if (isBrowser) {
+      try {
+        localStorage.setItem(getStorageKey(), JSON.stringify({ startTime: now }))
+      } catch (error) {
+        console.error('Error saving timer to localStorage:', error)
+      }
+    }
   }, [isTimerRunning, sessionId, getStorageKey])
 
   // Format time as MM:SS
@@ -76,7 +88,13 @@ export function useSessionTimer(sessionId: string | null): UseSessionTimerReturn
       if (remaining <= 0) {
         setIsTimerRunning(false)
         clearInterval(interval)
-        localStorage.removeItem(getStorageKey())
+        if (isBrowser) {
+          try {
+            localStorage.removeItem(getStorageKey())
+          } catch (error) {
+            console.error('Error removing timer from localStorage:', error)
+          }
+        }
         return
       }
 
