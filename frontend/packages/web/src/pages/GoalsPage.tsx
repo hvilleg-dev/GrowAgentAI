@@ -54,7 +54,7 @@ export default function GoalsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Goals & Growth</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('goals.title')}</h1>
           <button
             onClick={() => setShowForm(!showForm)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
@@ -117,7 +117,7 @@ export default function GoalsPage() {
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">Select a goal to view details</p>
+                <p className="text-gray-500">{t('goals.selectGoalDetails')}</p>
               </div>
             )}
           </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface Goal {
   id: string
   description: string
@@ -10,19 +12,21 @@ interface Props {
   onSelect: (id: string) => void
 }
 
-const statusConfig = {
-  not_started: { label: 'Not Started', color: 'bg-gray-100 text-gray-700' },
-  in_progress: { label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
-  completed: { label: 'Completed', color: 'bg-green-100 text-green-700' },
-}
-
 export default function GoalsList({ goals, selectedId, onSelect }: Props) {
+  const { t } = useTranslation()
+
+  const statusConfig = {
+    not_started: { label: t('goals.notStarted'), color: 'bg-gray-100 text-gray-700' },
+    in_progress: { label: t('goals.inProgress'), color: 'bg-blue-100 text-blue-700' },
+    completed: { label: t('goals.completed'), color: 'bg-green-100 text-green-700' },
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">Your Goals</h2>
+      <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">{t('goals.yourGoals')}</h2>
       <div className="space-y-2">
         {goals.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">No goals yet</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{t('goals.noGoalsYet')}</p>
         ) : (
           goals.map((goal) => (
             <button
