@@ -139,15 +139,18 @@ export default function SettingsPage() {
     if (!user?.id) return
     try {
       setIsEnabling2FA(true)
+      console.log('Calling /api/auth/enable-2fa for user:', user.id)
       const response = await apiClient.post('/api/auth/enable-2fa', {
         userId: user.id
       })
+      console.log('Response:', response.data)
       setQrCode(response.data.qrCode)
       setSecret(response.data.secret)
       setSetup2FACode('')
       setSetup2FAError(null)
     } catch (error: any) {
-      setSetup2FAError(error.response?.data?.error || 'Failed to enable 2FA')
+      console.error('Enable 2FA Error:', error)
+      setSetup2FAError(error.response?.data?.error || error.message || 'Failed to enable 2FA')
     } finally {
       setIsEnabling2FA(false)
     }
