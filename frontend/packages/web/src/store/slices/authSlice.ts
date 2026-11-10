@@ -26,8 +26,20 @@ export const login = createAsyncThunk(
         email,
         password,
       })
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+
+      // If 2FA is required, store temp token but not full token
+      if (response.data.requires2FA) {
+        if (response.data.tempToken) {
+          localStorage.setItem('tempToken', response.data.tempToken)
+        }
+        return response.data
+      }
+
+      // Normal login - store token and user
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+      }
       return response.data
     } catch (error: any) {
       const errorMsg = error.response?.data?.error ||
@@ -97,8 +109,11 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
         state.loading = false
-        state.token = action.payload.token
-        state.user = action.payload.user
+        // Only set token if not 2FA required (token will be set after 2FA verification)
+        if (!action.payload.requires2FA && action.payload.token) {
+          state.token = action.payload.token
+          state.user = action.payload.user
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false

@@ -12,8 +12,11 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string
+  token?: string
+  tempToken?: string
   user: User
+  requires2FA?: boolean
+  message?: string
 }
 
 // Session Types
