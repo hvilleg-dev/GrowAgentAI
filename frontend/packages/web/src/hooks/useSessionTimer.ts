@@ -22,7 +22,7 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
   const { notifyWarning } = useNotification()
   const lastActivityAt = useSelector((state: RootState) => state.sessions.lastActivityAt)
   const sessions = useSelector((state: RootState) => state.sessions.sessions)
-  const [remainingMs, setRemainingMs] = useState(0)
+  const [remainingMs, setRemainingMs] = useState(45 * 60 * 1000) // Initialize to 45 minutes
   const [status, setStatus] = useState<SessionStatus>('ACTIVE')
   const [warningShown, setWarningShown] = useState(false)
 
@@ -41,8 +41,16 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     const expires = getExpiresAt()
     if (!expires) return 45 * 60 * 1000 // Default to 45 minutes
     const now = Date.now()
-    const expiry = new Date(expires).getTime()
-    return Math.max(0, expiry - now)
+    const expiry = typeof expires === 'string'
+      ? new Date(expires).getTime()
+      : (expires instanceof Date ? expires.getTime() : parseInt(expires as string, 10))
+
+    const remaining = Math.max(0, expiry - now)
+    // Debug: log if timer is showing 0 but should have time
+    if (remaining === 0 && expiry > now) {
+      console.warn('[useSessionTimer] Timer calculated as 0 but expiry is in future:', { now, expiry, expires })
+    }
+    return remaining
   }, [getExpiresAt])
 
   // Format time as MM:SS
@@ -56,6 +64,10 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
   // Update timer state
   useEffect(() => {
     if (!sessionId) return
+
+    // Calculate immediately on mount
+    const remaining = calculateRemaining()
+    setRemainingMs(remaining)
 
     const interval = setInterval(() => {
       const remaining = calculateRemaining()
