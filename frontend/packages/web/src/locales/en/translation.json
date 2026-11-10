@@ -12,6 +12,9 @@
     "none": "None",
     "session": "Session"
   },
+  "header": {
+    "logout": "Logout"
+  },
   "sidebar": {
     "sessions": "Sessions",
     "selectGoal": "Select Goal (optional)",
@@ -57,7 +60,11 @@
     "other": "Other",
     "save": "Save",
     "updating": "Updating...",
-    "completeProfile": "All fields are required. Complete your profile to get the best coaching experience."
+    "completeProfile": "All fields are required. Complete your profile to get the best coaching experience.",
+    "enterAge": "Enter your age",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password"
   },
   "goals": {
     "createNewGoal": "Create New Goal",
@@ -80,19 +87,40 @@
     "required": "Required",
     "descriptionRequired": "Description required",
     "goalRequired": "Goal required",
-    "realityRequired": "Reality required"
+    "realityRequired": "Reality required",
+    "followUp": "Follow-up",
+    "createdGoals": "Created Goals"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "login": "Login",
+    "register": "Register",
+    "loggingIn": "Logging in...",
+    "registering": "Registering...",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "registerHere": "Register here"
   },
   "menu": {
     "home": "Home",
     "chat": "Chat",
     "settings": "Settings",
     "logout": "Logout",
-    "goals": "Goals"
+    "goals": "Goals",
+    "instructions": "Instructions"
   },
   "crisis": {
     "lowRisk": "Low Risk",
     "mediumRisk": "Medium Risk",
     "highRisk": "High Risk",
     "criticalRisk": "Critical Risk"
+  },
+  "instructions": {
+    "title": "Instructions",
+    "howToUse": "How to use this application",
+    "example": "Example: Goal \"Improve my leadership\" → Reality \"I struggle with quick decisions\" → Options \"Take a course, find a mentor\" → Will \"Dedicate 2 hours weekly starting Monday\""
   }
 }

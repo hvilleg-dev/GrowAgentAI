@@ -199,7 +199,7 @@ export default function SettingsPage() {
                 value={edad}
                 onChange={(e) => setEdad(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder="Enter your age"
+                placeholder={t('profile.enterAge')}
               />
             </div>
 
@@ -213,7 +213,7 @@ export default function SettingsPage() {
                 onChange={(e) => setGenero(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
-                <option value="">Select gender</option>
+                <option value="">{t('common.none')}</option>
                 <option value="Masculino">{t('profile.male')}</option>
                 <option value="Femenino">{t('profile.female')}</option>
                 <option value="Otro">{t('profile.other')}</option>
@@ -375,7 +375,7 @@ export default function SettingsPage() {
                   <div className="space-y-3">
                     <input
                       type="password"
-                      placeholder="Current password"
+                      placeholder={t('profile.currentPassword')}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
@@ -383,7 +383,7 @@ export default function SettingsPage() {
                     />
                     <input
                       type="password"
-                      placeholder="New password"
+                      placeholder={t('profile.newPassword')}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
@@ -391,7 +391,7 @@ export default function SettingsPage() {
                     />
                     <input
                       type="password"
-                      placeholder="Confirm new password"
+                      placeholder={t('profile.confirmPassword')}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required

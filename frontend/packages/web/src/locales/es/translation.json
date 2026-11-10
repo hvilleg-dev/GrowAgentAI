@@ -12,6 +12,9 @@
     "none": "Ninguno",
     "session": "Sesión"
   },
+  "header": {
+    "logout": "Cerrar Sesión"
+  },
   "sidebar": {
     "sessions": "Sesiones",
     "selectGoal": "Seleccionar Meta (opcional)",
@@ -57,7 +60,11 @@
     "other": "Otro",
     "save": "Guardar",
     "updating": "Actualizando...",
-    "completeProfile": "Todos los campos son obligatorios. Completa tu perfil para obtener la mejor experiencia de coaching."
+    "completeProfile": "Todos los campos son obligatorios. Completa tu perfil para obtener la mejor experiencia de coaching.",
+    "enterAge": "Ingresa tu edad",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña"
   },
   "goals": {
     "createNewGoal": "Crear Nueva Meta",
@@ -80,19 +87,40 @@
     "required": "Requerido",
     "descriptionRequired": "Descripción requerida",
     "goalRequired": "Meta requerida",
-    "realityRequired": "Realidad requerida"
+    "realityRequired": "Realidad requerida",
+    "followUp": "Seguimiento",
+    "createdGoals": "Metas Creadas"
+  },
+  "auth": {
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "fullName": "Nombre Completo",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "loggingIn": "Iniciando sesión...",
+    "registering": "Registrando...",
+    "noAccount": "¿No tienes cuenta?",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "loginHere": "Inicia sesión aquí",
+    "registerHere": "Regístrate aquí"
   },
   "menu": {
     "home": "Inicio",
     "chat": "Chat",
     "settings": "Configuración",
     "logout": "Cerrar Sesión",
-    "goals": "Metas"
+    "goals": "Metas",
+    "instructions": "Instrucciones"
   },
   "crisis": {
     "lowRisk": "Riesgo Bajo",
     "mediumRisk": "Riesgo Medio",
     "highRisk": "Riesgo Alto",
     "criticalRisk": "Riesgo Crítico"
+  },
+  "instructions": {
+    "title": "Instrucciones",
+    "howToUse": "Cómo usar esta aplicación",
+    "example": "Ejemplo: Meta \"Mejorar mi liderazgo\" → Realidad \"Lucho con decisiones rápidas\" → Opciones \"Tomar un curso, encontrar un mentor\" → Voluntad \"Dedicar 2 horas semanales a partir del lunes\""
   }
 }

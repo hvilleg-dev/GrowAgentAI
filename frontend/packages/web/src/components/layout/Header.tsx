@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { RootState, AppDispatch } from '@/store'
 import { logout } from '@/store/slices/authSlice'
 
 export default function Header() {
+  const { t } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { user } = useSelector((state: RootState) => state.auth)
@@ -22,7 +24,7 @@ export default function Header() {
           onClick={handleLogout}
           className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600"
         >
-          Logout
+          {t('header.logout')}
         </button>
       </div>
     </header>
