@@ -62,6 +62,25 @@ export class Sesion {
   @Column({ nullable: true })
   finalizadaEn?: Date;
 
+  @Column({
+    type: 'enum',
+    enum: ['ACTIVE', 'PAUSED', 'CLOSED'],
+    default: 'ACTIVE'
+  })
+  status: 'ACTIVE' | 'PAUSED' | 'CLOSED';
+
+  @Column()
+  expiresAt: Date;
+
+  @Column({ nullable: true })
+  pausedAt?: Date;
+
+  @Column({ default: 0 })
+  pausedDuration: number;
+
+  @Column({ nullable: true })
+  warningShownAt?: Date;
+
   @ManyToOne(() => Usuario, usuario => usuario.sesiones)
   @JoinColumn({ name: 'usuarioId' })
   usuario: Usuario;

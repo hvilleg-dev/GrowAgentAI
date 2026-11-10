@@ -26,5 +26,17 @@ export function createSessionRoutes(): Router {
     sessionController.deleteSession(req, res, next)
   );
 
+  sessionRouter.patch('/:sesionId/status', authMiddleware, (req, res, next) =>
+    sessionController.updateSessionStatus(req, res, next)
+  );
+
+  sessionRouter.post('/:sesionId/pause', authMiddleware, (req, res, next) =>
+    sessionController.pauseSession(req, res, next)
+  );
+
+  sessionRouter.post('/:sesionId/resume', authMiddleware, (req, res, next) =>
+    sessionController.resumeSession(req, res, next)
+  );
+
   return sessionRouter;
 }

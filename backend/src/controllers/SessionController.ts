@@ -20,6 +20,7 @@ export class SessionController {
 
       const sesionId = uuidv4();
       const now = new Date();
+      const expiresAt = new Date(now.getTime() + 45 * 60 * 1000); // 45 minutes
       const values = [
         sesionId,
         body.usuarioId,
@@ -34,13 +35,18 @@ export class SessionController {
         null, // planAccion
         now,
         now,
-        null  // finalizadaEn
+        null, // finalizadaEn
+        'ACTIVE', // status
+        expiresAt, // expiresAt
+        null, // pausedAt
+        0, // pausedDuration
+        null // warningShownAt
       ];
 
       const query = `
-        INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-        RETURNING "etapaActual", "criadaEn", "actualizadaEn", "goalId"
+        INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn", status, "expiresAt", "pausedAt", "pausedDuration", "warningShownAt")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        RETURNING "etapaActual", "criadaEn", "actualizadaEn", "goalId", "expiresAt", status
       `;
 
       const result = await AppDataSource.query(query, values);
@@ -51,7 +57,9 @@ export class SessionController {
         etapaActual: returned.etapaActual,
         objetivo: body.objetivo,
         goalId: returned.goalId,
-        criadaEn: returned.criadaEn
+        criadaEn: returned.criadaEn,
+        expiresAt: returned.expiresAt,
+        status: returned.status
       });
     } catch (error) {
       next(error);
@@ -162,6 +170,88 @@ export class SessionController {
       await sesionRepo.remove(sesion);
 
       res.json({ message: 'Sesión deleted successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateSessionStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+      const { status } = req.body;
+
+      if (!['ACTIVE', 'PAUSED', 'CLOSED'].includes(status)) {
+        res.status(400).json({ error: 'Invalid status. Must be ACTIVE, PAUSED, or CLOSED' });
+        return;
+      }
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      sesion.status = status;
+      if (status === 'CLOSED') {
+        sesion.finalizadaEn = new Date();
+      }
+      sesion.actualizadaEn = new Date();
+
+      await sesionRepo.save(sesion);
+
+      res.json({ message: 'Session status updated', sesion });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async pauseSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      sesion.status = 'PAUSED';
+      sesion.pausedAt = new Date();
+      sesion.actualizadaEn = new Date();
+
+      await sesionRepo.save(sesion);
+
+      res.json({ message: 'Session paused', sesion });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resumeSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      if (sesion.pausedAt) {
+        const pauseDuration = new Date().getTime() - new Date(sesion.pausedAt).getTime();
+        sesion.pausedDuration += pauseDuration;
+      }
+
+      sesion.status = 'ACTIVE';
+      sesion.pausedAt = null;
+      sesion.actualizadaEn = new Date();
+
+      await sesionRepo.save(sesion);
+
+      res.json({ message: 'Session resumed', sesion });
     } catch (error) {
       next(error);
     }
