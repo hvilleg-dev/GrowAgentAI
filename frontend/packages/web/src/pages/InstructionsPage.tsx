@@ -33,27 +33,27 @@ export default function InstructionsPage() {
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('instructions.coachingStylesExplained')}</h2>
         <div className="space-y-4">
           <div className="p-4 rounded-lg border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
-            <h3 className="font-bold text-indigo-800 dark:text-indigo-200 mb-1">Supportive — Empathetic and encouraging</h3>
+            <h3 className="font-bold text-indigo-800 dark:text-indigo-200 mb-1">{t('instructions.supportiveTitle')}</h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm">{t('instructions.supportiveDesc')}</p>
             <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-2 font-medium">{t('instructions.supportiveBestFor')}</p>
           </div>
 
           <div className="p-4 rounded-lg border border-orange-200 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/20">
-            <h3 className="font-bold text-orange-800 dark:text-orange-200 mb-1">Directive — Direct, action-oriented and results-focused</h3>
+            <h3 className="font-bold text-orange-800 dark:text-orange-200 mb-1">{t('instructions.directiveTitle')}</h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm">{t('instructions.directiveDesc')}</p>
             <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 font-medium">{t('instructions.directiveBestFor')}</p>
           </div>
 
           <div className="p-4 rounded-lg border border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20">
-            <h3 className="font-bold text-purple-800 dark:text-purple-200 mb-1">Socratic — Deep questions to guide self-discovery</h3>
+            <h3 className="font-bold text-purple-800 dark:text-purple-200 mb-1">{t('instructions.socraticTitle')}</h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm">{t('instructions.socraticDesc')}</p>
             <p className="text-xs text-purple-600 dark:text-purple-400 mt-2 font-medium">{t('instructions.socraticBestFor')}</p>
           </div>
 
           <div className="p-4 rounded-lg border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20">
-            <h3 className="font-bold text-green-800 dark:text-green-200 mb-1">Collaborative — Partnership, exploring together</h3>
+            <h3 className="font-bold text-green-800 dark:text-green-200 mb-1">{t('instructions.collaborativeTitle')}</h3>
             <p className="text-gray-700 dark:text-gray-300 text-sm">{t('instructions.collaborativeDesc')}</p>
-            <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium">Best for: people who like to think out loud, brainstorm, and work through problems together rather than alone.</p>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium">{t('instructions.collaborativeBestFor')}</p>
           </div>
         </div>
       </div>
