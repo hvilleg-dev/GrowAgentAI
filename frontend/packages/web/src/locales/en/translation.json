@@ -42,7 +42,8 @@
     "send": "Send",
     "readOnly": "This is a past session — read only. Create a new session to continue coaching.",
     "completeProfile": "Complete your profile first...",
-    "errorSending": "Error sending message. Please try again."
+    "errorSending": "Error sending message. Please try again.",
+    "sessionResumed": "Session resumed"
   },
   "profile": {
     "completeYourProfile": "Complete Your Profile",
