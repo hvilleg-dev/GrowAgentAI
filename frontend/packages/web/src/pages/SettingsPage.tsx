@@ -59,6 +59,7 @@ export default function SettingsPage() {
     },
     onSuccess: (newLang) => {
       dispatch(setLanguage(newLang))
+      i18n.changeLanguage(newLang)
     }
   })
 
@@ -115,7 +116,12 @@ export default function SettingsPage() {
 
   const handleLanguageChange = (newLang: Language) => {
     i18n.changeLanguage(newLang)
-    updateLanguageMutation.mutate(newLang)
+    updateLanguageMutation.mutate(newLang, {
+      onError: () => {
+        // Si falla, revert al idioma anterior
+        i18n.changeLanguage(language)
+      }
+    })
   }
 
   const handlePasswordChange = (e: React.FormEvent) => {
