@@ -5,8 +5,6 @@ dotenv.config();
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import https from 'https';
-import fs from 'fs';
 import { initializeDatabase } from '@/database/db';
 import { ProviderRouter } from '@/services/ProviderRouter';
 import { CrisisDetector } from '@/services/CrisisDetector';
@@ -22,7 +20,12 @@ const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Initialize services
