@@ -151,6 +151,29 @@
   "instructions": {
     "title": "Instructions",
     "howToUse": "How to use this application",
-    "example": "Example: Goal \"Improve my leadership\" → Reality \"I struggle with quick decisions\" → Options \"Take a course, find a mentor\" → Will \"Dedicate 2 hours weekly starting Monday\""
+    "example": "Example: Goal \"Improve my leadership\" → Reality \"I struggle with quick decisions\" → Options \"Take a course, find a mentor\" → Will \"Dedicate 2 hours weekly starting Monday\"",
+    "completeProfileRequired": "Complete Your Coaching Profile — Required",
+    "beforeChatting": "Before chatting, go to",
+    "andFillIn": "and fill in:",
+    "helpsCoachContext": "— helps the coach use the right context and perspective",
+    "allowsPersonalized": "— allows for personalized communication",
+    "occupationOptional": "— (optional) adds professional context to coaching",
+    "controlsCoachStyle": "— controls how the AI coach interacts with you",
+    "withoutProfile": "Without a complete profile, your AI coach will not be fully personalized. Take 1 minute to complete it before your first session.",
+    "coachingStylesExplained": "Coaching Styles — Choose the Right One for You",
+    "supportiveDesc": "The coach provides warmth, validation, and positive reinforcement. Ideal if you need encouragement and emotional support while working toward your goals. The coach celebrates small wins and helps you stay motivated during setbacks.",
+    "supportiveBestFor": "Best for: people new to coaching, going through difficult transitions, or who need confidence building.",
+    "directiveDesc": "The coach gives clear recommendations, sets deadlines, and challenges you to take action immediately. Less discussion, more execution. Ideal if you prefer concrete advice, fast results, and dislike lengthy reflection.",
+    "directiveBestFor": "Best for: goal-oriented professionals, people who want clear next steps, or those who tend to overthink.",
+    "socraticDesc": "The coach rarely tells you what to do — instead, it asks powerful questions that guide you to find your own answers. This builds self-awareness and critical thinking. Coaching feels like guided exploration.",
+    "socraticBestFor": "Best for: people who want to develop judgment and autonomy, reflective thinkers, or long-term personal development.",
+    "collaborativeDesc": "The coach works as a thinking partner, co-creating solutions with you. It contributes ideas while also inviting yours, and the dynamic feels like a peer conversation. Good balance between guidance and autonomy.",
+    "shareContext": "— the more context you share, the better",
+    "multipleSessions": "You can create multiple sessions per goal to explore different angles",
+    "tipMoreSessions": "Tip: The more sessions you have for a goal, the deeper the coaching becomes",
+    "readyToBegin": "Ready to begin?",
+    "completeProfileRequired2": "Complete your Coaching Profile in Settings (required)",
+    "createFirstGoal": "Create your first Goal",
+    "openChatLinkGoal": "Open Chat, link the goal, and start your session"
   }
 }

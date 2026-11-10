@@ -151,6 +151,29 @@
   "instructions": {
     "title": "Instrucciones",
     "howToUse": "Cómo usar esta aplicación",
-    "example": "Ejemplo: Meta \"Mejorar mi liderazgo\" → Realidad \"Lucho con decisiones rápidas\" → Opciones \"Tomar un curso, encontrar un mentor\" → Voluntad \"Dedicar 2 horas semanales a partir del lunes\""
+    "example": "Ejemplo: Meta \"Mejorar mi liderazgo\" → Realidad \"Lucho con decisiones rápidas\" → Opciones \"Tomar un curso, encontrar un mentor\" → Voluntad \"Dedicar 2 horas semanales a partir del lunes\"",
+    "completeProfileRequired": "Completa Tu Perfil de Coaching — Requerido",
+    "beforeChatting": "Antes de chatear, ve a",
+    "andFillIn": "y completa:",
+    "helpsCoachContext": "— ayuda al coach a usar el contexto y perspectiva correcta",
+    "allowsPersonalized": "— permite comunicación personalizada",
+    "occupationOptional": "— (opcional) agrega contexto profesional al coaching",
+    "controlsCoachStyle": "— controla cómo el coach de IA interactúa contigo",
+    "withoutProfile": "Sin un perfil completo, tu coach de IA no será totalmente personalizado. Dedica 1 minuto a completarlo antes de tu primera sesión.",
+    "coachingStylesExplained": "Estilos de Coaching — Elige el Correcto para Ti",
+    "supportiveDesc": "El coach proporciona calidez, validación y refuerzo positivo. Ideal si necesitas ánimo y apoyo emocional mientras trabajas hacia tus metas. El coach celebra pequeños logros y te ayuda a mantenerte motivado durante reveses.",
+    "supportiveBestFor": "Mejor para: personas nuevas en coaching, pasando por transiciones difíciles, o que necesitan construir confianza.",
+    "directiveDesc": "El coach da recomendaciones claras, establece plazos y te desafía a tomar acción inmediatamente. Menos discusión, más ejecución. Ideal si prefieres consejos concretos, resultados rápidos y no te gusta la reflexión prolongada.",
+    "directiveBestFor": "Mejor para: profesionales orientados a objetivos, personas que quieren pasos claros, o aquellos que tienden a overthinking.",
+    "socraticDesc": "El coach rara vez te dice qué hacer — en su lugar, hace preguntas poderosas que te guían a encontrar tus propias respuestas. Esto construye autoconciencia y pensamiento crítico. El coaching se siente como exploración guiada.",
+    "socraticBestFor": "Mejor para: personas que quieren desarrollar juicio y autonomía, pensadores reflexivos, o desarrollo personal a largo plazo.",
+    "collaborativeDesc": "El coach trabaja como socio pensante, co-creando soluciones contigo. Contribuye ideas mientras también invita las tuyas, y la dinámica se siente como una conversación entre pares. Buen equilibrio entre guía y autonomía.",
+    "shareContext": "— cuanto más contexto compartas, mejor",
+    "multipleSessions": "Puedes crear múltiples sesiones por meta para explorar diferentes ángulos",
+    "tipMoreSessions": "Consejo: Cuanto más sesiones tengas para una meta, más profundo se vuelve el coaching",
+    "readyToBegin": "¿Listo para comenzar?",
+    "completeProfileRequired2": "Completa tu Perfil de Coaching en Configuración (requerido)",
+    "createFirstGoal": "Crea tu primera Meta",
+    "openChatLinkGoal": "Abre Chat, vincula la meta, e inicia tu sesión"
   }
 }
