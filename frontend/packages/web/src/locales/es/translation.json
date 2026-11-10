@@ -121,6 +121,13 @@
     "lastUpdated": "Última actualización: 7 de noviembre de 2026"
   },
   "goals": {
+    "title": "Metas y Crecimiento",
+    "yourGoals": "Tus Metas",
+    "notStarted": "No iniciado",
+    "inProgress": "En Progreso",
+    "completed": "Completado",
+    "noGoalsYet": "Sin metas aún",
+    "selectGoalDetails": "Selecciona una meta para ver detalles",
     "createNewGoal": "Crear Nueva Meta",
     "goalDescription": "Descripción de la Meta",
     "descriptionPlaceholder": "Ej: Mejorar productividad",

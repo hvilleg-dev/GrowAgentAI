@@ -121,6 +121,13 @@
     "lastUpdated": "Last updated: November 7, 2026"
   },
   "goals": {
+    "title": "Goals & Growth",
+    "yourGoals": "Your Goals",
+    "notStarted": "Not Started",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "noGoalsYet": "No goals yet",
+    "selectGoalDetails": "Select a goal to view details",
     "createNewGoal": "Create New Goal",
     "goalDescription": "Goal Description",
     "descriptionPlaceholder": "e.g., Improve productivity",
