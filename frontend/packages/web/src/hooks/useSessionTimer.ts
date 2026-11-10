@@ -61,9 +61,9 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   }, [])
 
-  // Update timer state
+  // Update timer state - only when expiresAt is set
   useEffect(() => {
-    if (!sessionId) return
+    if (!sessionId || !getExpiresAt()) return
 
     // Calculate immediately on mount
     const remaining = calculateRemaining()
@@ -93,7 +93,7 @@ export function useSessionTimer(sessionId: string | null, expiresAt: string | nu
     }, TIMER_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [sessionId, calculateRemaining, formatTime, notifyWarning, warningShown])
+  }, [sessionId, calculateRemaining, formatTime, notifyWarning, warningShown, getExpiresAt])
 
   // Check inactivity and pause if needed
   useEffect(() => {
