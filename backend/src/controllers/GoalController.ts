@@ -9,8 +9,9 @@ export class GoalController {
     try {
       const { usuarioId, description, goal, reality, options, will } = req.body;
 
-      if (!usuarioId || !description || !goal || !reality || !options || !will) {
-        res.status(400).json({ error: 'Missing required fields' });
+      // REQUIRED fields: description, goal, reality
+      if (!usuarioId || !description || !goal || !reality) {
+        res.status(400).json({ error: 'Missing required fields: usuarioId, description, goal, reality' });
         return;
       }
 
@@ -28,8 +29,15 @@ export class GoalController {
       newGoal.description = description;
       newGoal.goal = goal;
       newGoal.reality = reality;
-      newGoal.options = Array.isArray(options) ? options : [options];
-      newGoal.will = will;
+
+      // OPTIONAL fields with defaults
+      if (Array.isArray(options) && options.length > 0 && options.some((o: any) => o && String(o).trim())) {
+        newGoal.options = options.map((o: any) => (o && String(o).trim()) ? String(o).trim() : 'I am not sure yet');
+      } else {
+        newGoal.options = ['I am not sure yet', 'I am not sure yet', 'I am not sure yet'];
+      }
+
+      newGoal.will = (will && String(will).trim()) ? String(will).trim() : 'I am not sure yet';
       newGoal.status = 'not_started';
 
       const saved = await goalRepo.save(newGoal);

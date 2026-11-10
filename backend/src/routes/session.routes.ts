@@ -22,5 +22,9 @@ export function createSessionRoutes(): Router {
     sessionController.endSession(req, res, next)
   );
 
+  sessionRouter.delete('/:sesionId', authMiddleware, (req, res, next) =>
+    sessionController.deleteSession(req, res, next)
+  );
+
   return sessionRouter;
 }

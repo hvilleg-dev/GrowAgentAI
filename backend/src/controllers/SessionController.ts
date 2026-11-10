@@ -122,4 +122,48 @@ export class SessionController {
       next(error);
     }
   }
+
+  async deleteSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        res.status(404).json({ error: 'Sesión not found' });
+        return;
+      }
+
+      // Prevent deleting active session (most recent)
+      const allSesiones = await sesionRepo.find({
+        where: { usuarioId: sesion.usuarioId },
+        order: { criadaEn: 'DESC' }
+      });
+
+      if (allSesiones.length > 0 && allSesiones[0].id === sesionId) {
+        res.status(400).json({ error: 'Cannot delete active session. Create a new session first.' });
+        return;
+      }
+
+      // Delete associated messages first
+      const mensajeQuery = `
+        DELETE FROM mensajes WHERE "sesionId" = $1
+      `;
+      await AppDataSource.query(mensajeQuery, [sesionId]);
+
+      // Delete associated crisis alerts
+      const alertQuery = `
+        DELETE FROM alertas_crisis WHERE "sesionId" = $1
+      `;
+      await AppDataSource.query(alertQuery, [sesionId]);
+
+      // Delete session
+      await sesionRepo.remove(sesion);
+
+      res.json({ message: 'Sesión deleted successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

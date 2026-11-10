@@ -7,10 +7,10 @@ const goalSchema = z.object({
   description: z.string().min(1, 'Description required'),
   goal: z.string().min(1, 'Goal required'),
   reality: z.string().min(1, 'Reality required'),
-  option1: z.string().min(1, 'Option 1 required'),
-  option2: z.string().min(1, 'Option 2 required'),
-  option3: z.string().min(1, 'Option 3 required'),
-  will: z.string().min(1, 'Will/Commitment required'),
+  option1: z.string().optional(),
+  option2: z.string().optional(),
+  option3: z.string().optional(),
+  will: z.string().optional(),
 })
 
 type GoalFormData = z.infer<typeof goalSchema>
@@ -101,7 +101,7 @@ export default function GoalForm(props: Props) {
       {/* Options */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          🔄 Options (What are your choices?)
+          🔄 Options (What are your choices?) - <span className="text-xs text-gray-500">Optional</span>
         </label>
         <div className="space-y-2">
           <input
@@ -125,14 +125,13 @@ export default function GoalForm(props: Props) {
       {/* Will */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          💪 Will (What will you do?)
+          💪 Will (What will you do?) - <span className="text-xs text-gray-500">Optional</span>
         </label>
         <textarea
           {...register('will')}
           placeholder="Your commitment and action steps..."
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20"
         />
-        {errors.will && <p className="text-red-500 text-xs mt-1">{errors.will.message}</p>}
       </div>
 
       {/* Buttons */}

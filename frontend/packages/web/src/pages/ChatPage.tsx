@@ -25,6 +25,8 @@ export default function ChatPage() {
   const [showGoalDetail, setShowGoalDetail] = useState(false)
   const [profileStatus, setProfileStatus] = useState<{ isComplete: boolean; missingFields: string[] } | null>(null)
   const [dismissedProfileNotification, setDismissedProfileNotification] = useState(false)
+  const [deleteConfirmSessionId, setDeleteConfirmSessionId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const currentGoal = goals.find(g => g.id === (currentSession?.goalId || selectedGoalId))
 
   // Check if profile is complete
@@ -96,6 +98,33 @@ export default function ChatPage() {
     dispatch(setCurrentSession(session))
   }
 
+  const handleDeleteSession = async (sessionId: string) => {
+    if (!confirm('¿Seguro que desea eliminar? Perderá seguimiento a su avance y control de su proceso')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      await apiClient.delete(`/api/sessions/${sessionId}`)
+      setDeleteConfirmSessionId(null)
+
+      // If deleting current session, switch to another
+      if (currentSession?.id === sessionId) {
+        const remaining = sessions.filter(s => s.id !== sessionId)
+        if (remaining.length > 0) {
+          dispatch(setCurrentSession(remaining[0]))
+        } else {
+          dispatch(setCurrentSession(null))
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete session:', err)
+      alert('Error deleting session')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <div className="flex h-full bg-gray-50 dark:bg-gray-900">
       {/* Sidebar - Sessions List */}
@@ -124,8 +153,9 @@ export default function ChatPage() {
 
         <button
           onClick={handleNewSession}
-          disabled={isCreating}
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4 hover:bg-indigo-700 disabled:opacity-50"
+          disabled={isCreating || (profileStatus && !profileStatus.isComplete)}
+          title={profileStatus && !profileStatus.isComplete ? 'Complete your profile first' : ''}
+          className="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isCreating ? 'Creating...' : '+ New Session'}
         </button>
@@ -136,27 +166,45 @@ export default function ChatPage() {
           ) : sessions.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-gray-400">No sessions yet</p>
           ) : (
-            sessions.map((session) => (
-              <div
-                key={session.id}
-                onClick={() => handleSelectSession(session)}
-                className={`p-3 rounded-lg border cursor-pointer transition ${
-                  currentSession?.id === session.id
-                    ? 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
-                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-1.5">
-                  {session.id === latestSession?.id ? (
-                    <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active session" />
-                  ) : (
-                    <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title="Past session" />
-                  )}
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{session.objetivo || 'Session'}</p>
+            sessions.map((session) => {
+              const isPastSession = session.id !== latestSession?.id
+              return (
+                <div
+                  key={session.id}
+                  className={`p-3 rounded-lg border transition ${
+                    currentSession?.id === session.id
+                      ? 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
+                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <div
+                    onClick={() => handleSelectSession(session)}
+                    className="cursor-pointer flex items-center gap-1.5"
+                  >
+                    {session.id === latestSession?.id ? (
+                      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active session" />
+                    ) : (
+                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title="Past session" />
+                    )}
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || 'Session'}</p>
+                    {isPastSession && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteSession(session.id)
+                        }}
+                        disabled={isDeleting}
+                        className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 shrink-0 ml-1 text-xs"
+                        title="Delete session"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-3.5">Stage: {session.etapaActual}</p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-3.5">Stage: {session.etapaActual}</p>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </div>
@@ -268,13 +316,14 @@ export default function ChatPage() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Type a message..."
-              disabled={!sessionId || isChatLoading}
+              placeholder={profileStatus && !profileStatus.isComplete ? 'Complete your profile first...' : 'Type a message...'}
+              disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete)}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
             />
             <button
               onClick={handleSendMessage}
-              disabled={!sessionId || isChatLoading || !inputText.trim()}
+              disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete)}
+              title={profileStatus && !profileStatus.isComplete ? 'Complete your profile first' : ''}
               className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isChatLoading ? '...' : 'Send'}
