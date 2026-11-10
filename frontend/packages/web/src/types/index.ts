@@ -22,6 +22,7 @@ export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'CLOSED'
 export interface Session {
   id: string
   usuarioId: string
+  goalId?: string
   objetivo?: string
   etapaActual: string
   realidad?: string
@@ -42,6 +43,7 @@ export interface Session {
 
 export interface CreateSessionRequest {
   usuarioId: string
+  goalId?: string
   objetivo?: string
   tema?: string
 }
