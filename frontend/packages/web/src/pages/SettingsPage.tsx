@@ -26,6 +26,11 @@ export default function SettingsPage() {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false)
   const [show2FAModal, setShow2FAModal] = useState(false)
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+  const [qrCode, setQrCode] = useState<string | null>(null)
+  const [secret, setSecret] = useState<string | null>(null)
+  const [setup2FACode, setSetup2FACode] = useState('')
+  const [setup2FAError, setSetup2FAError] = useState<string | null>(null)
+  const [isEnabling2FA, setIsEnabling2FA] = useState(false)
 
   // Coaching Profile Fields
   const [edad, setEdad] = useState<number | string>(user?.edad || '')
@@ -128,6 +133,60 @@ export default function SettingsPage() {
     e.preventDefault()
     setPasswordError(null)
     updatePasswordMutation.mutate()
+  }
+
+  const handleEnable2FA = async () => {
+    if (!user?.id) return
+    try {
+      setIsEnabling2FA(true)
+      const response = await apiClient.post('/api/auth/enable-2fa', {
+        userId: user.id
+      })
+      setQrCode(response.data.qrCode)
+      setSecret(response.data.secret)
+      setSetup2FACode('')
+      setSetup2FAError(null)
+    } catch (error: any) {
+      setSetup2FAError(error.response?.data?.error || 'Failed to enable 2FA')
+    } finally {
+      setIsEnabling2FA(false)
+    }
+  }
+
+  const handleVerify2FASetup = async () => {
+    if (!user?.id || !setup2FACode) return
+    try {
+      setIsEnabling2FA(true)
+      await apiClient.post('/api/auth/verify-2fa', {
+        userId: user.id,
+        code: setup2FACode,
+        setupMode: true
+      })
+      setTwoFactorEnabled(true)
+      setSetup2FACode('')
+      setSetup2FAError(null)
+      setQrCode(null)
+      setSecret(null)
+      setTimeout(() => setShow2FAModal(false), 1000)
+    } catch (error: any) {
+      setSetup2FAError(error.response?.data?.error || 'Invalid code')
+    } finally {
+      setIsEnabling2FA(false)
+    }
+  }
+
+  const handleDisable2FA = async () => {
+    if (!user?.id) return
+    if (!window.confirm('Are you sure? This will disable 2FA for your account.')) return
+    try {
+      await apiClient.post('/api/auth/disable-2fa', {
+        userId: user.id
+      })
+      setTwoFactorEnabled(false)
+      setShow2FAModal(false)
+    } catch (error: any) {
+      setSetup2FAError(error.response?.data?.error || 'Failed to disable 2FA')
+    }
   }
 
   return (
@@ -443,11 +502,16 @@ export default function SettingsPage() {
 
             {/* 2FA */}
             <button
-              onClick={() => setShow2FAModal(true)}
-              className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+              onClick={() => {
+                setShow2FAModal(true)
+                if (!twoFactorEnabled && !qrCode) {
+                  handleEnable2FA()
+                }
+              }}
+              className="w-full text-left px-4 py-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition dark:bg-gray-700 dark:hover:bg-gray-600"
             >
-              <p className="font-medium text-gray-900">{t('profile.twoFactorAuth')}</p>
-              <p className="text-sm text-gray-600">
+              <p className="font-medium text-gray-900 dark:text-gray-100">{t('profile.twoFactorAuth')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {twoFactorEnabled ? '✓ Enabled' : t('profile.addExtraLayerSecurity')}
               </p>
             </button>
@@ -468,57 +532,82 @@ export default function SettingsPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md p-6">
               <h2 className="text-2xl font-bold dark:text-gray-100 mb-4">{t('profile.twoFactorAuthTitle')}</h2>
-              {!twoFactorEnabled ? (
+              {!twoFactorEnabled && !qrCode ? (
+                <div className="text-center py-4">
+                  <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+                </div>
+              ) : !twoFactorEnabled && qrCode ? (
                 <div className="space-y-4">
-                  <p className="text-gray-600">
-                    {t('profile.twoFactorAuthDesc')}
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Scan this QR code with an authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc)
                   </p>
-                  <div className="bg-gray-100 p-4 rounded-lg text-center">
-                    <p className="text-sm text-gray-600 mb-2">{t('profile.scanQRCode')}</p>
-                    <div className="bg-white p-4 inline-block border-2 border-gray-300">
-                      <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/GrowAgentAI:${encodeURIComponent(user?.email || 'user@growagentai.com')}?secret=JBSWY3DPEBLW64TMMQ======&issuer=GrowAgentAI`}
-                        alt="2FA QR Code"
-                        className="w-48 h-48"
-                      />
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-center">
+                    <img
+                      src={qrCode}
+                      alt="2FA QR Code"
+                      className="w-48 h-48 mx-auto"
+                    />
+                  </div>
+                  {secret && (
+                    <div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Can't scan? Enter manually:</p>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded font-mono text-xs break-all text-center text-gray-900 dark:text-gray-100">
+                        {secret}
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">{t('profile.scanWith')}</p>
+                  )}
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={setup2FACode}
+                      onChange={(e) => setSetup2FACode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="Enter 6-digit code"
+                      maxLength={6}
+                      disabled={isEnabling2FA}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-center text-2xl tracking-widest font-mono dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                      autoFocus
+                    />
+                    {setup2FAError && (
+                      <p className="text-xs text-red-600 dark:text-red-400">{setup2FAError}</p>
+                    )}
                   </div>
                   <button
-                    onClick={() => {
-                      setTwoFactorEnabled(true)
-                      setShow2FAModal(false)
-                    }}
-                    className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium"
+                    onClick={handleVerify2FASetup}
+                    disabled={isEnabling2FA || setup2FACode.length !== 6}
+                    className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {t('profile.verifyEnable2FA')}
+                    {isEnabling2FA ? 'Verifying...' : 'Verify & Enable'}
                   </button>
                   <button
-                    onClick={() => setShow2FAModal(false)}
-                    className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                    onClick={() => {
+                      setShow2FAModal(false)
+                      setQrCode(null)
+                      setSecret(null)
+                      setSetup2FACode('')
+                      setSetup2FAError(null)
+                    }}
+                    disabled={isEnabling2FA}
+                    className="w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50"
                   >
-                    {t('common.cancel')}
+                    Cancel
                   </button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <p className="text-green-700 font-medium">{t('profile.twoFactorAuthEnabled')}</p>
+                  <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                    <p className="text-green-700 dark:text-green-400 font-medium">✓ {t('profile.twoFactorAuthEnabled')}</p>
                   </div>
                   <button
-                    onClick={() => {
-                      setTwoFactorEnabled(false)
-                      setShow2FAModal(false)
-                    }}
+                    onClick={handleDisable2FA}
                     className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 font-medium"
                   >
                     {t('profile.disable2FA')}
                   </button>
                   <button
                     onClick={() => setShow2FAModal(false)}
-                    className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                    className="w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
                   >
-                    {t('profile.close')}
+                    Close
                   </button>
                 </div>
               )}
