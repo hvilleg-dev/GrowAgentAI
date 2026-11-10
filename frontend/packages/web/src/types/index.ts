@@ -17,6 +17,8 @@ export interface AuthResponse {
 }
 
 // Session Types
+export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'CLOSED'
+
 export interface Session {
   id: string
   usuarioId: string
@@ -31,6 +33,11 @@ export interface Session {
   criadaEn: string
   actualizadaEn: string
   finalizadaEn?: string
+  status: SessionStatus
+  expiresAt: string
+  pausedAt?: string
+  pausedDuration: number
+  warningShownAt?: string
 }
 
 export interface CreateSessionRequest {

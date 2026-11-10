@@ -6,6 +6,7 @@ interface SessionsState {
   current: Session | null
   loading: boolean
   error: string | null
+  lastActivityAt: number
 }
 
 const initialState: SessionsState = {
@@ -13,6 +14,7 @@ const initialState: SessionsState = {
   current: null,
   loading: false,
   error: null,
+  lastActivityAt: Date.now(),
 }
 
 const sessionsSlice = createSlice({
@@ -34,8 +36,21 @@ const sessionsSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload
     },
+    updateSessionStatus: (state, action) => {
+      const { sessionId, status } = action.payload
+      const session = state.items.find(s => s.id === sessionId)
+      if (session) {
+        session.status = status
+      }
+      if (state.current?.id === sessionId) {
+        state.current.status = status
+      }
+    },
+    setLastActivity: (state) => {
+      state.lastActivityAt = Date.now()
+    },
   },
 })
 
-export const { setSessions, setCurrentSession, addSession, setLoading, setError } = sessionsSlice.actions
+export const { setSessions, setCurrentSession, addSession, setLoading, setError, updateSessionStatus, setLastActivity } = sessionsSlice.actions
 export default sessionsSlice.reducer
