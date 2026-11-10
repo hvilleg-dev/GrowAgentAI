@@ -102,9 +102,29 @@ export function createAuthRoutes(): Router {
         return;
       }
 
+      // Check if 2FA is enabled
+      if (usuario.twoFactorEnabled) {
+        // Generate temporary token for 2FA verification
+        const tempToken = generateToken(usuario.id, usuario.email);
+        res.status(200).json({
+          message: 'Login requires 2FA verification',
+          requires2FA: true,
+          tempToken,
+          user: {
+            id: usuario.id,
+            name: usuario.nombre,
+            email: usuario.email,
+            edad: usuario.edad,
+            genero: usuario.genero
+          }
+        });
+        return;
+      }
+
       const token = generateToken(usuario.id, usuario.email);
       res.status(200).json({
         message: 'Login successful',
+        requires2FA: false,
         user: {
           id: usuario.id,
           name: usuario.nombre,
@@ -294,6 +314,54 @@ export function createAuthRoutes(): Router {
       res.status(200).json({ message: '2FA disabled' });
     } catch (error) {
       logger.error('Disable 2FA error:', error);
+      next(error);
+    }
+  });
+
+  // Verify 2FA code
+  router.post('/verify-2fa', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId, code } = req.body;
+      if (!userId || !code) {
+        res.status(400).json({ error: 'Missing required fields: userId, code' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      if (!usuario.twoFactorEnabled) {
+        res.status(400).json({ error: '2FA not enabled for this user' });
+        return;
+      }
+
+      // Mock 2FA verification - in production, use a library like speakeasy
+      // For now, accept any 6-digit code as valid
+      const isCodeValid = /^\d{6}$/.test(code);
+
+      if (!isCodeValid) {
+        res.status(401).json({ error: 'Invalid 2FA code' });
+        return;
+      }
+
+      // Generate final token after successful 2FA
+      const token = generateToken(usuario.id, usuario.email);
+      res.status(200).json({
+        message: '2FA verification successful',
+        user: {
+          id: usuario.id,
+          name: usuario.nombre,
+          email: usuario.email,
+          edad: usuario.edad,
+          genero: usuario.genero
+        },
+        token
+      });
+    } catch (error) {
+      logger.error('Verify 2FA error:', error);
       next(error);
     }
   });
