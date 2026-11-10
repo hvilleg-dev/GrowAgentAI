@@ -92,9 +92,12 @@ export class SessionController {
         throw new NotFoundError('Sesión');
       }
 
-      // Ensure session has expiresAt set
+      // Ensure session has expiresAt and status set
       if (!sesion.expiresAt && sesion.criadaEn) {
         sesion.expiresAt = new Date(new Date(sesion.criadaEn).getTime() + 45 * 60 * 1000);
+      }
+      if (!sesion.status) {
+        sesion.status = 'ACTIVE';
       }
 
       res.json(sesion);
@@ -120,18 +123,24 @@ export class SessionController {
         order: { criadaEn: 'DESC' }
       });
 
-      // Ensure all sessions have expiresAt set
-      const sessionsWithExpiry = sesiones.map(s => {
-        if (!s.expiresAt && s.criadaEn) {
-          return {
-            ...s,
-            expiresAt: new Date(new Date(s.criadaEn).getTime() + 45 * 60 * 1000)
-          };
+      // Ensure all sessions have expiresAt and status set
+      const sessionsWithDefaults = sesiones.map(s => {
+        const updated: any = { ...s };
+
+        // Set expiresAt if missing
+        if (!updated.expiresAt && updated.criadaEn) {
+          updated.expiresAt = new Date(new Date(updated.criadaEn).getTime() + 45 * 60 * 1000);
         }
-        return s;
+
+        // Set status if missing - most recent session is ACTIVE, others are CLOSED
+        if (!updated.status) {
+          updated.status = sesiones[0]?.id === updated.id ? 'ACTIVE' : 'CLOSED';
+        }
+
+        return updated;
       });
 
-      res.json(sessionsWithExpiry);
+      res.json(sessionsWithDefaults);
     } catch (error) {
       next(error);
     }
