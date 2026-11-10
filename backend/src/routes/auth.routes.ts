@@ -107,8 +107,10 @@ export function createAuthRoutes(): Router {
         message: 'Login successful',
         user: {
           id: usuario.id,
-          nombre: usuario.nombre,
-          email: usuario.email
+          name: usuario.nombre,
+          email: usuario.email,
+          edad: usuario.edad,
+          genero: usuario.genero
         },
         token
       });
@@ -325,6 +327,45 @@ export function createAuthRoutes(): Router {
       });
     } catch (error) {
       logger.error('Get profile error:', error);
+      next(error);
+    }
+  });
+
+  // Check if profile is complete (for notification before chat)
+  router.get('/profile-status/:userId', authMiddleware, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { userId } = req.params;
+      if (!userId) {
+        res.status(400).json({ error: 'Missing required field: userId' });
+        return;
+      }
+
+      const usuario = await usuarioRepo.findOne({ where: { id: userId } });
+      if (!usuario) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      const isComplete = !!(usuario.nombre && usuario.email && usuario.edad && usuario.genero);
+      const missingFields = [];
+
+      if (!usuario.nombre) missingFields.push('name');
+      if (!usuario.edad) missingFields.push('age');
+      if (!usuario.genero) missingFields.push('gender');
+
+      res.status(200).json({
+        isComplete,
+        missingFields,
+        user: {
+          id: usuario.id,
+          name: usuario.nombre,
+          email: usuario.email,
+          edad: usuario.edad,
+          genero: usuario.genero
+        }
+      });
+    } catch (error) {
+      logger.error('Profile status error:', error);
       next(error);
     }
   });

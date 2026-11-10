@@ -8,6 +8,7 @@ import { setCurrentSession } from '@/store/slices/sessionsSlice'
 import { clearChat } from '@/store/slices/chatSlice'
 import CrisisIndicator from '@/components/CrisisIndicator'
 import MessageBubble from '@/components/MessageBubble'
+import { apiClient } from '@/services/apiClient'
 
 export default function ChatPage() {
   const dispatch = useDispatch<AppDispatch>()
@@ -22,7 +23,26 @@ export default function ChatPage() {
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
   const [showGoalDetail, setShowGoalDetail] = useState(false)
+  const [profileStatus, setProfileStatus] = useState<{ isComplete: boolean; missingFields: string[] } | null>(null)
+  const [dismissedProfileNotification, setDismissedProfileNotification] = useState(false)
   const currentGoal = goals.find(g => g.id === (currentSession?.goalId || selectedGoalId))
+
+  // Check if profile is complete
+  useEffect(() => {
+    const checkProfileStatus = async () => {
+      if (user?.id) {
+        try {
+          const response = await apiClient.get(`/api/auth/profile-status/${user.id}`)
+          setProfileStatus(response.data)
+          setDismissedProfileNotification(false)
+        } catch (err) {
+          console.error('Failed to check profile status:', err)
+        }
+      }
+    }
+
+    checkProfileStatus()
+  }, [user?.id])
 
   // Most recent session = active; older ones are read-only
   const latestSession = sessions.length > 0
@@ -143,6 +163,25 @@ export default function ChatPage() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
+        {/* Profile Completion Notification */}
+        {profileStatus && !profileStatus.isComplete && !dismissedProfileNotification && (
+          <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700 p-4 flex items-start gap-3">
+            <span className="text-xl">⚠️</span>
+            <div className="flex-1">
+              <h3 className="font-semibold text-amber-900 dark:text-amber-200">Complete Your Profile</h3>
+              <p className="text-sm text-amber-800 dark:text-amber-300 mt-1">
+                Please complete your profile in Settings before starting to chat. Missing: {profileStatus.missingFields.join(', ')}
+              </p>
+            </div>
+            <button
+              onClick={() => setDismissedProfileNotification(true)}
+              className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 ml-4 shrink-0"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="p-4 flex justify-between items-center">
