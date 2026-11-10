@@ -3,12 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import type { AppDispatch, RootState } from '@/store'
-import { login } from '@/store/slices/authSlice'
+import { login, setToken, setUser } from '@/store/slices/authSlice'
+import TwoFactorModal from '@/components/TwoFactorModal'
+import { apiClient } from '@/services/apiClient'
 
 export default function LoginPage() {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [show2FAModal, setShow2FAModal] = useState(false)
+  const [twoFAError, setTwoFAError] = useState('')
+  const [verifying2FA, setVerifying2FA] = useState(false)
+  const [tempUser, setTempUser] = useState<any>(null)
+  const [tempUserId, setTempUserId] = useState<string | null>(null)
+
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { loading, error } = useSelector((state: RootState) => state.auth)
@@ -17,7 +25,39 @@ export default function LoginPage() {
     e.preventDefault()
     const result = await dispatch(login({ email, password }))
     if (login.fulfilled.match(result)) {
+      // Check if 2FA is required
+      const authData = result.payload as any
+      if (authData.requires2FA) {
+        setTempUser(authData.user)
+        setTempUserId(authData.user.id)
+        setShow2FAModal(true)
+      } else {
+        navigate('/')
+      }
+    }
+  }
+
+  const handle2FAVerification = async (code: string) => {
+    if (!tempUserId) return
+
+    setVerifying2FA(true)
+    setTwoFAError('')
+    try {
+      const response = await apiClient.post('/api/auth/verify-2fa', {
+        userId: tempUserId,
+        code
+      })
+
+      // Store token and user data
+      dispatch(setToken(response.data.token))
+      dispatch(setUser(response.data.user))
+
+      setShow2FAModal(false)
       navigate('/')
+    } catch (err: any) {
+      setTwoFAError(err.response?.data?.error || 'Invalid code')
+    } finally {
+      setVerifying2FA(false)
     }
   }
 
@@ -69,6 +109,19 @@ export default function LoginPage() {
           </a>
         </p>
       </div>
+
+      <TwoFactorModal
+        isOpen={show2FAModal}
+        isVerifying={verifying2FA}
+        error={twoFAError}
+        onSubmit={handle2FAVerification}
+        onCancel={() => {
+          setShow2FAModal(false)
+          setTwoFAError('')
+          setTempUser(null)
+          setTempUserId(null)
+        }}
+      />
     </div>
   )
 }
