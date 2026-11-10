@@ -2,18 +2,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 
-const goalSchema = z.object({
-  description: z.string().min(1, 'Description required'),
-  goal: z.string().min(1, 'Goal required'),
-  reality: z.string().min(1, 'Reality required'),
-  option1: z.string().optional(),
-  option2: z.string().optional(),
-  option3: z.string().optional(),
-  will: z.string().optional(),
-})
-
-type GoalFormData = z.infer<typeof goalSchema>
+type GoalFormData = {
+  description: string
+  goal: string
+  reality: string
+  option1?: string
+  option2?: string
+  option3?: string
+  will?: string
+}
 
 interface Props {
   onClose: () => void
@@ -21,8 +20,19 @@ interface Props {
 }
 
 export default function GoalForm(props: Props) {
+  const { t } = useTranslation()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  console.log('GoalForm rendered, onSubmit:', props.onSubmit ? 'exists' : 'undefined')
+
+  const goalSchema = z.object({
+    description: z.string().min(1, t('goals.descriptionRequired')),
+    goal: z.string().min(1, t('goals.goalRequired')),
+    reality: z.string().min(1, t('goals.realityRequired')),
+    option1: z.string().optional(),
+    option2: z.string().optional(),
+    option3: z.string().optional(),
+    will: z.string().optional(),
+  })
+
   const {
     register,
     handleSubmit,
@@ -52,17 +62,17 @@ export default function GoalForm(props: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <h3 className="text-lg font-semibold">Create New Goal</h3>
+      <h3 className="text-lg font-semibold">{t('goals.createNewGoal')}</h3>
 
       {/* Goal Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Goal Description
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t('goals.goalDescription')}
         </label>
         <input
           {...register('description')}
-          placeholder="e.g., Improve productivity"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder={t('goals.descriptionPlaceholder')}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
         />
         {errors.description && (
           <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
@@ -72,25 +82,25 @@ export default function GoalForm(props: Props) {
       {/* GROW Fields */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            🎯 Goal (What do you want to achieve?)
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t('goals.goal')}
           </label>
           <textarea
             {...register('goal')}
-            placeholder="Specific goal..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20"
+            placeholder={t('goals.goalPlaceholder')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20 dark:bg-gray-700 dark:text-gray-100"
           />
           {errors.goal && <p className="text-red-500 text-xs mt-1">{errors.goal.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            📊 Reality (Where are you now?)
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t('goals.reality')}
           </label>
           <textarea
             {...register('reality')}
-            placeholder="Current situation..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20"
+            placeholder={t('goals.realityPlaceholder')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20 dark:bg-gray-700 dark:text-gray-100"
           />
           {errors.reality && (
             <p className="text-red-500 text-xs mt-1">{errors.reality.message}</p>
@@ -100,37 +110,37 @@ export default function GoalForm(props: Props) {
 
       {/* Options */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          🔄 Options (What are your choices?) - <span className="text-xs text-gray-500">Optional</span>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t('goals.options')} <span className="text-xs text-gray-500 dark:text-gray-400">{t('goals.optionsLabel')}</span>
         </label>
         <div className="space-y-2">
           <input
             {...register('option1')}
-            placeholder="Option 1..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder={t('goals.option1')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
           />
           <input
             {...register('option2')}
-            placeholder="Option 2..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder={t('goals.option2')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
           />
           <input
             {...register('option3')}
-            placeholder="Option 3..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder={t('goals.option3')}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
           />
         </div>
       </div>
 
       {/* Will */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          💪 Will (What will you do?) - <span className="text-xs text-gray-500">Optional</span>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t('goals.will')} <span className="text-xs text-gray-500 dark:text-gray-400">{t('goals.willLabel')}</span>
         </label>
         <textarea
           {...register('will')}
-          placeholder="Your commitment and action steps..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20"
+          placeholder={t('goals.willPlaceholder')}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20 dark:bg-gray-700 dark:text-gray-100"
         />
       </div>
 
@@ -139,16 +149,16 @@ export default function GoalForm(props: Props) {
         <button
           type="button"
           onClick={props.onClose}
-          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+          className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
         >
-          Cancel
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
         >
-          {isSubmitting ? 'Creating...' : 'Create Goal'}
+          {isSubmitting ? t('goals.creating') : t('goals.create')}
         </button>
       </div>
     </form>

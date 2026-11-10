@@ -8,7 +8,9 @@
     "delete": "Delete",
     "create": "Create",
     "close": "Close",
-    "back": "Back"
+    "back": "Back",
+    "none": "None",
+    "session": "Session"
   },
   "sidebar": {
     "sessions": "Sessions",
@@ -36,7 +38,8 @@
     "typeMessage": "Type a message...",
     "send": "Send",
     "readOnly": "This is a past session — read only. Create a new session to continue coaching.",
-    "completeProfile": "Complete your profile first..."
+    "completeProfile": "Complete your profile first...",
+    "errorSending": "Error sending message. Please try again."
   },
   "profile": {
     "completeYourProfile": "Complete Your Profile",

@@ -138,7 +138,7 @@ export default function ChatPage() {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             disabled={isLoadingGoals}
           >
-            <option value="">None</option>
+            <option value="">{t('common.none')}</option>
             {goals.map((goal) => (
               <option key={goal.id} value={goal.id}>
                 {goal.goal}
@@ -182,7 +182,7 @@ export default function ChatPage() {
                     ) : (
                       <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={t('sidebar.pastSession')} />
                     )}
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || 'Session'}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || t('common.session')}</p>
                     {isPastSession && (
                       <button
                         onClick={(e) => {
@@ -303,7 +303,7 @@ export default function ChatPage() {
           <>
           {error && (
             <div className="bg-red-50 text-red-700 text-sm p-2 rounded mb-2">
-              {t('common.error')} sending message. {t('common.error')} try again.
+              {t('chat.errorSending')}
             </div>
           )}
           <div className="flex gap-2">

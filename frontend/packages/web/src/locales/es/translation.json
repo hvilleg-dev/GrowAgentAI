@@ -8,12 +8,14 @@
     "delete": "Eliminar",
     "create": "Crear",
     "close": "Cerrar",
-    "back": "Atrás"
+    "back": "Atrás",
+    "none": "Ninguno",
+    "session": "Sesión"
   },
   "sidebar": {
     "sessions": "Sesiones",
     "selectGoal": "Seleccionar Meta (opcional)",
-    "newSession": "Nueva Sesión",
+    "newSession": "+ Nueva Sesión",
     "noSessions": "No hay sesiones aún",
     "loadingSessions": "Cargando sesiones...",
     "activeSession": "Sesión activa",
@@ -36,7 +38,8 @@
     "typeMessage": "Escribe un mensaje...",
     "send": "Enviar",
     "readOnly": "Esta es una sesión anterior — solo lectura. Crea una nueva sesión para continuar con el coaching.",
-    "completeProfile": "Completa tu perfil primero..."
+    "completeProfile": "Completa tu perfil primero...",
+    "errorSending": "Error al enviar el mensaje. Por favor intenta de nuevo."
   },
   "profile": {
     "completeYourProfile": "Completa Tu Perfil",
