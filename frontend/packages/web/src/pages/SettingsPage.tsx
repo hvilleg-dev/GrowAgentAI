@@ -164,6 +164,30 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Session Configuration */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Configuración de Sesión</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Duración de la Sesión (minutos)
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="text"
+                  value="45"
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-semibold"
+                />
+                <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">Por defecto</span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                La duración estándar de las sesiones es 45 minutos. Se pausa automáticamente después de 10 minutos de inactividad.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Coaching Profile Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('profile.coachingProfile')}</h2>

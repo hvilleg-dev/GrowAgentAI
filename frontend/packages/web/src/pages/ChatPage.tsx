@@ -96,6 +96,12 @@ export default function ChatPage() {
       alert('You must be logged in to create a session')
       return
     }
+    // Prevent creating new session if one is already active
+    const activeSession = sessions.find(s => s.status === 'ACTIVE' || s.status === 'PAUSED')
+    if (activeSession) {
+      alert('Solo puedes tener una sesión activa. Termina la sesión actual antes de crear una nueva.')
+      return
+    }
     const payload: any = {
       usuarioId: user.id,
       objetivo: `Sesión ${new Date().toLocaleTimeString()}`
@@ -119,6 +125,7 @@ export default function ChatPage() {
     try {
       await apiClient.delete(`/api/sessions/${sessionId}`)
       setDeleteConfirmSessionId(null)
+      notifyInfo({ message: 'Sesión eliminada', duration: 2000 })
 
       // If deleting current session, switch to another
       if (currentSession?.id === sessionId) {
@@ -193,20 +200,20 @@ export default function ChatPage() {
                     onClick={() => handleSelectSession(session)}
                     className="cursor-pointer flex items-center gap-1.5"
                   >
-                    {session.id === latestSession?.id ? (
+                    {currentSession?.id === session.id ? (
                       <>
                         {session.status === 'ACTIVE' && (
-                          <span className="w-2 h-2 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
+                          <span className="w-3 h-3 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
                         )}
                         {session.status === 'PAUSED' && (
-                          <span className="w-2 h-2 rounded-full bg-yellow-500 shrink-0" title="Session paused" />
+                          <span className="w-3 h-3 rounded-full bg-yellow-500 shrink-0" title="Session paused" />
                         )}
                         {session.status === 'CLOSED' && (
-                          <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" title="Session closed" />
+                          <span className="w-3 h-3 rounded-full bg-red-500 shrink-0" title="Session closed" />
                         )}
                       </>
                     ) : (
-                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={t('sidebar.pastSession')} />
+                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={session.status === 'CLOSED' ? t('sidebar.pastSession') : 'Sesión'} />
                     )}
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || t('common.session')}</p>
                     {isPastSession && (
@@ -267,7 +274,7 @@ export default function ChatPage() {
             </div>
             <div className="flex items-center gap-4">
               {sessionStatus !== 'CLOSED' && (
-                <div className={`text-sm font-mono font-semibold px-3 py-1 rounded ${
+                <div className={`text-lg font-mono font-bold px-4 py-2 rounded ${
                   sessionStatus === 'ACTIVE' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                   sessionStatus === 'PAUSED' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
