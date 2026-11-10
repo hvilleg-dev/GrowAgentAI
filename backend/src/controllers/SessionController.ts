@@ -46,20 +46,32 @@ export class SessionController {
       const query = `
         INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn", status, "expiresAt", "pausedAt", "pausedDuration", "warningShownAt")
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
-        RETURNING "etapaActual", "criadaEn", "actualizadaEn", "goalId", "expiresAt", status
+        RETURNING *
       `;
 
       const result = await AppDataSource.query(query, values);
       const returned = result[0];
 
       res.status(201).json({
-        id: sesionId,
-        etapaActual: returned.etapaActual,
-        objetivo: body.objetivo,
+        id: returned.id,
+        usuarioId: returned.usuarioId,
         goalId: returned.goalId,
+        etapaActual: returned.etapaActual,
+        objetivo: returned.objetivo,
+        realidad: returned.realidad,
+        opciones: returned.opciones,
+        voluntad: returned.voluntad,
+        resumen: returned.resumen,
+        reflexion: returned.reflexion,
+        planAccion: returned.planAccion,
         criadaEn: returned.criadaEn,
+        actualizadaEn: returned.actualizadaEn,
+        finalizadaEn: returned.finalizadaEn,
+        status: returned.status,
         expiresAt: returned.expiresAt,
-        status: returned.status
+        pausedAt: returned.pausedAt,
+        pausedDuration: returned.pausedDuration,
+        warningShownAt: returned.warningShownAt
       });
     } catch (error) {
       next(error);
