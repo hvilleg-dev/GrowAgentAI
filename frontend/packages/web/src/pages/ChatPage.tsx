@@ -191,18 +191,23 @@ export default function ChatPage() {
           ) : (
             sessions.map((session) => {
               const isPastSession = session.id !== latestSession?.id
+              const isClosed = session.status === 'CLOSED'
               return (
                 <div
                   key={session.id}
                   className={`p-3 rounded-lg border transition ${
                     currentSession?.id === session.id
-                      ? 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
-                      : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      ? isClosed
+                        ? 'bg-red-50 dark:bg-red-900/20 border-red-300 opacity-60'
+                        : 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
+                      : isClosed
+                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed'
+                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'
                   }`}
                 >
                   <div
-                    onClick={() => handleSelectSession(session)}
-                    className="cursor-pointer flex items-center gap-1.5"
+                    onClick={() => !isClosed && handleSelectSession(session)}
+                    className={`flex items-center gap-1.5 ${isClosed ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     {currentSession?.id === session.id ? (
                       <>
@@ -213,13 +218,22 @@ export default function ChatPage() {
                           <span className="w-3 h-3 rounded-full bg-yellow-500 shrink-0" title="Session paused" />
                         )}
                         {session.status === 'CLOSED' && (
-                          <span className="w-3 h-3 rounded-full bg-red-500 shrink-0" title="Session closed" />
+                          <span className="text-lg shrink-0" title="Session closed">
+                            🔒
+                          </span>
                         )}
                       </>
                     ) : (
                       <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={session.status === 'CLOSED' ? t('sidebar.pastSession') : 'Sesión'} />
                     )}
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate flex-1">{session.objetivo || t('common.session')}</p>
+                    <p className={`text-sm font-medium truncate flex-1 ${
+                      isClosed
+                        ? 'text-gray-500 dark:text-gray-500'
+                        : 'text-gray-900 dark:text-gray-100'
+                    }`}>{session.objetivo || t('common.session')}</p>
+                    {isClosed && currentSession?.id === session.id && (
+                      <span className="text-xs text-red-600 dark:text-red-400">Archivada</span>
+                    )}
                     {isPastSession && (
                       <button
                         onClick={(e) => {
@@ -234,7 +248,11 @@ export default function ChatPage() {
                       </button>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 ml-3.5">{t('sidebar.stage')}: {session.etapaActual}</p>
+                  <p className={`text-xs mt-0.5 ml-3.5 ${
+                    isClosed
+                      ? 'text-gray-400 dark:text-gray-600'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>{t('sidebar.stage')}: {session.etapaActual}</p>
                 </div>
               )
             })
@@ -396,14 +414,33 @@ export default function ChatPage() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : t('chat.typeMessage')}
-                  disabled={!sessionId || isChatLoading || (profileStatus && !profileStatus.isComplete)}
+                  placeholder={
+                    profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
+                    currentSession?.status === 'CLOSED' ? 'Sesión cerrada' :
+                    t('chat.typeMessage')
+                  }
+                  disabled={
+                    !sessionId ||
+                    isChatLoading ||
+                    (profileStatus && !profileStatus.isComplete) ||
+                    currentSession?.status === 'CLOSED'
+                  }
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!sessionId || isChatLoading || !inputText.trim() || (profileStatus && !profileStatus.isComplete)}
-                  title={profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') : ''}
+                  disabled={
+                    !sessionId ||
+                    isChatLoading ||
+                    !inputText.trim() ||
+                    (profileStatus && !profileStatus.isComplete) ||
+                    currentSession?.status === 'CLOSED'
+                  }
+                  title={
+                    profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
+                    currentSession?.status === 'CLOSED' ? 'Sesión cerrada' :
+                    ''
+                  }
                   className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isChatLoading ? '...' : t('chat.send')}
