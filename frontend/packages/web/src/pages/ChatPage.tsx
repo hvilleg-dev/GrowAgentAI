@@ -142,9 +142,9 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-full bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar - Sessions List */}
-      <div className="w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 flex flex-col">
-        <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">{t('sidebar.sessions')}</h2>
+      {/* Sidebar - Sessions List - Hidden on mobile, visible on desktop */}
+      <div className="hidden md:flex w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 flex-col">
+        <h2 className="text-xl md:text-lg font-semibold dark:text-gray-100 mb-4">{t('sidebar.sessions')}</h2>
 
         {/* Goal Selector */}
         <div className="mb-4">

@@ -12,13 +12,13 @@ export default function MessageBubble({ message, crisisLevel }: Props) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-xs px-4 py-2 rounded-lg ${
+        className={`max-w-full md:max-w-md px-4 py-3 md:py-2 rounded-lg ${
           isUser
             ? 'bg-indigo-600 text-white'
-            : 'bg-white border border-gray-200 text-gray-900'
+            : 'bg-white dark:bg-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-600 text-gray-900'
         }`}
       >
-        <p className="text-sm">{message.content}</p>
+        <p className="text-base md:text-sm leading-relaxed">{message.content}</p>
 
         {crisisLevel && !isUser && (
           <div className="mt-2 flex justify-end">
@@ -26,7 +26,7 @@ export default function MessageBubble({ message, crisisLevel }: Props) {
           </div>
         )}
 
-        <p className={`text-xs mt-1 ${isUser ? 'text-indigo-100' : 'text-gray-500'}`}>
+        <p className={`text-sm md:text-xs mt-1 ${isUser ? 'text-indigo-100' : 'text-gray-500 dark:text-gray-400'}`}>
           {new Date(message.timestamp).toLocaleTimeString()}
         </p>
       </div>

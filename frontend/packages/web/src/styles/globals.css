@@ -5,10 +5,16 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Accessibility: Larger base font for readability */
+    font-size: 16px;
   }
 
   body {
     @apply bg-white text-gray-900;
+    /* Improved legibility for users 30+ */
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
   }
 
   html.dark body {
@@ -19,11 +25,37 @@
     @apply bg-gray-900;
     color-scheme: dark;
   }
+
+  /* Heading sizes - mobile first, scale up on desktop */
+  h1 {
+    @apply text-2xl md:text-3xl font-bold leading-tight;
+  }
+
+  h2 {
+    @apply text-xl md:text-2xl font-bold leading-snug;
+  }
+
+  h3 {
+    @apply text-lg md:text-xl font-semibold leading-snug;
+  }
+
+  /* Typography scale for accessibility */
+  p, span, label {
+    line-height: 1.6;
+  }
+
+  small {
+    @apply text-sm md:text-base;
+  }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+    @apply px-4 py-2 md:py-3 md:px-5 rounded-lg font-medium transition-colors text-base md:text-lg;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .btn-primary {
@@ -35,7 +67,12 @@
   }
 
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500;
+    @apply w-full px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base md:text-lg;
+    min-height: 44px;
+  }
+
+  .input::placeholder {
+    @apply text-gray-500 text-base md:text-lg;
   }
 
   .card {
