@@ -27,7 +27,6 @@ export default function PasswordInput({
         <input
           type={showPassword ? 'text' : 'password'}
           placeholder={placeholder}
-          autoComplete={rest.name === 'confirmPassword' ? 'new-password' : 'current-password'}
           className={`w-full px-4 py-2 md:py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base md:text-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 ${className}`}
           {...rest}
         />
