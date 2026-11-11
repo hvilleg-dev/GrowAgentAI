@@ -40,6 +40,20 @@ export default function SettingsPage() {
   const [profileSuccess, setProfileSuccess] = useState(false)
   const [profileError, setProfileError] = useState<string | null>(null)
 
+  // Load 2FA status from profile on mount
+  useEffect(() => {
+    if (!user?.id) return
+    const loadProfile = async () => {
+      try {
+        const response = await apiClient.get(`/api/auth/profile/${user.id}`)
+        setTwoFactorEnabled(response.data.twoFactorEnabled || false)
+      } catch (error) {
+        console.error('Failed to load profile:', error)
+      }
+    }
+    loadProfile()
+  }, [user?.id])
+
   const updateThemeMutation = useMutation({
     mutationFn: async (newTheme: Theme) => {
       if (!user?.id) throw new Error('No user ID')
