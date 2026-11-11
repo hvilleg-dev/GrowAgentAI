@@ -326,16 +326,29 @@ export class SessionController {
       const mostRecentSession = activeSessions[0];
 
       if (mostRecentSession.deviceId && mostRecentSession.deviceId !== currentDeviceId) {
+        const now = new Date();
+        const expiresAt = new Date(mostRecentSession.expiresAt);
+        let timeRemainingSeconds = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
+
+        // Account for pause duration if session is paused
+        if (mostRecentSession.status === 'PAUSED' && mostRecentSession.pausedAt) {
+          timeRemainingSeconds = Math.max(0, timeRemainingSeconds + Math.floor(mostRecentSession.pausedDuration / 1000));
+        }
+
         res.json({
           hasActiveSession: true,
           sessionId: mostRecentSession.id,
-          deviceId: mostRecentSession.deviceId
+          deviceId: mostRecentSession.deviceId,
+          timeRemainingSeconds,
+          status: mostRecentSession.status
         });
       } else {
         res.json({
           hasActiveSession: false,
           sessionId: null,
-          deviceId: null
+          deviceId: null,
+          timeRemainingSeconds: null,
+          status: null
         });
       }
     } catch (error) {

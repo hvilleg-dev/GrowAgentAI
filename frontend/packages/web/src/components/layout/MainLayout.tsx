@@ -14,13 +14,19 @@ export default function MainLayout() {
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
-  const handleMultiDeviceResolved = (action: 'pause-other' | 'create-new') => {
-    setMultiDeviceConflict({
-      hasConflict: false,
-      sessionId: null,
-      otherDeviceId: null,
-    })
-    // UI updates handled by usePostLoginSync side effects
+  const handleMultiDeviceResolved = (action: 'pause-other' | 'back-to-other' | 'auto-timeout') => {
+    if (action === 'back-to-other') {
+      // User chose to go back to other device - close the app on this one
+      window.location.href = '/'
+    } else {
+      // User chose 'pause-other' or timeout occurred
+      setMultiDeviceConflict({
+        hasConflict: false,
+        sessionId: null,
+        otherDeviceId: null,
+      })
+      // UI updates handled by usePostLoginSync side effects
+    }
   }
 
   return (
@@ -48,6 +54,8 @@ export default function MainLayout() {
         isOpen={multiDeviceConflict.hasConflict}
         sessionId={multiDeviceConflict.sessionId}
         otherDeviceId={multiDeviceConflict.otherDeviceId}
+        timeRemaining={multiDeviceConflict.timeRemaining}
+        deviceStatus={multiDeviceConflict.deviceStatus}
         onResolve={handleMultiDeviceResolved}
       />
     </div>

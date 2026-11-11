@@ -11,6 +11,8 @@ interface MultiDeviceConflict {
   hasConflict: boolean
   sessionId: string | null
   otherDeviceId: string | null
+  timeRemaining?: number
+  deviceStatus?: string
 }
 
 // Phase 5: Post-login sync - handle multi-device lock, session loading, crash recovery
@@ -42,7 +44,7 @@ export function usePostLoginSync() {
         const response = await apiClient.get(`/api/sessions/active-device/${user.id}`, {
           params: { currentDeviceId }
         })
-        const { hasActiveSession, sessionId, deviceId } = response.data
+        const { hasActiveSession, sessionId, deviceId, timeRemainingSeconds, status } = response.data
 
         if (hasActiveSession && deviceId !== currentDeviceId) {
           // Phase 5: Another device has active session - store conflict info for modal
@@ -50,6 +52,8 @@ export function usePostLoginSync() {
             hasConflict: true,
             sessionId,
             otherDeviceId: deviceId,
+            timeRemaining: timeRemainingSeconds,
+            deviceStatus: status,
           })
         }
 
