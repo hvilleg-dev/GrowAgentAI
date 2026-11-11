@@ -11,6 +11,7 @@ import { setCurrentSession, setLastActivity } from '@/store/slices/sessionsSlice
 import { useNotification } from '@/hooks/useNotification'
 import CrisisIndicator from '@/components/CrisisIndicator'
 import MessageBubble from '@/components/MessageBubble'
+import ConfirmModal from '@/components/ConfirmModal'
 import { apiClient } from '@/services/apiClient'
 
 export default function ChatPage() {
@@ -35,6 +36,10 @@ export default function ChatPage() {
   const [dismissedProfileNotification, setDismissedProfileNotification] = useState(false)
   const [deleteConfirmSessionId, setDeleteConfirmSessionId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [draftConfirmation, setDraftConfirmation] = useState<{ isOpen: boolean; sessionId: string | null }>({
+    isOpen: false,
+    sessionId: null,
+  })
   const currentGoal = goals.find(g => g.id === (currentSession?.goalId || selectedGoalId))
 
   // Check if profile is complete
@@ -90,6 +95,28 @@ export default function ChatPage() {
     }
   }
 
+  const handleSelectSession = (session: any) => {
+    // If switching from ACTIVE to another session with unsaved input
+    if (inputText.trim() && currentSession?.status !== 'CLOSED') {
+      setDraftConfirmation({ isOpen: true, sessionId: session.id })
+    } else {
+      dispatch(setCurrentSession(session))
+      setInputText('')
+    }
+  }
+
+  const handleConfirmSwitchSession = () => {
+    if (draftConfirmation.sessionId) {
+      // Find session and switch
+      const session = sessions.find(s => s.id === draftConfirmation.sessionId)
+      if (session) {
+        dispatch(setCurrentSession(session))
+        setInputText('')
+      }
+    }
+    setDraftConfirmation({ isOpen: false, sessionId: null })
+  }
+
   const handleNewSession = () => {
     if (!user?.id) {
       alert('You must be logged in to create a session')
@@ -111,9 +138,6 @@ export default function ChatPage() {
     createSession(payload)
   }
 
-  const handleSelectSession = (session: any) => {
-    dispatch(setCurrentSession(session))
-  }
 
   const handleDeleteSession = async (sessionId: string) => {
     if (!confirm('¿Seguro que desea eliminar? Perderá seguimiento a su avance y control de su proceso')) {
@@ -450,6 +474,17 @@ export default function ChatPage() {
           )}
         </div>
       </div>
+
+      {/* Draft confirmation modal */}
+      <ConfirmModal
+        isOpen={draftConfirmation.isOpen}
+        title={t('chat.unsavedChanges')}
+        message={t('chat.draftWillBeLost') || 'Tu mensaje se perderá. ¿Deseas continuar?'}
+        confirmLabel={t('common.continue')}
+        cancelLabel={t('common.cancel')}
+        onConfirm={handleConfirmSwitchSession}
+        onCancel={() => setDraftConfirmation({ isOpen: false, sessionId: null })}
+      />
     </div>
   )
 }
