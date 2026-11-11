@@ -23,7 +23,15 @@ export function useSessions() {
 
   const createSessionMutation = useMutation({
     mutationFn: async (request: CreateSessionRequest) => {
-      const response = await apiClient.post<Session>('/api/sessions', request)
+      let deviceId = localStorage.getItem('device_id')
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        localStorage.setItem('device_id', deviceId)
+      }
+      const response = await apiClient.post<Session>('/api/sessions', {
+        ...request,
+        deviceId
+      })
       return response.data
     },
     onSuccess: (session) => {

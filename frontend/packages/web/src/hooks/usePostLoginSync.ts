@@ -31,11 +31,20 @@ export function usePostLoginSync() {
 
     const performSync = async () => {
       try {
+        // Phase 5: Generate or get device ID
+        let currentDeviceId = localStorage.getItem('device_id')
+        if (!currentDeviceId) {
+          currentDeviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          localStorage.setItem('device_id', currentDeviceId)
+        }
+
         // Phase 5: Check multi-device lock - see if another device has this session active
-        const response = await apiClient.get(`/api/sessions/active-device/${user.id}`)
+        const response = await apiClient.get(`/api/sessions/active-device/${user.id}`, {
+          params: { currentDeviceId }
+        })
         const { hasActiveSession, sessionId, deviceId } = response.data
 
-        if (hasActiveSession && deviceId !== localStorage.getItem('device_id')) {
+        if (hasActiveSession && deviceId !== currentDeviceId) {
           // Phase 5: Another device has active session - store conflict info for modal
           setMultiDeviceConflict({
             hasConflict: true,
