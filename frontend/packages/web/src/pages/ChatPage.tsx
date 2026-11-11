@@ -263,7 +263,7 @@ export default function ChatPage() {
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="p-4 flex justify-between items-center">
-            <div>
+            <div className="flex-1">
               <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {currentSession?.objetivo || t('chat.title')}
               </h1>
@@ -273,14 +273,14 @@ export default function ChatPage() {
                 </p>
               )}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
               {isTimerRunning && (
-                <div className="text-lg font-mono font-bold px-4 py-2 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                <div className="text-sm md:text-lg font-mono font-bold px-2 md:px-4 py-2 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   {timeRemaining}
                 </div>
               )}
               {!isTimerRunning && currentSession && (
-                <div className="text-lg font-mono font-bold px-4 py-2 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                <div className="text-sm md:text-lg font-mono font-bold px-2 md:px-4 py-2 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                   {timeRemaining}
                 </div>
               )}
@@ -288,7 +288,42 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Goal Context — compact chip */}
+          {/* Mobile: Goal selector and New Session button - visible only on mobile */}
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 px-4 py-3 space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('sidebar.selectGoal')}
+              </label>
+              <select
+                value={selectedGoalId || ''}
+                onChange={(e) => setSelectedGoalId(e.target.value || null)}
+                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                disabled={isLoadingGoals}
+              >
+                <option value="">{t('common.none')}</option>
+                {goals.map((goal) => (
+                  <option key={goal.id} value={goal.id}>
+                    {goal.description}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleNewSession}
+              disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)}
+              title={
+                profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
+                !canCreateNewSession ? `Espera ${timeRemaining} para nueva sesión` :
+                sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status) ? 'Solo una sesión activa permitida' :
+                ''
+              }
+              className="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isCreating ? t('common.loading') : t('sidebar.newSession')}
+            </button>
+          </div>
+
+          {/* Goal Context — compact chip - visible on both mobile and desktop */}
           {currentGoal && (
             <div className="px-4 pb-2 border-t border-gray-200 dark:border-gray-700 pt-2">
               <button
