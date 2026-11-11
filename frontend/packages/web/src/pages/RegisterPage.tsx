@@ -53,23 +53,23 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800 dark:text-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-gray-800 dark:text-gray-100">
           GrowAgentAI
         </h1>
-        <p className="text-center text-gray-600 mb-8">Create your account</p>
+        <p className="text-center text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-8">Create your account</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded text-sm sm:text-base">
               {serverError}
             </div>
           )}
 
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
               Full Name
             </label>
             <input
@@ -78,13 +78,13 @@ export default function RegisterPage() {
               className="input"
             />
             {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.name.message}</p>
             )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <input
@@ -94,7 +94,7 @@ export default function RegisterPage() {
               className="input"
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+              <p className="text-red-500 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
@@ -114,22 +114,22 @@ export default function RegisterPage() {
             error={errors.confirmPassword?.message}
           />
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center">
             After registering, complete your Coaching Profile in Settings.
           </p>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-base sm:text-lg min-h-12"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
-        <p className="text-center mt-4 text-gray-600">
+        <p className="text-center mt-6 text-sm sm:text-base text-gray-600 dark:text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
+          <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
             Login
           </Link>
         </p>
