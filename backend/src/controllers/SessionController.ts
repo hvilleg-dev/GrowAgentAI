@@ -40,12 +40,13 @@ export class SessionController {
         expiresAt, // expiresAt
         null, // pausedAt
         0, // pausedDuration
-        null // warningShownAt
+        null, // warningShownAt
+        body.deviceId || null // deviceId
       ];
 
       const query = `
-        INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn", status, "expiresAt", "pausedAt", "pausedDuration", "warningShownAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        INSERT INTO sesiones (id, "usuarioId", "goalId", "etapaActual", objetivo, realidad, opciones, voluntad, resumen, reflexion, "planAccion", "criadaEn", "actualizadaEn", "finalizadaEn", status, "expiresAt", "pausedAt", "pausedDuration", "warningShownAt", "deviceId")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
         RETURNING *
       `;
 
@@ -71,7 +72,8 @@ export class SessionController {
         expiresAt: returned.expiresAt,
         pausedAt: returned.pausedAt,
         pausedDuration: returned.pausedDuration,
-        warningShownAt: returned.warningShownAt
+        warningShownAt: returned.warningShownAt,
+        deviceId: returned.deviceId
       });
     } catch (error) {
       next(error);
@@ -289,6 +291,82 @@ export class SessionController {
       await sesionRepo.save(sesion);
 
       res.json({ message: 'Session resumed', sesion });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getActiveDeviceSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { usuarioId } = req.params;
+      const currentDeviceId = req.body?.currentDeviceId || null;
+
+      const usuarioRepo = AppDataSource.getRepository(Usuario);
+      const usuario = await usuarioRepo.findOne({ where: { id: usuarioId } });
+
+      if (!usuario) {
+        throw new NotFoundError('Usuario');
+      }
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const activeSessions = await sesionRepo.find({
+        where: { usuarioId, status: 'ACTIVE' },
+        order: { criadaEn: 'DESC' }
+      });
+
+      if (activeSessions.length === 0) {
+        res.json({
+          hasActiveSession: false,
+          sessionId: null,
+          deviceId: null
+        });
+        return;
+      }
+
+      const mostRecentSession = activeSessions[0];
+
+      if (mostRecentSession.deviceId && mostRecentSession.deviceId !== currentDeviceId) {
+        res.json({
+          hasActiveSession: true,
+          sessionId: mostRecentSession.id,
+          deviceId: mostRecentSession.deviceId
+        });
+      } else {
+        res.json({
+          hasActiveSession: false,
+          sessionId: null,
+          deviceId: null
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async pauseOtherDeviceSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+      const { deviceId } = req.body;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      if (sesion.deviceId !== deviceId) {
+        res.status(400).json({ error: 'Device ID mismatch - cannot pause session from different device' });
+        return;
+      }
+
+      sesion.status = 'PAUSED';
+      sesion.pausedAt = new Date();
+      sesion.actualizadaEn = new Date();
+
+      await sesionRepo.save(sesion);
+
+      res.json({ message: 'Other device session paused', sesion });
     } catch (error) {
       next(error);
     }

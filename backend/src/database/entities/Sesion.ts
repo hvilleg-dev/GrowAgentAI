@@ -81,6 +81,9 @@ export class Sesion {
   @Column({ nullable: true })
   warningShownAt?: Date;
 
+  @Column({ nullable: true, type: 'varchar', length: 255 })
+  deviceId?: string;
+
   @ManyToOne(() => Usuario, usuario => usuario.sesiones)
   @JoinColumn({ name: 'usuarioId' })
   usuario: Usuario;

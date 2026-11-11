@@ -38,5 +38,13 @@ export function createSessionRoutes(): Router {
     sessionController.resumeSession(req, res, next)
   );
 
+  sessionRouter.get('/active-device/:usuarioId', authMiddleware, (req, res, next) =>
+    sessionController.getActiveDeviceSession(req, res, next)
+  );
+
+  sessionRouter.post('/:sesionId/pause-other-device', authMiddleware, (req, res, next) =>
+    sessionController.pauseOtherDeviceSession(req, res, next)
+  );
+
   return sessionRouter;
 }
