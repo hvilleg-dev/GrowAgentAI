@@ -208,55 +208,55 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="h-full bg-gray-50 dark:bg-gray-900 p-6">
+    <div className="h-full bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">{t('profile.settings')}</h1>
+        <h1 className="text-2xl sm:text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6 sm:mb-8">{t('profile.settings')}</h1>
 
         {/* User Profile Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('profile.settings')}</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('profile.settings')}</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('profile.name')}
               </label>
               <input
                 type="text"
                 value={user?.name || ''}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-100 min-h-[44px] text-sm sm:text-base"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('profile.email')}
               </label>
               <input
                 type="email"
                 value={user?.email || ''}
                 disabled
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-100 min-h-[44px] text-sm sm:text-base"
               />
             </div>
           </div>
         </div>
 
         {/* Session Configuration */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Configuración de Sesión</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Configuración de Sesión</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Duración de la Sesión (minutos)
               </label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <input
                   type="text"
                   value="45"
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-gray-100 font-semibold"
+                  className="flex-1 px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-100 text-gray-900 font-semibold min-h-[44px] text-sm sm:text-base"
                 />
-                <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">Por defecto</span>
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">Por defecto</span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 La duración estándar de las sesiones es 45 minutos. Se pausa automáticamente después de 10 minutos de inactividad.
@@ -267,7 +267,7 @@ export default function SettingsPage() {
 
         {/* Coaching Profile Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('profile.coachingProfile')}</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('profile.coachingProfile')}</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             {t('profile.coachingProfileInfo')}
           </p>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                 max="120"
                 value={edad}
                 onChange={(e) => setEdad(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 min-h-[44px] text-sm sm:text-base"
                 placeholder={t('profile.enterAge')}
               />
             </div>
@@ -311,7 +311,7 @@ export default function SettingsPage() {
               <select
                 value={genero}
                 onChange={(e) => setGenero(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 min-h-[44px] text-sm sm:text-base"
               >
                 <option value="">{t('common.none')}</option>
                 <option value="Masculino">{t('profile.male')}</option>
@@ -329,7 +329,7 @@ export default function SettingsPage() {
                 type="text"
                 value={ocupacion}
                 onChange={(e) => setOcupacion(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 min-h-[44px] text-sm sm:text-base"
                 placeholder={t('profile.occupationPlaceholder')}
               />
             </div>
@@ -383,7 +383,7 @@ export default function SettingsPage() {
 
         {/* Preferences Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('profile.preferences')}</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('profile.preferences')}</h2>
 
           {/* Theme */}
           <div className="mb-6">
@@ -446,7 +446,7 @@ export default function SettingsPage() {
 
         {/* Privacy & Security */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {t('profile.privacySecurity')}
           </h2>
           <div className="space-y-4">
