@@ -190,5 +190,17 @@ const authSlice = createSlice({
   },
 })
 
+// Phase 5: Middleware for post-login session sync
+export const loginWithSessionSync = (email: string, password: string) => {
+  return async (dispatch: any, getState: any) => {
+    const result = await dispatch(login({ email, password }))
+    if (login.fulfilled.match(result)) {
+      // After successful login, dispatch action to load and sync sessions
+      // This will be handled by a component (LoginPage or MainLayout)
+    }
+    return result
+  }
+}
+
 export const { clearError, setToken, setUser, clearAllCaches } = authSlice.actions
 export default authSlice.reducer
