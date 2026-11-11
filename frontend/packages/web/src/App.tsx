@@ -41,12 +41,13 @@ function App() {
 
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light')
 
-    if (savedTheme !== initialTheme) {
+    // Only dispatch if it's different from current theme
+    if (theme !== initialTheme) {
       dispatch(setTheme(initialTheme))
     }
 
-    console.log('Initial theme:', initialTheme, 'saved:', savedTheme, 'prefersDark:', prefersDark)
-  }, [dispatch])
+    console.log('Initial theme:', initialTheme, 'saved:', savedTheme, 'prefersDark:', prefersDark, 'current:', theme)
+  }, [dispatch, theme])
 
   // Apply theme to DOM
   useEffect(() => {
