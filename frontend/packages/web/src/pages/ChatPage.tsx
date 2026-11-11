@@ -12,6 +12,7 @@ import { useNotification } from '@/hooks/useNotification'
 import CrisisIndicator from '@/components/CrisisIndicator'
 import MessageBubble from '@/components/MessageBubble'
 import ConfirmModal from '@/components/ConfirmModal'
+import { useSessionAlerts } from '@/components/SessionAlerts'
 import { apiClient } from '@/services/apiClient'
 
 export default function ChatPage() {
@@ -27,7 +28,7 @@ export default function ChatPage() {
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error, saveDraft, getDraftForSession } = useChat(sessionId || '')
 
   // Session timer - starts on first message, dual timeout (45min + 15min inactivity)
-  const { timeRemaining, isTimerRunning, startTimer, canCreateNewSession, updateActivity } = useSessionTimer(sessionId)
+  const { remainingMs, timeRemaining, isTimerRunning, startTimer, canCreateNewSession, updateActivity } = useSessionTimer(sessionId)
 
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
@@ -98,6 +99,13 @@ export default function ChatPage() {
       }
     }
   }, [sessionId, getDraftForSession])
+
+  // Phase 6: Session alerts and notifications
+  useSessionAlerts({
+    remainingMs,
+    isTimerRunning,
+    sessionStatus: currentSession?.status,
+  })
 
   const handleSendMessage = () => {
     if (inputText.trim() && sessionId) {
