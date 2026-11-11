@@ -173,3 +173,8 @@ base_conocimiento_chat/
 *.jpeg
 jpg/
 jpeg/
+
+# Playwright & Test Artifacts
+playwright-report/
+test-results/
+screenshots/
