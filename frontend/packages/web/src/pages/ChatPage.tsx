@@ -24,7 +24,7 @@ export default function ChatPage() {
   const { goals, isLoading: isLoadingGoals } = useGoals(user?.id || null)
 
   const sessionId = currentSession?.id || sessions[0]?.id
-  const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error } = useChat(sessionId || '')
+  const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error, saveDraft, getDraftForSession } = useChat(sessionId || '')
 
   // Session timer - starts on first message, dual timeout (45min + 15min inactivity)
   const { timeRemaining, isTimerRunning, startTimer, canCreateNewSession, updateActivity } = useSessionTimer(sessionId)
@@ -79,6 +79,25 @@ export default function ChatPage() {
       dispatch(setCurrentSession(sessions[0]))
     }
   }, [sessions, currentSession, dispatch])
+
+  // Phase 4: Auto-save draft on input change (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      saveDraft(inputText)
+    }, 500) // Debounce 500ms
+
+    return () => clearTimeout(timer)
+  }, [inputText, sessionId, saveDraft])
+
+  // Phase 4: Recover draft when switching sessions
+  useEffect(() => {
+    if (sessionId) {
+      const recovered = getDraftForSession(sessionId)
+      if (recovered && !inputText) {
+        setInputText(recovered)
+      }
+    }
+  }, [sessionId, getDraftForSession])
 
   const handleSendMessage = () => {
     if (inputText.trim() && sessionId) {
