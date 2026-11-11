@@ -62,27 +62,27 @@ export default function GoalForm(props: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <h3 className="text-lg font-semibold">{t('goals.createNewGoal')}</h3>
+      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">{t('goals.createNewGoal')}</h3>
 
       {/* Goal Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('goals.goalDescription')}
         </label>
         <input
           {...register('description')}
           placeholder={t('goals.descriptionPlaceholder')}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100 min-h-[44px]"
         />
         {errors.description && (
-          <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>
+          <p className="text-red-500 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.description.message}</p>
         )}
       </div>
 
       {/* GROW Fields */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('goals.goal')}
           </label>
           <textarea
@@ -90,11 +90,11 @@ export default function GoalForm(props: Props) {
             placeholder={t('goals.goalPlaceholder')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20 dark:bg-gray-700 dark:text-gray-100"
           />
-          {errors.goal && <p className="text-red-500 text-xs mt-1">{errors.goal.message}</p>}
+          {errors.goal && <p className="text-red-500 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.goal.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('goals.reality')}
           </label>
           <textarea
@@ -103,14 +103,14 @@ export default function GoalForm(props: Props) {
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 h-20 dark:bg-gray-700 dark:text-gray-100"
           />
           {errors.reality && (
-            <p className="text-red-500 text-xs mt-1">{errors.reality.message}</p>
+            <p className="text-red-500 dark:text-red-400 text-xs sm:text-sm mt-1">{errors.reality.message}</p>
           )}
         </div>
       </div>
 
       {/* Options */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('goals.options')} <span className="text-xs text-gray-500 dark:text-gray-400">{t('goals.optionsLabel')}</span>
         </label>
         <div className="space-y-2">
@@ -134,7 +134,7 @@ export default function GoalForm(props: Props) {
 
       {/* Will */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('goals.will')} <span className="text-xs text-gray-500 dark:text-gray-400">{t('goals.willLabel')}</span>
         </label>
         <textarea

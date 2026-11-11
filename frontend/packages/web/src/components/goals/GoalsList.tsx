@@ -22,28 +22,28 @@ export default function GoalsList({ goals, selectedId, onSelect }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-      <h2 className="text-lg font-semibold dark:text-gray-100 mb-4">{t('goals.yourGoals')}</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-3 sm:p-4">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('goals.yourGoals')}</h2>
       <div className="space-y-2">
         {goals.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{t('goals.noGoalsYet')}</p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center py-4">{t('goals.noGoalsYet')}</p>
         ) : (
           goals.map((goal) => (
             <button
               key={goal.id}
               onClick={() => onSelect(goal.id)}
-              className={`w-full text-left p-3 rounded-lg transition ${
+              className={`w-full text-left p-3 sm:p-4 rounded-lg transition min-h-[44px] flex flex-col justify-center ${
                 selectedId === goal.id
                   ? 'bg-indigo-50 dark:bg-indigo-900 border-2 border-indigo-500'
                   : 'bg-gray-50 dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600'
               }`}
             >
-              <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+              <p className="font-medium text-xs sm:text-sm text-gray-900 dark:text-gray-100 truncate">
                 {goal.description}
               </p>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <span
-                  className={`inline-block px-2 py-1 text-xs font-medium rounded ${
+                  className={`inline-block px-2 py-0.5 text-xs font-medium rounded ${
                     statusConfig[goal.status].color
                   }`}
                 >
