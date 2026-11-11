@@ -25,8 +25,8 @@ export default function ChatPage() {
   const sessionId = currentSession?.id || sessions[0]?.id
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error } = useChat(sessionId || '')
 
-  // Session timer - starts on first message
-  const { timeRemaining, isTimerRunning, startTimer, canCreateNewSession } = useSessionTimer(sessionId)
+  // Session timer - starts on first message, dual timeout (45min + 15min inactivity)
+  const { timeRemaining, isTimerRunning, startTimer, canCreateNewSession, updateActivity } = useSessionTimer(sessionId)
 
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
@@ -80,6 +80,9 @@ export default function ChatPage() {
       // Start timer on first message
       if (!isTimerRunning) {
         startTimer()
+      } else {
+        // Update last activity timestamp (prevents 15min inactivity timeout)
+        updateActivity()
       }
       dispatch(setLastActivity())
       sendMessage(inputText)
