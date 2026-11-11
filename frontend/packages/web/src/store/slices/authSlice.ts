@@ -74,16 +74,35 @@ export const register = createAsyncThunk(
   },
 )
 
-export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
-  try {
-    await apiClient.post('/auth/logout')
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    return null
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || 'Logout failed')
-  }
-})
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      await apiClient.post('/auth/logout')
+
+      // Phase 1: Comprehensive cache cleanup on logout
+      dispatch(clearAllCaches())
+      // Also dispatch reset actions for other slices
+      const { resetSessions } = require('./sessionsSlice')
+      const { resetChat } = require('./chatSlice')
+      dispatch(resetSessions())
+      dispatch(resetChat())
+
+      return null
+    } catch (error: any) {
+      // Even if logout API fails, still clear caches locally
+      const dispatchRef = dispatch
+      setTimeout(() => {
+        dispatchRef(clearAllCaches())
+        const { resetSessions } = require('./sessionsSlice')
+        const { resetChat } = require('./chatSlice')
+        dispatchRef(resetSessions())
+        dispatchRef(resetChat())
+      }, 100)
+      return rejectWithValue(error.response?.data?.message || 'Logout failed')
+    }
+  },
+)
 
 const authSlice = createSlice({
   name: 'auth',
@@ -99,6 +118,37 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload
       localStorage.setItem('user', JSON.stringify(action.payload))
+    },
+    clearAllCaches: (state) => {
+      // Phase 1: Comprehensive cache cleanup
+      // 1. Clear Redux auth state
+      state.token = null
+      state.user = null
+      state.error = null
+      state.loading = false
+
+      // 2. Clear localStorage - all auth and session related keys
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('tempToken') // 2FA temp token
+
+      // 3. Clear timer-related localStorage
+      const timerKeys = Object.keys(localStorage).filter(key => key.startsWith('timer_'))
+      timerKeys.forEach(key => localStorage.removeItem(key))
+
+      // 4. Clear draft-related localStorage
+      const draftKeys = Object.keys(localStorage).filter(key => key.startsWith('draft_'))
+      draftKeys.forEach(key => localStorage.removeItem(key))
+
+      // 5. Clear message queue localStorage
+      const messageQueueKeys = Object.keys(localStorage).filter(
+        key => key.startsWith('messages_pending_') || key.startsWith('messages_')
+      )
+      messageQueueKeys.forEach(key => localStorage.removeItem(key))
+
+      // 6. Clear session state localStorage
+      const sessionKeys = Object.keys(localStorage).filter(key => key.startsWith('session_'))
+      sessionKeys.forEach(key => localStorage.removeItem(key))
     },
   },
   extraReducers: (builder) => {
@@ -140,5 +190,5 @@ const authSlice = createSlice({
   },
 })
 
-export const { clearError, setToken, setUser } = authSlice.actions
+export const { clearError, setToken, setUser, clearAllCaches } = authSlice.actions
 export default authSlice.reducer

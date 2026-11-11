@@ -39,8 +39,15 @@ const chatSlice = createSlice({
       state.inputText = ''
       state.crisisLevel = null
     },
+    resetChat: (state) => {
+      // Reset to initial state (called during logout)
+      state.messages = []
+      state.inputText = ''
+      state.loading = false
+      state.crisisLevel = null
+    },
   },
 })
 
-export const { setInputText, addMessage, setMessages, setLoading, setCrisisLevel, clearChat } = chatSlice.actions
+export const { setInputText, addMessage, setMessages, setLoading, setCrisisLevel, clearChat, resetChat } = chatSlice.actions
 export default chatSlice.reducer

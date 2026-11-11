@@ -49,8 +49,16 @@ const sessionsSlice = createSlice({
     setLastActivity: (state) => {
       state.lastActivityAt = Date.now()
     },
+    resetSessions: (state) => {
+      // Reset to initial state (called during logout)
+      state.items = []
+      state.current = null
+      state.loading = false
+      state.error = null
+      state.lastActivityAt = Date.now()
+    },
   },
 })
 
-export const { setSessions, setCurrentSession, addSession, setLoading, setError, updateSessionStatus, setLastActivity } = sessionsSlice.actions
+export const { setSessions, setCurrentSession, addSession, setLoading, setError, updateSessionStatus, setLastActivity, resetSessions } = sessionsSlice.actions
 export default sessionsSlice.reducer
