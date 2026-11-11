@@ -4,7 +4,6 @@ interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement>
   label?: string
   error?: string
   placeholder?: string
-  autocomplete?: string
 }
 
 export default function PasswordInput({

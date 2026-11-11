@@ -104,6 +104,7 @@ export default function RegisterPage() {
           <PasswordInput
             label="Password"
             {...register('password')}
+            autoComplete="current-password"
             placeholder="••••••••"
             error={errors.password?.message}
           />
@@ -112,6 +113,7 @@ export default function RegisterPage() {
           <PasswordInput
             label="Confirm Password"
             {...register('confirmPassword')}
+            autoComplete="new-password"
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
           />
