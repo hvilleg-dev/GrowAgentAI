@@ -42,6 +42,7 @@ export interface Session {
   pausedAt?: string
   pausedDuration: number
   warningShownAt?: string
+  deviceId?: string
 }
 
 export interface CreateSessionRequest {
@@ -49,6 +50,7 @@ export interface CreateSessionRequest {
   goalId?: string
   objetivo?: string
   tema?: string
+  deviceId?: string
 }
 
 // Message Types
