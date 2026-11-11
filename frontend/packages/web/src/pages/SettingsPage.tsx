@@ -6,6 +6,7 @@ import type { RootState, AppDispatch } from '@/store'
 import { setTheme, setLanguage } from '@/store/slices/uiSlice'
 import type { Theme, Language } from '@/types'
 import { apiClient } from '@/services/apiClient'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation()
@@ -472,29 +473,23 @@ export default function SettingsPage() {
                     </div>
                   )}
                   <div className="space-y-3">
-                    <input
-                      type="password"
+                    <PasswordInput
                       placeholder={t('profile.currentPassword')}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     />
-                    <input
-                      type="password"
+                    <PasswordInput
                       placeholder={t('profile.newPassword')}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     />
-                    <input
-                      type="password"
+                    <PasswordInput
                       placeholder={t('profile.confirmPassword')}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     />
                     <div className="flex gap-2">
                       <button

@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { AppDispatch, RootState } from '@/store'
 import { register as registerAction } from '@/store/slices/authSlice'
+import PasswordInput from '@/components/PasswordInput'
 
 const registerSchema = z
   .object({
@@ -98,38 +99,20 @@ export default function RegisterPage() {
           </div>
 
           {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              {...register('password')}
-              type="password"
-              placeholder="••••••••"
-              className="input"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-            )}
-          </div>
+          <PasswordInput
+            label="Password"
+            {...register('password')}
+            placeholder="••••••••"
+            error={errors.password?.message}
+          />
 
           {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
-            <input
-              {...register('confirmPassword')}
-              type="password"
-              placeholder="••••••••"
-              className="input"
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
+          <PasswordInput
+            label="Confirm Password"
+            {...register('confirmPassword')}
+            placeholder="••••••••"
+            error={errors.confirmPassword?.message}
+          />
 
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
             After registering, complete your Coaching Profile in Settings.

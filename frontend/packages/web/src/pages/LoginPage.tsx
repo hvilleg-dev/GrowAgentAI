@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import type { AppDispatch, RootState } from '@/store'
 import { login, setToken, setUser } from '@/store/slices/authSlice'
 import TwoFactorModal from '@/components/TwoFactorModal'
+import PasswordInput from '@/components/PasswordInput'
 import { apiClient } from '@/services/apiClient'
 
 export default function LoginPage() {
@@ -84,12 +85,10 @@ export default function LoginPage() {
             required
           />
 
-          <input
-            type="password"
+          <PasswordInput
             placeholder={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-100"
             required
           />
 
