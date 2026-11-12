@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { apiClient } from '@/services/apiClient'
 import type { User, AuthResponse } from '@/types'
+import { resetSessions } from './sessionsSlice'
+import { resetChat } from './chatSlice'
 
 interface AuthState {
   token: string | null
@@ -83,8 +85,6 @@ export const logout = createAsyncThunk(
       // Phase 1: Comprehensive cache cleanup on logout
       dispatch(clearAllCaches())
       // Also dispatch reset actions for other slices
-      const { resetSessions } = require('./sessionsSlice')
-      const { resetChat } = require('./chatSlice')
       dispatch(resetSessions())
       dispatch(resetChat())
 
@@ -94,8 +94,6 @@ export const logout = createAsyncThunk(
       const dispatchRef = dispatch
       setTimeout(() => {
         dispatchRef(clearAllCaches())
-        const { resetSessions } = require('./sessionsSlice')
-        const { resetChat } = require('./chatSlice')
         dispatchRef(resetSessions())
         dispatchRef(resetChat())
       }, 100)
