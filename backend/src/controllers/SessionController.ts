@@ -18,6 +18,19 @@ export class SessionController {
         throw new NotFoundError('Usuario');
       }
 
+      // Reject if user already has an open session
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const existingOpen = await sesionRepo
+        .createQueryBuilder('s')
+        .where('s."usuarioId" = :uid', { uid: body.usuarioId })
+        .andWhere("s.status IN ('ACTIVE', 'PAUSED')")
+        .getOne();
+
+      if (existingOpen) {
+        res.status(409).json({ code: 'SESSION_ALREADY_OPEN', sessionId: existingOpen.id });
+        return;
+      }
+
       const sesionId = uuidv4();
       const now = new Date();
       const expiresAt = new Date(now.getTime() + 45 * 60 * 1000); // 45 minutes
@@ -148,6 +161,35 @@ export class SessionController {
     }
   }
 
+  async closeSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { sesionId } = req.params;
+
+      const sesionRepo = AppDataSource.getRepository(Sesion);
+      const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
+
+      if (!sesion) {
+        throw new NotFoundError('Sesión');
+      }
+
+      // Idempotent: if already closed, return current state
+      if (sesion.status === 'CLOSED') {
+        res.json(sesion);
+        return;
+      }
+
+      sesion.status = 'CLOSED';
+      sesion.finalizadaEn = new Date();
+      sesion.actualizadaEn = new Date();
+
+      await sesionRepo.save(sesion);
+
+      res.json(sesion);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async endSession(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { sesionId } = req.params;
@@ -182,14 +224,9 @@ export class SessionController {
         return;
       }
 
-      // Prevent deleting active session (most recent)
-      const allSesiones = await sesionRepo.find({
-        where: { usuarioId: sesion.usuarioId },
-        order: { criadaEn: 'DESC' }
-      });
-
-      if (allSesiones.length > 0 && allSesiones[0].id === sesionId) {
-        res.status(400).json({ error: 'Cannot delete active session. Create a new session first.' });
+      // Prevent deleting an open session
+      if (sesion.status === 'ACTIVE' || sesion.status === 'PAUSED') {
+        res.status(409).json({ code: 'SESSION_STILL_OPEN', message: 'Session must be closed before deletion' });
         return;
       }
 

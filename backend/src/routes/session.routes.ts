@@ -18,6 +18,10 @@ export function createSessionRoutes(): Router {
     sessionController.listSessions(req, res, next)
   );
 
+  sessionRouter.post('/:sesionId/close', authMiddleware, (req, res, next) =>
+    sessionController.closeSession(req, res, next)
+  );
+
   sessionRouter.post('/:sesionId/end', authMiddleware, (req, res, next) =>
     sessionController.endSession(req, res, next)
   );

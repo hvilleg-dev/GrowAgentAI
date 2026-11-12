@@ -210,6 +210,17 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
     return () => clearInterval(interval)
   }, [isTimerRunning, timerStartTime, lastActivityAt, sessionId, formatTime, notifyWarning, warningShown, getTimerStorageKey, dispatch])
 
+  // Stop timer immediately when session is CLOSED externally (e.g. via markClosed in ChatPage)
+  useEffect(() => {
+    if (sessionStatus === 'CLOSED' && isTimerRunning) {
+      setIsTimerRunning(false)
+      setRemainingMs(0)
+      if (isBrowser) {
+        try { localStorage.removeItem(getTimerStorageKey()) } catch (_) {}
+      }
+    }
+  }, [sessionStatus, isTimerRunning, getTimerStorageKey])
+
   // Can create new session only if timer is not running
   const canCreateNewSession = !isTimerRunning || remainingMs <= 0
 
