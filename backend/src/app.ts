@@ -2,6 +2,16 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Initialize Sentry before importing anything else that might throw errors
+import * as Sentry from '@sentry/node';
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    tracesSampleRate: 1.0,
+  });
+}
+
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -20,6 +30,7 @@ const app: Express = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 // Middleware
+app.use(Sentry.Handlers.requestHandler());
 app.use(helmet());
 app.use(cors({
   origin: function (origin, callback) {
@@ -141,6 +152,9 @@ async function start() {
       goals: '/api/goals',
       feedback: '/api/feedback'
     });
+
+    // Sentry error handler (before custom error handler)
+    app.use(Sentry.Handlers.errorHandler());
 
     // Error Handler (after routes so it catches errors from routes)
     app.use((err: any, _req: Request, res: Response, _next: Function) => {
