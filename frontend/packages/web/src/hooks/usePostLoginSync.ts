@@ -78,12 +78,13 @@ export function usePostLoginSync() {
           )
 
           if (activeSessions.length > 0) {
-            // Set most recent active session as current and track it
+            // Set most recent active session as current
             const mostRecent = activeSessions.reduce((a, b) =>
               new Date(a.criadaEn) > new Date(b.criadaEn) ? a : b
             )
             dispatch(setCurrentSession(mostRecent))
-            localStorage.setItem('current_session_id', mostRecent.id)
+            // Do NOT set current_session_id here — only set when THIS device creates a session
+            // Setting it here would wrongly flag sessions created by other devices
           }
           // No notification when all sessions closed - user sees the locked chat naturally
         }
