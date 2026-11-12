@@ -6,7 +6,8 @@ export const schemas = {
     usuarioId: Joi.string().uuid().required(),
     objetivo: Joi.string().min(1).max(500).optional(),
     goalId: Joi.string().uuid().optional(),
-    tema: Joi.string().optional()
+    tema: Joi.string().optional(),
+    deviceId: Joi.string().optional()
   }),
 
   chat: Joi.object({
