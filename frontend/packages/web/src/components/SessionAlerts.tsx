@@ -51,16 +51,6 @@ export function useSessionAlerts({
     }
   }, [isTimerRunning, remainingMs, lastWarningTime, stableNotifyWarning])
 
-  // Phase 6: Session ended notification
-  useEffect(() => {
-    if (sessionStatus === 'CLOSED' && isTimerRunning === false) {
-      notifyInfo({
-        message: 'Tu sesión ha terminado. Los mensajes están archivados.',
-        duration: 5000,
-      })
-    }
-  }, [sessionStatus, isTimerRunning, stableNotifyInfo])
-
   // Phase 6: Inactivity warning (approaching 15 minutes)
   // Note: This is triggered from useSessionTimer when inactivity > 10 minutes
   // Frontend can notify here when needed
