@@ -80,7 +80,7 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      await apiClient.post('/auth/logout')
+      await apiClient.post('/api/auth/logout')
 
       // Phase 1: Comprehensive cache cleanup on logout
       dispatch(clearAllCaches())
