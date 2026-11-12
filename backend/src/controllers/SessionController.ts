@@ -336,7 +336,8 @@ export class SessionController {
   async getActiveDeviceSession(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { usuarioId } = req.params;
-      const currentDeviceId = req.body?.currentDeviceId || null;
+      // Frontend sends currentDeviceId as a query param (?currentDeviceId=...) on a GET request
+      const currentDeviceId = (req.query?.currentDeviceId as string) || null;
 
       const usuarioRepo = AppDataSource.getRepository(Usuario);
       const usuario = await usuarioRepo.findOne({ where: { id: usuarioId } });
@@ -346,10 +347,13 @@ export class SessionController {
       }
 
       const sesionRepo = AppDataSource.getRepository(Sesion);
-      const activeSessions = await sesionRepo.find({
-        where: { usuarioId, status: 'ACTIVE' },
-        order: { criadaEn: 'DESC' }
-      });
+      // Include PAUSED sessions — they are still "active" from the multi-device conflict perspective
+      const activeSessions = await sesionRepo
+        .createQueryBuilder('s')
+        .where('s."usuarioId" = :uid', { uid: usuarioId })
+        .andWhere("s.status IN ('ACTIVE', 'PAUSED')")
+        .orderBy('s."criadaEn"', 'DESC')
+        .getMany();
 
       if (activeSessions.length === 0) {
         res.json({
@@ -362,7 +366,8 @@ export class SessionController {
 
       const mostRecentSession = activeSessions[0];
 
-      if (mostRecentSession.deviceId && mostRecentSession.deviceId !== currentDeviceId) {
+      // Conflict if session has no deviceId (unknown owner) or belongs to a different device
+      if (!mostRecentSession.deviceId || mostRecentSession.deviceId !== currentDeviceId) {
         const now = new Date();
         const expiresAt = new Date(mostRecentSession.expiresAt);
         let timeRemainingSeconds = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
