@@ -69,7 +69,7 @@ export class Sesion {
   })
   status: 'ACTIVE' | 'PAUSED' | 'CLOSED';
 
-  @Column()
+  @Column({ default: () => "NOW() + interval '45 minutes'" })
   expiresAt: Date;
 
   @Column({ nullable: true })
