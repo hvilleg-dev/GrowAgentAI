@@ -144,8 +144,8 @@ export default function ChatPage() {
       alert('You must be logged in to create a session')
       return
     }
-    // Prevent creating new session if one is already active, paused, or being created (no status yet)
-    const activeSession = sessions.find(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)
+    // Prevent creating new session if one is already active, paused, or still loading (no status yet)
+    const activeSession = sessions.find(s => s.status === 'ACTIVE' || s.status === 'PAUSED')
     if (activeSession) {
       alert('Solo puedes tener una sesión activa. Termina la sesión actual antes de crear una nueva.')
       return
@@ -223,7 +223,7 @@ export default function ChatPage() {
 
         <button
           onClick={handleNewSession}
-          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)}
+          disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED')}
           title={
             profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
             !canCreateNewSession ? `Espera ${timeRemaining} para nueva sesión` :
@@ -383,7 +383,7 @@ export default function ChatPage() {
             </div>
             <button
               onClick={handleNewSession}
-              disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status)}
+              disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED')}
               title={
                 profileStatus && !profileStatus.isComplete ? t('chat.completeProfile') :
                 !canCreateNewSession ? `Espera ${timeRemaining} para nueva sesión` :
