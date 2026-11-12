@@ -359,7 +359,7 @@ export class SessionController {
   async pauseOtherDeviceSession(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { sesionId } = req.params;
-      const { deviceId } = req.body;
+      const { deviceId, newDeviceId } = req.body; // deviceId = old owner (PC), newDeviceId = new owner (phone)
 
       const sesionRepo = AppDataSource.getRepository(Sesion);
       const sesion = await sesionRepo.findOne({ where: { id: sesionId } });
@@ -376,6 +376,10 @@ export class SessionController {
       sesion.status = 'PAUSED';
       sesion.pausedAt = new Date();
       sesion.actualizadaEn = new Date();
+      // Transfer ownership to new device so it can take control
+      if (newDeviceId) {
+        sesion.deviceId = newDeviceId;
+      }
 
       await sesionRepo.save(sesion);
 

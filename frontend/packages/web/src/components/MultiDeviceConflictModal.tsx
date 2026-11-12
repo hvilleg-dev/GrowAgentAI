@@ -48,8 +48,10 @@ export default function MultiDeviceConflictModal({
     if (autoTimeoutTriggered || !sessionId) return
     setAutoTimeoutTriggered(true)
     try {
+      const myDeviceId = localStorage.getItem('device_id')
       await apiClient.post(`/api/sessions/${sessionId}/pause-other-device`, {
         deviceId: otherDeviceId,
+        newDeviceId: myDeviceId,
       })
       onResolve('auto-timeout')
     } catch (error) {
@@ -61,8 +63,10 @@ export default function MultiDeviceConflictModal({
     if (!sessionId) return
     setIsProcessing(true)
     try {
+      const myDeviceId = localStorage.getItem('device_id')
       await apiClient.post(`/api/sessions/${sessionId}/pause-other-device`, {
-        deviceId: otherDeviceId,
+        deviceId: otherDeviceId,  // old owner (PC) to pause
+        newDeviceId: myDeviceId,  // new owner (this device/phone)
       })
       onResolve('pause-other')
     } catch (error) {

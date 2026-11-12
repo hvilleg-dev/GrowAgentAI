@@ -37,6 +37,7 @@ export function useSessions() {
     onSuccess: (session) => {
       dispatch(addSession(session))
       dispatch(setCurrentSession(session))
+      localStorage.setItem('current_session_id', session.id) // track for takeover detection
       queryClient.invalidateQueries({ queryKey: ['sessions', user?.id] })
     },
   })

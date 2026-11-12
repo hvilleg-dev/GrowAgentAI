@@ -58,14 +58,19 @@ export function usePostLoginSync() {
           })
         }
 
-        // Phase 5: Check if current device was paused by another device - auto logout
+        // Phase 5: Detect if another device took over the session this device was using
+        // When "Continuar aquí" is pressed on phone, the session's deviceId changes to phone's ID
         if (sessions && sessions.length > 0) {
-          const currentDeviceSession = sessions.find(s => s.deviceId === currentDeviceId)
-          if (currentDeviceSession && currentDeviceSession.status === 'PAUSED' && hasActiveSession && deviceId !== currentDeviceId) {
-            // This device's session was paused by another device - logout and redirect
-            await dispatch(logout())
-            window.location.href = '/login'
-            return
+          const myActiveSessionId = localStorage.getItem('current_session_id')
+          if (myActiveSessionId) {
+            const mySession = sessions.find(s => s.id === myActiveSessionId)
+            // If our session now has a different deviceId → we were kicked out
+            if (mySession && mySession.deviceId && mySession.deviceId !== currentDeviceId) {
+              localStorage.removeItem('current_session_id')
+              await dispatch(logout())
+              window.location.href = '/login'
+              return
+            }
           }
 
           const activeSessions = sessions.filter(
@@ -73,11 +78,12 @@ export function usePostLoginSync() {
           )
 
           if (activeSessions.length > 0) {
-            // Set most recent active session as current
+            // Set most recent active session as current and track it
             const mostRecent = activeSessions.reduce((a, b) =>
               new Date(a.criadaEn) > new Date(b.criadaEn) ? a : b
             )
             dispatch(setCurrentSession(mostRecent))
+            localStorage.setItem('current_session_id', mostRecent.id)
           }
           // No notification when all sessions closed - user sees the locked chat naturally
         }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { updateSessionStatus } from '@/store/slices/sessionsSlice'
 import { useNotification } from './useNotification'
+import { apiClient } from '@/services/apiClient'
 
 // Phase 2: Dual Timeout System
 const SESSION_DURATION = 45 * 60 * 1000 // 45 minutes from first message
@@ -25,7 +26,7 @@ interface UseSessionTimerReturn {
 
 const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'undefined'
 
-export function useSessionTimer(sessionId: string | null, sessionStatus?: string): UseSessionTimerReturn {
+export function useSessionTimer(sessionId: string | null, sessionStatus?: string, expiresAt?: string | Date | null): UseSessionTimerReturn {
   const dispatch = useAppDispatch()
   const { notifyWarning } = useNotification()
   const [remainingMs, setRemainingMs] = useState(SESSION_DURATION)
@@ -39,53 +40,65 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
   const getTimerStorageKey = useCallback((id?: string) => `timer_${id || sessionId}`, [sessionId])
   const getActivityStorageKey = useCallback((id?: string) => `activity_${id || sessionId}`, [sessionId])
 
-  // Initialize timer state from localStorage (app resume/refresh)
+  // Initialize timer state from localStorage (resume/refresh) or from session expiresAt (device takeover)
   useEffect(() => {
     if (!sessionId || !isBrowser) return
     try {
       const timerKey = getTimerStorageKey()
       const activityKey = getActivityStorageKey()
       const storedTimer = localStorage.getItem(timerKey)
-      const storedActivity = localStorage.getItem(activityKey)
 
       if (storedTimer) {
         const timerData: TimerState = JSON.parse(storedTimer)
         const firstMessageAt = timerData.firstMessageAt
-        const lastActivityAt = timerData.lastActivityAt || firstMessageAt
-
-        // Check if timer already expired
+        const storedActivity = timerData.lastActivityAt || firstMessageAt
         const elapsed = Date.now() - firstMessageAt
-        if (elapsed >= SESSION_DURATION) {
-          // Duration timeout reached
-          setRemainingMs(0)
-          setIsTimerRunning(false)
-          localStorage.removeItem(timerKey)
-          dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
-          return
-        }
 
-        // Check inactivity timeout
-        const inactivityTime = Date.now() - lastActivityAt
-        if (inactivityTime >= INACTIVITY_TIMEOUT) {
-          // Inactivity timeout reached
+        if (elapsed >= SESSION_DURATION) {
           setRemainingMs(0)
           setIsTimerRunning(false)
           localStorage.removeItem(timerKey)
           localStorage.removeItem(activityKey)
           dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
+          apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' }).catch(() => {})
           return
         }
 
-        // Timer still valid
+        // Inactivity during offline: dispatch PAUSED, keep timer running
+        const inactivityTime = Date.now() - storedActivity
+        if (inactivityTime >= INACTIVITY_TIMEOUT) {
+          inactivityPausedRef.current = true
+          dispatch(updateSessionStatus({ sessionId, status: 'PAUSED' }))
+        }
+
         setTimerStartTime(firstMessageAt)
-        setLastActivityAt(lastActivityAt)
+        setLastActivityAt(storedActivity)
         setIsTimerRunning(true)
         setRemainingMs(SESSION_DURATION - elapsed)
+        return
+      }
+
+      // No localStorage data — initialize from session's expiresAt (phone taking over from PC)
+      if (expiresAt) {
+        const expiry = new Date(expiresAt).getTime()
+        const now = Date.now()
+        const remaining = Math.max(0, expiry - now)
+        if (remaining > 0) {
+          const syntheticStart = now - (SESSION_DURATION - remaining)
+          setTimerStartTime(syntheticStart)
+          setLastActivityAt(now)
+          setIsTimerRunning(true)
+          setRemainingMs(remaining)
+          localStorage.setItem(timerKey, JSON.stringify({
+            firstMessageAt: syntheticStart,
+            lastActivityAt: now,
+          }))
+        }
       }
     } catch (error) {
       console.error('Error reading timer from localStorage:', error)
     }
-  }, [sessionId, getTimerStorageKey, getActivityStorageKey, dispatch])
+  }, [sessionId, expiresAt, getTimerStorageKey, getActivityStorageKey, dispatch])
 
   // Start timer function - called when session is created
   // forceSessionId: pass the new session's ID directly (avoids stale closure issue)
@@ -149,18 +162,17 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
       const durationElapsed = now - timerStartTime
       const inactivityElapsed = now - lastActivityAt
 
-      // Check duration timeout (45 minutes from first message)
+      // Check duration timeout (45 minutes) → CLOSED in Redux + backend
       if (durationElapsed >= SESSION_DURATION) {
         setIsTimerRunning(false)
         clearInterval(interval)
         setRemainingMs(0)
         dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
+        apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' }).catch(() => {})
         if (isBrowser) {
           try {
             localStorage.removeItem(getTimerStorageKey())
-          } catch (error) {
-            console.error('Error removing timer from localStorage:', error)
-          }
+          } catch (_) {}
         }
         return
       }
@@ -169,8 +181,8 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
       if (inactivityElapsed >= INACTIVITY_TIMEOUT && !inactivityPausedRef.current) {
         inactivityPausedRef.current = true
         dispatch(updateSessionStatus({ sessionId, status: 'PAUSED' }))
-        // Timer keeps running - session is paused but not closed
-        // useActivityDetector will resume to ACTIVE when user acts
+        apiClient.post(`/api/sessions/${sessionId}/pause`, {}).catch(() => {})
+        // Timer keeps running - useActivityDetector will resume to ACTIVE when user acts
       }
 
       // Calculate remaining time based on 45-min session duration only
