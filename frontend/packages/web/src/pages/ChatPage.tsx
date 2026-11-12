@@ -33,6 +33,7 @@ export default function ChatPage() {
   const [inputText, setInputText] = useState('')
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
   const [showGoalDetail, setShowGoalDetail] = useState(false)
+  const [showMobileSessions, setShowMobileSessions] = useState(false)
   const [profileStatus, setProfileStatus] = useState<{ isComplete: boolean; missingFields: string[] } | null>(null)
   const [dismissedProfileNotification, setDismissedProfileNotification] = useState(false)
   const [deleteConfirmSessionId, setDeleteConfirmSessionId] = useState<string | null>(null)
@@ -362,26 +363,16 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Mobile: Goal selector and New Session button - visible only on mobile */}
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 px-4 py-3 space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('sidebar.selectGoal')}
-              </label>
-              <select
-                value={selectedGoalId || ''}
-                onChange={(e) => setSelectedGoalId(e.target.value || null)}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                disabled={isLoadingGoals}
-              >
-                <option value="">{t('common.none')}</option>
-                {goals.map((goal) => (
-                  <option key={goal.id} value={goal.id}>
-                    {goal.description}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Mobile: controls bar - visible only on mobile */}
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 px-4 py-2 flex items-center gap-2">
+            <button
+              onClick={() => setShowMobileSessions(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-medium border border-gray-200 dark:border-gray-600"
+            >
+              <span>📋</span>
+              <span>{t('sidebar.sessions')} ({sessions.length})</span>
+              <span className="text-gray-400">{showMobileSessions ? '▲' : '▼'}</span>
+            </button>
             <button
               onClick={handleNewSession}
               disabled={isCreating || (profileStatus && !profileStatus.isComplete) || !canCreateNewSession || sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED')}
@@ -391,11 +382,79 @@ export default function ChatPage() {
                 sessions.some(s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status) ? 'Solo una sesión activa permitida' :
                 ''
               }
-              className="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-auto bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
-              {isCreating ? t('common.loading') : t('sidebar.newSession')}
+              {isCreating ? '...' : `+ ${t('sidebar.newSession')}`}
             </button>
           </div>
+
+          {/* Mobile: collapsible sessions panel */}
+          {showMobileSessions && (
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-4 py-3 max-h-52 overflow-y-auto">
+              <div className="mb-3">
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('sidebar.selectGoal')}
+                </label>
+                <select
+                  value={selectedGoalId || ''}
+                  onChange={(e) => setSelectedGoalId(e.target.value || null)}
+                  className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                  disabled={isLoadingGoals}
+                >
+                  <option value="">{t('common.none')}</option>
+                  {goals.map((goal) => (
+                    <option key={goal.id} value={goal.id}>
+                      {goal.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                {isLoadingSessions ? (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('sidebar.loadingSessions')}</p>
+                ) : sessions.length === 0 ? (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('sidebar.noSessions')}</p>
+                ) : (
+                  sessions.map((session) => {
+                    const isClosed = session.status === 'CLOSED'
+                    const isActive = currentSession?.id === session.id
+                    return (
+                      <div
+                        key={session.id}
+                        onClick={() => {
+                          if (!isClosed) {
+                            handleSelectSession(session)
+                            setShowMobileSessions(false)
+                          }
+                        }}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition ${
+                          isActive
+                            ? isClosed
+                              ? 'bg-red-50 dark:bg-red-900/20 border-red-300 opacity-60'
+                              : 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
+                            : isClosed
+                              ? 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-60 cursor-not-allowed'
+                              : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 cursor-pointer active:bg-gray-100 dark:active:bg-gray-600'
+                        }`}
+                      >
+                        {isClosed ? (
+                          <span className="text-sm shrink-0">🔒</span>
+                        ) : session.status === 'PAUSED' ? (
+                          <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 shrink-0" />
+                        ) : (
+                          <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shrink-0" />
+                        )}
+                        <span className={`truncate flex-1 font-medium ${isClosed ? 'text-gray-400 dark:text-gray-500' : 'text-gray-800 dark:text-gray-100'}`}>
+                          {session.objetivo || t('common.session')}
+                        </span>
+                        <span className="text-gray-400 dark:text-gray-500 shrink-0 text-xs">{session.etapaActual}</span>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Goal Context — compact chip - visible on both mobile and desktop */}
           {currentGoal && (
