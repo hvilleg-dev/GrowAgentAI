@@ -7,7 +7,7 @@ import { useNotification } from './useNotification'
 const SESSION_DURATION = 45 * 60 * 1000 // 45 minutes from first message
 const INACTIVITY_TIMEOUT = 15 * 60 * 1000 // 15 minutes without sending message
 const WARNING_TIME = 2 * 60 * 1000 // 2 minutes before expiry warning
-const TIMER_INTERVAL = 100 // 100ms for smooth countdown
+const TIMER_INTERVAL = 1000 // 1s interval for performance (avoid excessive re-renders)
 
 interface TimerState {
   firstMessageAt: number
