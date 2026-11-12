@@ -60,13 +60,13 @@ export default function ChatPage() {
     checkProfileStatus()
   }, [user?.id])
 
-  // Most recent session = active; older ones are read-only
+  // Most recent session = active; older ones or closed ones are read-only
   const latestSession = sessions.length > 0
     ? sessions.reduce((a, b) =>
         new Date(a.criadaEn) > new Date(b.criadaEn) ? a : b
       )
     : null
-  const isReadOnly = !!currentSession && !!latestSession && currentSession.id !== latestSession.id
+  const isReadOnly = !!currentSession && (currentSession.status === 'CLOSED' || (!!latestSession && currentSession.id !== latestSession.id))
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom
