@@ -1,4 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import * as Sentry from '@sentry/node';
 import { authMiddleware } from '@/middleware/auth.middleware';
 
 export function createFeedbackRoutes(): Router {
@@ -14,44 +15,26 @@ export function createFeedbackRoutes(): Router {
         return;
       }
 
-      const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
-      const telegramChatId = process.env.TELEGRAM_CHAT_ID;
-
-      if (!telegramBotToken || !telegramChatId) {
-        console.warn('Telegram not configured - feedback will be logged only');
-        console.log(`[FEEDBACK] From user ${userId}: ${message}`);
-        res.json({ success: true, message: 'Feedback received (Telegram not configured)' });
-        return;
-      }
-
-      // Format message for Telegram
-      const telegramMessage = `📬 *Nuevo Feedback*
-━━━━━━━━━━━━━━━━
-👤 *Usuario:* \`${userId}\`
-🕐 *Hora:* ${new Date(timestamp).toLocaleString('es-ES')}
-━━━━━━━━━━━━━━━━
-💬 *Mensaje:*
-${message}`;
-
-      // Send to Telegram via fetch
-      const telegramUrl = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
-      const response = await fetch(telegramUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: telegramChatId,
-          text: telegramMessage,
-          parse_mode: 'Markdown'
-        })
+      // Capture feedback as Sentry event
+      Sentry.captureMessage(message, {
+        level: 'info',
+        tags: {
+          type: 'user_feedback',
+          userId,
+          timestamp
+        },
+        contexts: {
+          feedback: {
+            userId,
+            message: message.substring(0, 500),
+            receivedAt: new Date(timestamp).toISOString()
+          }
+        }
       });
 
-      if (!response.ok) {
-        throw new Error(`Telegram API error: ${response.statusText}`);
-      }
-
-      res.json({ success: true, message: 'Feedback sent successfully' });
+      res.json({ success: true, message: 'Feedback received successfully' });
     } catch (error) {
-      console.error('Error sending feedback to Telegram:', error);
+      console.error('Error processing feedback:', error);
       next(error);
     }
   });
