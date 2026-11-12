@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import type { RootState } from '@/store'
 import { useNotification } from '@/hooks/useNotification'
@@ -25,6 +25,11 @@ export function useSessionAlerts({
   const [networkLossNotificationId, setNetworkLossNotificationId] = useState<string | null>(null)
   const [pausedNotificationShown, setPausedNotificationShown] = useState(false)
 
+  // Stable callback refs to prevent infinite loops
+  const stableNotifyWarning = useCallback(notifyWarning, [])
+  const stableNotifyInfo = useCallback(notifyInfo, [])
+  const stableNotifyError = useCallback(notifyError, [])
+
   // Phase 6: 2-minute warning before session ends
   useEffect(() => {
     if (isTimerRunning && remainingMs <= WARNING_THRESHOLD && remainingMs > 0) {
@@ -32,14 +37,14 @@ export function useSessionAlerts({
       // Only show warning once per 30 seconds to avoid spam
       if (now - lastWarningTime > 30000) {
         const minutes = Math.ceil(remainingMs / 60000)
-        notifyWarning({
+        stableNotifyWarning({
           message: `Tu sesión termina en ${minutes} minuto${minutes !== 1 ? 's' : ''}. Guarda tu trabajo.`,
           duration: 5000,
         })
         setLastWarningTime(now)
       }
     }
-  }, [isTimerRunning, remainingMs, lastWarningTime, notifyWarning])
+  }, [isTimerRunning, remainingMs, lastWarningTime, stableNotifyWarning])
 
   // Phase 6: Session ended notification
   useEffect(() => {
@@ -49,7 +54,7 @@ export function useSessionAlerts({
         duration: 5000,
       })
     }
-  }, [sessionStatus, isTimerRunning, notifyInfo])
+  }, [sessionStatus, isTimerRunning, stableNotifyInfo])
 
   // Phase 6: Inactivity warning (approaching 15 minutes)
   // Note: This is triggered from useSessionTimer when inactivity > 10 minutes
@@ -59,7 +64,7 @@ export function useSessionAlerts({
   useEffect(() => {
     const handleOnline = () => {
       if (networkLossNotificationId) {
-        notifyInfo({
+        stableNotifyInfo({
           message: 'Conexión restaurada. Sincronizando...',
           duration: 3000,
         })
@@ -84,7 +89,7 @@ export function useSessionAlerts({
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [networkLossNotificationId, notifyWarning, notifyInfo])
+  }, [networkLossNotificationId, stableNotifyWarning, stableNotifyInfo])
 
   // Phase 6: Session paused on another device - show once
   useEffect(() => {
@@ -95,7 +100,7 @@ export function useSessionAlerts({
       })
       setPausedNotificationShown(true)
     }
-  }, [sessionStatus, currentSession?.status, pausedNotificationShown, notifyWarning])
+  }, [sessionStatus, currentSession?.status, pausedNotificationShown, stableNotifyWarning])
 }
 
 export default function SessionAlerts({ remainingMs, isTimerRunning, sessionStatus }: SessionAlertsProps) {
