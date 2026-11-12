@@ -19,7 +19,7 @@ export default function ChatPage() {
   const { t } = useTranslation()
   const dispatch = useDispatch<AppDispatch>()
   const { notifyInfo } = useNotification()
-  const { sessions, isLoading: isLoadingSessions, createSession, isCreating } = useSessions()
+  const { sessions, isLoading: isLoadingSessions, createSession, createSessionMutation, isCreating } = useSessions()
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
   const { user } = useSelector((state: RootState) => state.auth)
   const { goals, isLoading: isLoadingGoals } = useGoals(user?.id || null)
@@ -109,13 +109,8 @@ export default function ChatPage() {
 
   const handleSendMessage = () => {
     if (inputText.trim() && sessionId) {
-      // Start timer on first message
-      if (!isTimerRunning) {
-        startTimer()
-      } else {
-        // Update last activity timestamp (prevents 15min inactivity timeout)
-        updateActivity()
-      }
+      // Update last activity timestamp (prevents 15min inactivity timeout)
+      updateActivity()
       dispatch(setLastActivity())
       sendMessage(inputText)
       setInputText('')
@@ -162,7 +157,13 @@ export default function ChatPage() {
     if (selectedGoalId) {
       payload.goalId = selectedGoalId
     }
-    createSession(payload)
+    // Create session and start timer immediately
+    createSessionMutation.mutate(payload, {
+      onSuccess: () => {
+        // Timer starts when session is created, not on first message
+        startTimer()
+      }
+    })
   }
 
 

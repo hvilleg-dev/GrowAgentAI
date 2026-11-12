@@ -45,6 +45,7 @@ export function useSessions() {
     sessions,
     isLoading,
     createSession: createSessionMutation.mutate,
+    createSessionMutation,
     isCreating: createSessionMutation.isPending,
   }
 }
