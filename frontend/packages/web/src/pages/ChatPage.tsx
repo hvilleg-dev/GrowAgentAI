@@ -255,13 +255,13 @@ export default function ChatPage() {
                         ? 'bg-red-50 dark:bg-red-900/20 border-red-300 opacity-60'
                         : 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
                       : isClosed
-                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60 cursor-not-allowed'
+                        ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-70 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700'
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer'
                   }`}
                 >
                   <div
-                    onClick={() => !isClosed && handleSelectSession(session)}
-                    className={`flex items-center gap-1.5 ${isClosed ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                    onClick={() => handleSelectSession(session)}
+                    className="flex items-center gap-1.5 cursor-pointer"
                   >
                     {currentSession?.id === session.id ? (
                       <>
@@ -422,19 +422,17 @@ export default function ChatPage() {
                       <div
                         key={session.id}
                         onClick={() => {
-                          if (!isClosed) {
-                            handleSelectSession(session)
-                            setShowMobileSessions(false)
-                          }
+                          handleSelectSession(session)
+                          setShowMobileSessions(false)
                         }}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition ${
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition cursor-pointer ${
                           isActive
                             ? isClosed
-                              ? 'bg-red-50 dark:bg-red-900/20 border-red-300 opacity-60'
+                              ? 'bg-red-50 dark:bg-red-900/20 border-red-300 opacity-70'
                               : 'bg-indigo-100 dark:bg-indigo-900/40 border-indigo-300'
                             : isClosed
-                              ? 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-60 cursor-not-allowed'
-                              : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 cursor-pointer active:bg-gray-100 dark:active:bg-gray-600'
+                              ? 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-70 active:bg-gray-200'
+                              : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 active:bg-gray-100 dark:active:bg-gray-600'
                         }`}
                       >
                         {isClosed ? (

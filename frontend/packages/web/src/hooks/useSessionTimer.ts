@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppDispatch } from '@/store/hooks'
+import { useSelector } from 'react-redux'
+import { useQueryClient } from '@tanstack/react-query'
 import { updateSessionStatus } from '@/store/slices/sessionsSlice'
 import { useNotification } from './useNotification'
 import { apiClient } from '@/services/apiClient'
+import type { RootState } from '@/store'
 
 // Phase 2: Dual Timeout System
 const SESSION_DURATION = 3 * 60 * 1000 // TEST: 3 minutes (restore to 45 * 60 * 1000)
@@ -28,6 +31,8 @@ const isBrowser = typeof window !== 'undefined' && typeof localStorage !== 'unde
 
 export function useSessionTimer(sessionId: string | null, sessionStatus?: string, expiresAt?: string | Date | null): UseSessionTimerReturn {
   const dispatch = useAppDispatch()
+  const queryClient = useQueryClient()
+  const { user } = useSelector((state: RootState) => state.auth)
   const { notifyWarning } = useNotification()
   const [remainingMs, setRemainingMs] = useState(SESSION_DURATION)
   const [warningShown, setWarningShown] = useState(false)
@@ -60,7 +65,9 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
           localStorage.removeItem(timerKey)
           localStorage.removeItem(activityKey)
           dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
-          apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' }).catch(() => {})
+          apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' })
+            .then(() => queryClient.invalidateQueries({ queryKey: ['sessions', user?.id] }))
+            .catch(() => queryClient.invalidateQueries({ queryKey: ['sessions', user?.id] }))
           return
         }
 
@@ -162,17 +169,17 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
       const durationElapsed = now - timerStartTime
       const inactivityElapsed = now - lastActivityAt
 
-      // Check duration timeout (45 minutes) → CLOSED in Redux + backend
+      // Check duration timeout → CLOSED in Redux + backend + React Query cache
       if (durationElapsed >= SESSION_DURATION) {
         setIsTimerRunning(false)
         clearInterval(interval)
         setRemainingMs(0)
         dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
-        apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' }).catch(() => {})
+        apiClient.patch(`/api/sessions/${sessionId}/status`, { status: 'CLOSED' })
+          .then(() => queryClient.invalidateQueries({ queryKey: ['sessions', user?.id] }))
+          .catch(() => queryClient.invalidateQueries({ queryKey: ['sessions', user?.id] }))
         if (isBrowser) {
-          try {
-            localStorage.removeItem(getTimerStorageKey())
-          } catch (_) {}
+          try { localStorage.removeItem(getTimerStorageKey()) } catch (_) {}
         }
         return
       }

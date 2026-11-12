@@ -89,22 +89,20 @@ export function usePostLoginSync() {
           // No notification when all sessions closed - user sees the locked chat naturally
         }
 
-        // Phase 5: App crash recovery - check localStorage for unfinished state
-        const savedTimerId = Object.keys(localStorage)
-          .find(key => key.startsWith('timer_'))
-        if (savedTimerId) {
-          const sessionIdFromTimer = savedTimerId.replace('timer_', '')
+        // Phase 5: App crash recovery - clean up stale timer keys and recover if needed
+        const allTimerKeys = Object.keys(localStorage).filter(key => key.startsWith('timer_'))
+        allTimerKeys.forEach(timerKey => {
+          const sessionIdFromTimer = timerKey.replace('timer_', '')
           const session = sessions?.find(s => s.id === sessionIdFromTimer)
-
-          if (session && (session.status === 'ACTIVE' || session.status === 'PAUSED')) {
-            // Recover timer and session
+          if (!session || session.status === 'CLOSED') {
+            // Session gone or closed - remove stale timer data
+            localStorage.removeItem(timerKey)
+            localStorage.removeItem(`activity_${sessionIdFromTimer}`)
+          } else if (session.status === 'ACTIVE' || session.status === 'PAUSED') {
+            // Recover active/paused session
             dispatch(setCurrentSession(session))
-            // Timer will be recovered by useSessionTimer hook
-          } else {
-            // Session not found or closed - clean up localStorage
-            localStorage.removeItem(savedTimerId)
           }
-        }
+        })
       } catch (error) {
         console.error('Error in post-login sync:', error)
         // Silently fail - don't break login flow
