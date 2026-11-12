@@ -34,6 +34,7 @@ export default function ChatPage() {
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
   const [showGoalDetail, setShowGoalDetail] = useState(false)
   const [showMobileSessions, setShowMobileSessions] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [profileStatus, setProfileStatus] = useState<{ isComplete: boolean; missingFields: string[] } | null>(null)
   const [dismissedProfileNotification, setDismissedProfileNotification] = useState(false)
   const [deleteConfirmSessionId, setDeleteConfirmSessionId] = useState<string | null>(null)
@@ -112,11 +113,12 @@ export default function ChatPage() {
 
   const handleSendMessage = () => {
     if (inputText.trim() && sessionId) {
-      // Update last activity timestamp (prevents 15min inactivity timeout)
       updateActivity()
       dispatch(setLastActivity())
       sendMessage(inputText)
       setInputText('')
+      // Restore focus to input after sending
+      setTimeout(() => inputRef.current?.focus(), 50)
     }
   }
 
@@ -263,30 +265,19 @@ export default function ChatPage() {
                     onClick={() => handleSelectSession(session)}
                     className="flex items-center gap-1.5 cursor-pointer"
                   >
-                    {currentSession?.id === session.id ? (
-                      <>
-                        {(session.status === 'ACTIVE' || !session.status) && (
-                          <span className="w-3 h-3 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
-                        )}
-                        {session.status === 'PAUSED' && (
-                          <span className="w-3 h-3 rounded-full bg-yellow-500 shrink-0" title="Session paused" />
-                        )}
-                        {session.status === 'CLOSED' && (
-                          <span className="text-lg shrink-0" title="Session closed">
-                            🔒
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" title={session.status === 'CLOSED' ? t('sidebar.pastSession') : 'Sesión'} />
-                    )}
+                    {session.status === 'ACTIVE' || !session.status
+                      ? <span className="w-3 h-3 rounded-full bg-green-500 shrink-0 animate-pulse" title={t('sidebar.activeSession')} />
+                      : session.status === 'PAUSED'
+                        ? <span className="w-3 h-3 rounded-full bg-yellow-500 shrink-0" title="Pausada" />
+                        : <span className="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-500 shrink-0" title="Archivada" />
+                    }
                     <p className={`text-sm font-medium truncate flex-1 ${
                       isClosed
                         ? 'text-gray-500 dark:text-gray-500'
                         : 'text-gray-900 dark:text-gray-100'
                     }`}>{session.objetivo || t('common.session')}</p>
-                    {isClosed && currentSession?.id === session.id && (
-                      <span className="text-xs text-red-600 dark:text-red-400">Archivada</span>
+                    {isClosed && (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">Cerrada</span>
                     )}
                     {isPastSession && (
                       <button
@@ -520,6 +511,7 @@ export default function ChatPage() {
               )}
               <div className="flex gap-2">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
