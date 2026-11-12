@@ -215,8 +215,11 @@ export default function ChatPage() {
   /* ── FUENTE ÚNICA DE VERDAD DE SESIONES ─────────────────────────────────── */
 
   const getStatus = useCallback(
-    (s: { id: string; status?: string | null }): string =>
-      closedIds.has(s.id) ? SESSION_STATUS.CLOSED : s.status || SESSION_STATUS.ACTIVE,
+    (s: { id: string; status?: string | null }): string => {
+      if (closedIds.has(s.id)) return SESSION_STATUS.CLOSED
+      const raw = (s.status ?? '').toString().trim().toUpperCase()
+      return raw || SESSION_STATUS.ACTIVE
+    },
     [closedIds]
   )
 
@@ -245,11 +248,22 @@ export default function ChatPage() {
   const canWrite = !!currentSession && isCurrentOpen && !profileIncomplete
   const isReadOnly = !!currentSession && !isCurrentOpen
 
+  // Don't show timer if expiresAt is already past (even if server still says ACTIVE)
+  const expiresMs = currentSession?.expiresAt ? Date.parse(currentSession.expiresAt) : NaN
+  const isExpiredByClock = !Number.isNaN(expiresMs) && expiresMs <= Date.now()
+  const showTimer = isCurrentOpen && !isExpiredByClock
+
   const currentGoal = goals.find((g) => g.id === (currentSession?.goalId || selectedGoalId))
 
   /* ── HOOKS DE CHAT Y TEMPORIZADOR ───────────────────────────────────────── */
 
   const { messages, crisisLevel, isLoading: isChatLoading, sendMessage, error, saveDraft, getDraftForSession } = useChat(sessionId)
+
+  // Stable refs so draft effects don't re-run when function identity changes
+  const getDraftRef = useRef(getDraftForSession)
+  const saveDraftRef = useRef(saveDraft)
+  getDraftRef.current = getDraftForSession
+  saveDraftRef.current = saveDraft
 
   const { remainingMs, timeRemaining, isTimerRunning, startTimer, canCreateNewSession, updateActivity } = useSessionTimer(
     sessionId,
@@ -259,7 +273,7 @@ export default function ChatPage() {
 
   useSessionAlerts({
     remainingMs,
-    isTimerRunning,
+    isTimerRunning: isTimerRunning && isCurrentOpen,
     sessionStatus: currentStatus ?? undefined,
   })
 
@@ -320,9 +334,12 @@ export default function ChatPage() {
     })
   }, [sessions])
 
-  // Cierre inmediato al llegar a expiresAt, sin esperar a refrescar
+  // markClosed: deduplicado por id — solo notifica una vez por sesión cerrada
+  const notifiedClosedRef = useRef<Set<string>>(new Set())
   const markClosed = useCallback(
     (id: string, reason: 'expired' | 'manual') => {
+      if (notifiedClosedRef.current.has(id)) return
+      notifiedClosedRef.current.add(id)
       setClosedIds((prev) => new Set(prev).add(id))
       invalidateSessions()
       notifyInfo({
@@ -336,35 +353,28 @@ export default function ChatPage() {
     [invalidateSessions, notifyInfo, t]
   )
 
+  // Cierre al llegar a expiresAt del servidor
   useEffect(() => {
     if (!currentSession?.id || !isCurrentOpen || !currentSession.expiresAt) return
     const id = currentSession.id
-    const msLeft = new Date(currentSession.expiresAt).getTime() - Date.now()
-    if (msLeft <= 0) {
-      markClosed(id, 'expired')
-      return
-    }
-    const timeout = setTimeout(() => markClosed(id, 'expired'), msLeft + 500)
-    return () => clearTimeout(timeout)
-  }, [currentSession?.id, currentSession?.expiresAt, isCurrentOpen, markClosed])
+    const expiresMs = Date.parse(currentSession.expiresAt)
+    if (Number.isNaN(expiresMs)) return
 
-  // Fallback: si el hook del temporizador llega a 0 estando en marcha
-  const runningForRef = useRef<string | null>(null)
-  useEffect(() => {
-    if (isTimerRunning) {
-      runningForRef.current = sessionId
+    const msLeft = expiresMs - Date.now()
+    if (msLeft <= 0) {
+      // Ya venció: pedir estado real al servidor en lugar de cerrar localmente
+      invalidateSessions()
       return
     }
-    if (runningForRef.current && runningForRef.current === sessionId && isCurrentOpen && (remainingMs ?? 0) <= 0) {
-      markClosed(sessionId, 'expired')
-    }
-    runningForRef.current = null
-  }, [isTimerRunning, remainingMs, sessionId, isCurrentOpen, markClosed])
+    const timeout = setTimeout(() => markClosed(id, 'expired'), Math.min(msLeft + 500, 2_000_000_000))
+    return () => clearTimeout(timeout)
+  }, [currentSession?.id, currentSession?.expiresAt, isCurrentOpen, markClosed, invalidateSessions])
 
   // Restaurar texto y refrescar estado si falla el envío
   useEffect(() => {
     if (!error) return
     setInputText((prev) => prev || lastSentRef.current)
+    lastSentRef.current = ''
     invalidateSessions()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
@@ -390,21 +400,21 @@ export default function ChatPage() {
     if (canWrite) focusInput()
   }, [canWrite, sessionId, isChatLoading, focusInput])
 
-  // Borradores por sesión
+  // Borradores por sesión — solo se recuperan al cambiar sessionId, no en cada render
   const draftOwnerRef = useRef<string | null>(null)
   useEffect(() => {
     if (!sessionId) return
-    draftOwnerRef.current = null
-    setInputText(getDraftForSession(sessionId) || '')
+    setInputText(getDraftRef.current(sessionId) || '')
     draftOwnerRef.current = sessionId
-  }, [sessionId, getDraftForSession])
+  }, [sessionId])
 
   useEffect(() => {
+    if (!sessionId) return
     const timer = setTimeout(() => {
-      if (draftOwnerRef.current === sessionId) saveDraft(inputText)
+      if (draftOwnerRef.current === sessionId) saveDraftRef.current(inputText)
     }, 500)
     return () => clearTimeout(timer)
-  }, [inputText, sessionId, saveDraft])
+  }, [inputText, sessionId])
 
   /* ── ACCIONES ───────────────────────────────────────────────────────────── */
 
@@ -428,7 +438,7 @@ export default function ChatPage() {
 
   const handleSelectSession = (session: Session) => {
     if (session.id === sessionId) return
-    if (canWrite && inputText.trim()) saveDraft(inputText)
+    if (canWrite && inputText.trim()) saveDraftRef.current(inputText)
     dispatch(setCurrentSession(session))
     setShowMobileSessions(false)
   }
@@ -583,7 +593,7 @@ export default function ChatPage() {
               )}
             </div>
             <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-              {isCurrentOpen && (
+              {showTimer && (
                 <div
                   role="timer"
                   className={`text-sm md:text-lg font-mono font-bold px-2 md:px-4 py-2 rounded ${timerClasses(isTimerRunning ? remainingMs : undefined)}`}
