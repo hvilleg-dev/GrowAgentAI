@@ -91,16 +91,23 @@ export function useSessionAlerts({
     }
   }, [networkLossNotificationId, stableNotifyWarning, stableNotifyInfo])
 
-  // Phase 6: Session paused on another device - show once
+  // Phase 6: Session paused on another device - show once per session
   useEffect(() => {
     if (sessionStatus === 'PAUSED' && currentSession?.status === 'PAUSED' && !pausedNotificationShown) {
-      notifyWarning({
+      stableNotifyWarning({
         message: 'Tu sesión fue pausada en otro dispositivo. Puedes crear una nueva sesión aquí.',
         duration: 5000,
       })
       setPausedNotificationShown(true)
     }
   }, [sessionStatus, currentSession?.status, pausedNotificationShown, stableNotifyWarning])
+
+  // Clear paused notification state when session becomes active again
+  useEffect(() => {
+    if (currentSession?.status === 'ACTIVE' && pausedNotificationShown) {
+      setPausedNotificationShown(false)
+    }
+  }, [currentSession?.status, pausedNotificationShown])
 }
 
 export default function SessionAlerts({ remainingMs, isTimerRunning, sessionStatus }: SessionAlertsProps) {
