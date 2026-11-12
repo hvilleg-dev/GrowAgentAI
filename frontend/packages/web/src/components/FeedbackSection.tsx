@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { useNotification } from '@/hooks/useNotification'
 import { apiClient } from '@/services/apiClient'
 
-export default function FeedbackSection() {
+interface FeedbackSectionProps {
+  onClose?: () => void
+}
+
+export default function FeedbackSection({ onClose }: FeedbackSectionProps) {
   const { t } = useTranslation()
   const { notifyInfo, notifyError } = useNotification()
   const [isOpen, setIsOpen] = useState(false)
@@ -26,6 +30,7 @@ export default function FeedbackSection() {
       notifyInfo({ message: 'Gracias por tu feedback 🙏', duration: 3000 })
       setFeedback('')
       setIsOpen(false)
+      onClose?.()
     } catch (error) {
       console.error('Error sending feedback:', error)
       notifyError({ message: 'Error al enviar el feedback', duration: 3000 })

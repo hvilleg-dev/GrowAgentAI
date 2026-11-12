@@ -50,7 +50,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           {t('menu.instructionsLabel')}
         </Link>
       </nav>
-      <FeedbackSection />
+      <FeedbackSection onClose={handleNavigate} />
     </aside>
   )
 }
