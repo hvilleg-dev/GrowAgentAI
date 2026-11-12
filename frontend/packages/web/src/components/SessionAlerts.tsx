@@ -23,6 +23,7 @@ export function useSessionAlerts({
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
   const [lastWarningTime, setLastWarningTime] = useState<number>(0)
   const [networkLossNotificationId, setNetworkLossNotificationId] = useState<string | null>(null)
+  const [pausedNotificationShown, setPausedNotificationShown] = useState(false)
 
   // Phase 6: 2-minute warning before session ends
   useEffect(() => {
@@ -85,15 +86,16 @@ export function useSessionAlerts({
     }
   }, [networkLossNotificationId, notifyWarning, notifyInfo])
 
-  // Phase 6: Session paused on another device
+  // Phase 6: Session paused on another device - show once
   useEffect(() => {
-    if (sessionStatus === 'PAUSED' && currentSession?.status === 'PAUSED') {
+    if (sessionStatus === 'PAUSED' && currentSession?.status === 'PAUSED' && !pausedNotificationShown) {
       notifyWarning({
-        message: 'Tu sesión fue pausada en otro dispositivo. Puedes crearuna nueva sesión aquí.',
+        message: 'Tu sesión fue pausada en otro dispositivo. Puedes crear una nueva sesión aquí.',
         duration: 5000,
       })
+      setPausedNotificationShown(true)
     }
-  }, [sessionStatus, currentSession?.status, notifyWarning])
+  }, [sessionStatus, currentSession?.status, pausedNotificationShown, notifyWarning])
 }
 
 export default function SessionAlerts({ remainingMs, isTimerRunning, sessionStatus }: SessionAlertsProps) {
