@@ -35,10 +35,11 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
   const { user } = useSelector((state: RootState) => state.auth)
   const { notifyWarning } = useNotification()
   const [remainingMs, setRemainingMs] = useState(SESSION_DURATION)
-  const [warningShown, setWarningShown] = useState(false)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [timerStartTime, setTimerStartTime] = useState<number | null>(null)
-  const [lastActivityAt, setLastActivityAt] = useState<number | null>(null)
+  // Refs instead of state: changes don't need to restart the countdown interval
+  const timerStartTimeRef = useRef<number | null>(null)
+  const lastActivityAtRef = useRef<number | null>(null)
+  const warningShownRef = useRef(false)
   const inactivityPausedRef = useRef(false) // tracks if we already dispatched PAUSED for inactivity
 
   // Get localStorage keys for this session
@@ -78,8 +79,8 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
           dispatch(updateSessionStatus({ sessionId, status: 'PAUSED' }))
         }
 
-        setTimerStartTime(firstMessageAt)
-        setLastActivityAt(storedActivity)
+        timerStartTimeRef.current = firstMessageAt
+        lastActivityAtRef.current = storedActivity
         setIsTimerRunning(true)
         setRemainingMs(SESSION_DURATION - elapsed)
         return
@@ -89,11 +90,12 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
       if (expiresAt) {
         const expiry = new Date(expiresAt).getTime()
         const now = Date.now()
-        const remaining = Math.max(0, expiry - now)
+        // Cap remaining at SESSION_DURATION to prevent syntheticStart going into the future
+        const remaining = Math.min(Math.max(0, expiry - now), SESSION_DURATION)
         if (remaining > 0) {
           const syntheticStart = now - (SESSION_DURATION - remaining)
-          setTimerStartTime(syntheticStart)
-          setLastActivityAt(now)
+          timerStartTimeRef.current = syntheticStart
+          lastActivityAtRef.current = now
           setIsTimerRunning(true)
           setRemainingMs(remaining)
           localStorage.setItem(timerKey, JSON.stringify({
@@ -113,11 +115,11 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
     const effectiveId = forceSessionId || sessionId
     if (isTimerRunning || !effectiveId) return
     const now = Date.now()
-    setTimerStartTime(now)
-    setLastActivityAt(now)
+    timerStartTimeRef.current = now
+    lastActivityAtRef.current = now
+    warningShownRef.current = false
     setIsTimerRunning(true)
     setRemainingMs(SESSION_DURATION)
-    setWarningShown(false)
 
     if (isBrowser) {
       try {
@@ -136,13 +138,13 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
   const updateActivity = useCallback(() => {
     if (!isTimerRunning || !sessionId) return
     const now = Date.now()
-    setLastActivityAt(now)
+    lastActivityAtRef.current = now
     inactivityPausedRef.current = false // reset so inactivity can trigger PAUSED again
 
-    if (isBrowser && timerStartTime) {
+    if (isBrowser && timerStartTimeRef.current) {
       try {
         const timerData: TimerState = {
-          firstMessageAt: timerStartTime,
+          firstMessageAt: timerStartTimeRef.current,
           lastActivityAt: now,
         }
         localStorage.setItem(getTimerStorageKey(), JSON.stringify(timerData))
@@ -150,7 +152,7 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
         console.error('Error updating activity in localStorage:', error)
       }
     }
-  }, [isTimerRunning, sessionId, timerStartTime, getTimerStorageKey])
+  }, [isTimerRunning, sessionId, getTimerStorageKey])
 
   // Format time as MM:SS
   const formatTime = useCallback((ms: number): string => {
@@ -161,13 +163,15 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
   }, [])
 
   // Timer countdown effect - Phase 2: Dual timeout logic
+  // Depends only on isTimerRunning/sessionId — refs give the interval the latest values without restarting it
   useEffect(() => {
-    if (!isTimerRunning || !sessionId || !timerStartTime || !lastActivityAt) return
+    if (!isTimerRunning || !sessionId) return
+    if (!timerStartTimeRef.current || !lastActivityAtRef.current) return
 
     const interval = setInterval(() => {
       const now = Date.now()
-      const durationElapsed = now - timerStartTime
-      const inactivityElapsed = now - lastActivityAt
+      const durationElapsed = now - timerStartTimeRef.current!
+      const inactivityElapsed = now - lastActivityAtRef.current!
 
       // Check duration timeout → CLOSED in Redux + backend + React Query cache
       if (durationElapsed >= SESSION_DURATION) {
@@ -198,8 +202,8 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
       setRemainingMs(remaining)
 
       // Warning at 2 minutes before expiry
-      if (remaining <= WARNING_TIME && !warningShown) {
-        setWarningShown(true)
+      if (remaining <= WARNING_TIME && !warningShownRef.current) {
+        warningShownRef.current = true
         notifyWarning({
           message: `Session ending in ${formatTime(remaining)}. Save your work.`,
           duration: 5000,
@@ -208,7 +212,7 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
     }, TIMER_INTERVAL)
 
     return () => clearInterval(interval)
-  }, [isTimerRunning, timerStartTime, lastActivityAt, sessionId, formatTime, notifyWarning, warningShown, getTimerStorageKey, dispatch])
+  }, [isTimerRunning, sessionId, formatTime, notifyWarning, getTimerStorageKey, dispatch])
 
   // Stop timer immediately when session is CLOSED externally (e.g. via markClosed in ChatPage)
   useEffect(() => {
