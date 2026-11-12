@@ -19,6 +19,7 @@ export function useSessions() {
       return response.data
     },
     enabled: !!user?.id,
+    refetchInterval: 30_000, // poll every 30s to detect device takeover and session changes
   })
 
   const createSessionMutation = useMutation({

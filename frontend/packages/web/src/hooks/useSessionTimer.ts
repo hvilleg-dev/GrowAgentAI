@@ -8,8 +8,8 @@ import { apiClient } from '@/services/apiClient'
 import type { RootState } from '@/store'
 
 // Phase 2: Dual Timeout System
-const SESSION_DURATION = 3 * 60 * 1000 // TEST: 3 minutes (restore to 45 * 60 * 1000)
-const INACTIVITY_TIMEOUT = 2 * 60 * 1000 // TEST: 2 minutes (restore to 15 * 60 * 1000)
+const SESSION_DURATION = 45 * 60 * 1000 // 45 minutes
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000 // 15 minutes inactivity → PAUSED
 const WARNING_TIME = 2 * 60 * 1000 // 2 minutes before expiry warning
 const TIMER_INTERVAL = 1000 // 1s interval for performance (avoid excessive re-renders)
 
