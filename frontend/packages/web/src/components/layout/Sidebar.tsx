@@ -49,8 +49,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         >
           {t('menu.instructionsLabel')}
         </Link>
+        <div className="pt-2 mt-4 border-t border-gray-200 dark:border-gray-700">
+          <FeedbackSection onClose={handleNavigate} />
+        </div>
       </nav>
-      <FeedbackSection onClose={handleNavigate} />
     </aside>
   )
 }
