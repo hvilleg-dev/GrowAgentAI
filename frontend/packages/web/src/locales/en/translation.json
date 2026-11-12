@@ -251,5 +251,9 @@
     "chatWithCoach": "Chat with Your AI Coach",
     "coachGuideGrow": "The coach will guide you through GROW stages based on your goal",
     "beHonestDetailed": "Be honest and detailed — the more context you share, the better"
+  },
+  "feedback": {
+    "title": "Send Feedback",
+    "placeholder": "Tell us your opinion..."
   }
 }

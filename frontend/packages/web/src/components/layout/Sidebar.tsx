@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import FeedbackSection from '../FeedbackSection'
 import type { RootState } from '@/store'
 
 interface SidebarProps {
@@ -18,8 +19,8 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
   }
 
   return (
-    <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4">
-      <nav className="space-y-2">
+    <aside className="w-64 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 flex flex-col h-full">
+      <nav className="space-y-2 flex-1">
         <Link
           to="/"
           onClick={handleNavigate}
@@ -49,6 +50,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           {t('menu.instructionsLabel')}
         </Link>
       </nav>
+      <FeedbackSection />
     </aside>
   )
 }

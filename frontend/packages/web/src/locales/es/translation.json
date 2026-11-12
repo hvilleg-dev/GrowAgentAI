@@ -251,5 +251,9 @@
     "chatWithCoach": "Chatea con Tu Coach de IA",
     "coachGuideGrow": "El coach te guiará a través de etapas GROW basadas en tu meta",
     "beHonestDetailed": "Sé honesto y detallado — cuanto más contexto compartas, mejor"
+  },
+  "feedback": {
+    "title": "Enviar Feedback",
+    "placeholder": "Cuéntanos tu opinión..."
   }
 }
