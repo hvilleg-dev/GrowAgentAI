@@ -11,29 +11,44 @@ export const apiClient: AxiosInstance = axios.create({
   withCredentials: true,
 })
 
-// Add token to requests
+// Add token and device ID to every request
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  const deviceId = localStorage.getItem('device_id')
+  if (deviceId) {
+    config.headers['X-Device-Id'] = deviceId
+  }
   return config
 })
+
+function clearSessionAndRedirect() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('current_session_id')
+  window.location.href = '/login'
+}
 
 // Handle errors
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
-    if (error.response?.status === 401) {
-      // Don't redirect if it's the login endpoint itself (invalid credentials)
+    const status = error.response?.status
+    const code = (error.response?.data as any)?.code
+
+    // Session taken over by another device → immediate logout
+    if (status === 403 && code === 'DEVICE_MISMATCH') {
+      clearSessionAndRedirect()
+      return Promise.reject(error)
+    }
+
+    if (status === 401) {
       const isLoginEndpoint = error.config?.url?.includes('/api/auth/login') ||
                               error.config?.url?.includes('/api/auth/register')
-
       if (!isLoginEndpoint) {
-        // Token expired or invalid on protected endpoints
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
+        clearSessionAndRedirect()
       }
     }
     return Promise.reject(error)

@@ -42,6 +42,23 @@ export class ChatController {
         throw new NotFoundError('Sesión');
       }
 
+      // Reject if session is closed or expired
+      if (sesion.status === 'CLOSED') {
+        res.status(409).json({ code: 'SESSION_CLOSED', message: 'Session is closed' });
+        return;
+      }
+      if (sesion.expiresAt && new Date(sesion.expiresAt) <= new Date()) {
+        res.status(409).json({ code: 'SESSION_CLOSED', message: 'Session has expired' });
+        return;
+      }
+
+      // Enforce single-device ownership — prevent dual sessions
+      const requestDeviceId = req.headers['x-device-id'] as string | undefined;
+      if (requestDeviceId && sesion.deviceId && sesion.deviceId !== requestDeviceId) {
+        res.status(403).json({ code: 'DEVICE_MISMATCH', message: 'This session belongs to another device' });
+        return;
+      }
+
       // Get Goal context if session has goalId
       let goalContext = '';
       if (sesion.goalId) {
