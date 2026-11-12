@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppDispatch } from '@/store/hooks'
 import { updateSessionStatus } from '@/store/slices/sessionsSlice'
 import { useNotification } from './useNotification'
@@ -18,7 +18,7 @@ interface UseSessionTimerReturn {
   remainingMs: number
   timeRemaining: string
   isTimerRunning: boolean
-  startTimer: () => void
+  startTimer: (forceSessionId?: string) => void
   canCreateNewSession: boolean
   updateActivity: () => void // Track last activity for inactivity timeout
 }
@@ -33,10 +33,11 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [timerStartTime, setTimerStartTime] = useState<number | null>(null)
   const [lastActivityAt, setLastActivityAt] = useState<number | null>(null)
+  const inactivityPausedRef = useRef(false) // tracks if we already dispatched PAUSED for inactivity
 
   // Get localStorage keys for this session
-  const getTimerStorageKey = useCallback(() => `timer_${sessionId}`, [sessionId])
-  const getActivityStorageKey = useCallback(() => `activity_${sessionId}`, [sessionId])
+  const getTimerStorageKey = useCallback((id?: string) => `timer_${id || sessionId}`, [sessionId])
+  const getActivityStorageKey = useCallback((id?: string) => `activity_${id || sessionId}`, [sessionId])
 
   // Initialize timer state from localStorage (app resume/refresh)
   useEffect(() => {
@@ -86,9 +87,11 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
     }
   }, [sessionId, getTimerStorageKey, getActivityStorageKey, dispatch])
 
-  // Start timer function - called when FIRST message is sent
-  const startTimer = useCallback(() => {
-    if (isTimerRunning || !sessionId) return
+  // Start timer function - called when session is created
+  // forceSessionId: pass the new session's ID directly (avoids stale closure issue)
+  const startTimer = useCallback((forceSessionId?: string) => {
+    const effectiveId = forceSessionId || sessionId
+    if (isTimerRunning || !effectiveId) return
     const now = Date.now()
     setTimerStartTime(now)
     setLastActivityAt(now)
@@ -102,7 +105,7 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
           firstMessageAt: now,
           lastActivityAt: now,
         }
-        localStorage.setItem(getTimerStorageKey(), JSON.stringify(timerData))
+        localStorage.setItem(getTimerStorageKey(effectiveId), JSON.stringify(timerData))
       } catch (error) {
         console.error('Error saving timer to localStorage:', error)
       }
@@ -114,6 +117,7 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
     if (!isTimerRunning || !sessionId) return
     const now = Date.now()
     setLastActivityAt(now)
+    inactivityPausedRef.current = false // reset so inactivity can trigger PAUSED again
 
     if (isBrowser && timerStartTime) {
       try {
@@ -161,26 +165,16 @@ export function useSessionTimer(sessionId: string | null, sessionStatus?: string
         return
       }
 
-      // Check inactivity timeout (15 minutes without message)
-      if (inactivityElapsed >= INACTIVITY_TIMEOUT) {
-        setIsTimerRunning(false)
-        clearInterval(interval)
-        setRemainingMs(0)
-        dispatch(updateSessionStatus({ sessionId, status: 'CLOSED' }))
-        if (isBrowser) {
-          try {
-            localStorage.removeItem(getTimerStorageKey())
-          } catch (error) {
-            console.error('Error removing timer from localStorage:', error)
-          }
-        }
-        return
+      // Check inactivity timeout (15 minutes without activity → PAUSED, not CLOSED)
+      if (inactivityElapsed >= INACTIVITY_TIMEOUT && !inactivityPausedRef.current) {
+        inactivityPausedRef.current = true
+        dispatch(updateSessionStatus({ sessionId, status: 'PAUSED' }))
+        // Timer keeps running - session is paused but not closed
+        // useActivityDetector will resume to ACTIVE when user acts
       }
 
-      // Calculate remaining time (use whichever timeout expires first)
-      const remainingDuration = Math.max(0, SESSION_DURATION - durationElapsed)
-      const remainingInactivity = Math.max(0, INACTIVITY_TIMEOUT - inactivityElapsed)
-      const remaining = Math.min(remainingDuration, remainingInactivity)
+      // Calculate remaining time based on 45-min session duration only
+      const remaining = Math.max(0, SESSION_DURATION - durationElapsed)
 
       setRemainingMs(remaining)
 

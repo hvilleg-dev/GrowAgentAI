@@ -465,5 +465,10 @@ export function createAuthRoutes(): Router {
     }
   });
 
+  // Logout - JWT is stateless; client clears token locally, server just acknowledges
+  router.post('/logout', (_req: Request, res: Response): void => {
+    res.json({ success: true, message: 'Logged out' });
+  });
+
   return router;
 }

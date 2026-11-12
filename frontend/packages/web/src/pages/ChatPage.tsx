@@ -90,11 +90,13 @@ export default function ChatPage() {
     return () => clearTimeout(timer)
   }, [inputText, sessionId, saveDraft])
 
-  // Phase 4: Recover draft when switching sessions
+  // Phase 4: Recover draft only when session changes (not on every render)
+  const draftRecoveredForRef = useRef<string | null>(null)
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && sessionId !== draftRecoveredForRef.current) {
+      draftRecoveredForRef.current = sessionId
       const recovered = getDraftForSession(sessionId)
-      if (recovered && !inputText) {
+      if (recovered) {
         setInputText(recovered)
       }
     }
@@ -157,11 +159,10 @@ export default function ChatPage() {
     if (selectedGoalId) {
       payload.goalId = selectedGoalId
     }
-    // Create session and start timer immediately
+    // Create session and start timer immediately (pass new session ID to avoid stale closure)
     createSessionMutation.mutate(payload, {
-      onSuccess: () => {
-        // Timer starts when session is created, not on first message
-        startTimer()
+      onSuccess: (newSession: any) => {
+        startTimer(newSession?.id)
       }
     })
   }

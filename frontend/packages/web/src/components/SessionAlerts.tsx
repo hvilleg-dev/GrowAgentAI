@@ -23,7 +23,12 @@ export function useSessionAlerts({
   const { current: currentSession } = useSelector((state: RootState) => state.sessions)
   const [lastWarningTime, setLastWarningTime] = useState<number>(0)
   const [networkLossNotificationId, setNetworkLossNotificationId] = useState<string | null>(null)
-  const [pausedNotificationShown, setPausedNotificationShown] = useState(false)
+  // Use sessionStorage to persist across page refreshes within the same browser session
+  const getPausedKey = () => `paused_notif_${currentSession?.id}`
+  const [pausedNotificationShown, setPausedNotificationShown] = useState(() => {
+    if (!currentSession?.id) return false
+    return sessionStorage.getItem(`paused_notif_${currentSession.id}`) === 'true'
+  })
 
   // Stable callback refs to prevent infinite loops
   const stableNotifyWarning = useCallback(notifyWarning, [])
@@ -91,7 +96,7 @@ export function useSessionAlerts({
     }
   }, [networkLossNotificationId, stableNotifyWarning, stableNotifyInfo])
 
-  // Phase 6: Session paused on another device - show once per session
+  // Phase 6: Session paused on another device - show once per session (persisted in sessionStorage)
   useEffect(() => {
     if (sessionStatus === 'PAUSED' && currentSession?.status === 'PAUSED' && !pausedNotificationShown) {
       stableNotifyWarning({
@@ -99,6 +104,7 @@ export function useSessionAlerts({
         duration: 5000,
       })
       setPausedNotificationShown(true)
+      try { sessionStorage.setItem(getPausedKey(), 'true') } catch (_) {}
     }
   }, [sessionStatus, currentSession?.status, pausedNotificationShown, stableNotifyWarning])
 
@@ -106,6 +112,7 @@ export function useSessionAlerts({
   useEffect(() => {
     if (currentSession?.status === 'ACTIVE' && pausedNotificationShown) {
       setPausedNotificationShown(false)
+      try { sessionStorage.removeItem(getPausedKey()) } catch (_) {}
     }
   }, [currentSession?.status, pausedNotificationShown])
 }

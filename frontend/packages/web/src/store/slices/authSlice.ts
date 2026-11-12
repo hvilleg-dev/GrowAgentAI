@@ -89,15 +89,12 @@ export const logout = createAsyncThunk(
       dispatch(resetChat())
 
       return null
-    } catch (error: any) {
-      // Even if logout API fails, still clear caches locally
-      const dispatchRef = dispatch
-      setTimeout(() => {
-        dispatchRef(clearAllCaches())
-        dispatchRef(resetSessions())
-        dispatchRef(resetChat())
-      }, 100)
-      return rejectWithValue(error.response?.data?.message || 'Logout failed')
+    } catch (_error) {
+      // Even if logout API fails (e.g. 404), still clear caches locally and fulfill
+      dispatch(clearAllCaches())
+      dispatch(resetSessions())
+      dispatch(resetChat())
+      return null
     }
   },
 )

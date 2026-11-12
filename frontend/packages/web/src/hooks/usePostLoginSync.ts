@@ -62,8 +62,9 @@ export function usePostLoginSync() {
         if (sessions && sessions.length > 0) {
           const currentDeviceSession = sessions.find(s => s.deviceId === currentDeviceId)
           if (currentDeviceSession && currentDeviceSession.status === 'PAUSED' && hasActiveSession && deviceId !== currentDeviceId) {
-            // This device's session was paused by another device - logout automatically
-            dispatch(logout()).catch(() => {})
+            // This device's session was paused by another device - logout and redirect
+            await dispatch(logout())
+            window.location.href = '/login'
             return
           }
 
@@ -77,13 +78,8 @@ export function usePostLoginSync() {
               new Date(a.criadaEn) > new Date(b.criadaEn) ? a : b
             )
             dispatch(setCurrentSession(mostRecent))
-          } else {
-            // All sessions closed - show past sessions
-            notifyWarning({
-              message: 'Tus sesiones anteriores han terminado. Crea una nueva.',
-              duration: 3000,
-            })
           }
+          // No notification when all sessions closed - user sees the locked chat naturally
         }
 
         // Phase 5: App crash recovery - check localStorage for unfinished state
