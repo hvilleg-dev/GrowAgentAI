@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import Header from './Header'
 import Sidebar from './Sidebar'
 import MobileDrawer from '../MobileDrawer'
 import MultiDeviceConflictModal from '../MultiDeviceConflictModal'
 import { usePostLoginSync } from '@/hooks/usePostLoginSync'
+import { logout } from '@/store/slices/authSlice'
+import type { AppDispatch } from '@/store'
 
 export default function MainLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
 
   // Phase 5: Sync sessions after login (multi-device lock, crash recovery)
   const { multiDeviceConflict, setMultiDeviceConflict } = usePostLoginSync()
@@ -16,8 +20,12 @@ export default function MainLayout() {
 
   const handleMultiDeviceResolved = (action: 'pause-other' | 'back-to-other' | 'auto-timeout') => {
     if (action === 'back-to-other') {
-      // User chose to go back to other device - close the app on this one
-      window.location.href = '/'
+      // User chose to go back to other device - logout this device
+      dispatch(logout()).then(() => {
+        window.location.href = '/login'
+      }).catch(() => {
+        window.location.href = '/login'
+      })
     } else {
       // User chose 'pause-other' or timeout occurred
       setMultiDeviceConflict({

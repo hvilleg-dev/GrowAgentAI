@@ -5,6 +5,7 @@ import type { RootState, AppDispatch } from '@/store'
 import { useSessions } from './useSessions'
 import { setCurrentSession } from '@/store/slices/sessionsSlice'
 import { useNotification } from './useNotification'
+import { logout } from '@/store/slices/authSlice'
 import { apiClient } from '@/services/apiClient'
 
 interface MultiDeviceConflict {
@@ -57,8 +58,15 @@ export function usePostLoginSync() {
           })
         }
 
-        // Phase 5: Load sessions and check for ACTIVE one
+        // Phase 5: Check if current device was paused by another device - auto logout
         if (sessions && sessions.length > 0) {
+          const currentDeviceSession = sessions.find(s => s.deviceId === currentDeviceId)
+          if (currentDeviceSession && currentDeviceSession.status === 'PAUSED' && hasActiveSession && deviceId !== currentDeviceId) {
+            // This device's session was paused by another device - logout automatically
+            dispatch(logout()).catch(() => {})
+            return
+          }
+
           const activeSessions = sessions.filter(
             s => s.status === 'ACTIVE' || s.status === 'PAUSED' || !s.status
           )
